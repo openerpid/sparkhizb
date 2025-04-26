@@ -2,11 +2,13 @@
 
 ## Installation & loading
 
+Open terminal in yours project.
+
 ```sh
 composer require sparkhizb/lib dev-main
 ```
 ```sh
-ln -s vendor/sparkhizb/lib/src/Commands/HizbInstallCommand.php app/Commands/HizbInstallCommand.php
+cp vendor/sparkhizb/lib/src/Commands/HizbInstallCommand.php app/Commands/HizbInstallCommand.php
 ```
 ```sh
 php spark hizb:install
