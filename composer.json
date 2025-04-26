@@ -1,0 +1,45 @@
+{
+    "name": "sparkhizb/lib",
+    "type": "library",
+    "description": "Sparkhizb is a full-featured library creation and transfer class for PHP",
+    "website": "https://dorbitt.com/",
+    "authors": [
+        {
+            "name": "Imong Ali",
+            "email": "lienux.qq@gmail.com",
+            "website": "https://imongali.com/"
+        },
+        {
+            "name": "Ummu Khairiyah Yusna",
+            "email": "ummukhairiyahyusna@gmail.com",
+            "website": "https://ummukhairiyahyusna.com/"
+        }
+    ],
+    "funding": [
+        {
+            "url": "https://github.com/openerpid",
+            "type": "github"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/sparkhizb-composer-installer": true
+        }
+    },
+    "require": {
+        "php": ">=7.4.0",
+        "ext-ctype": "*",
+        "ext-filter": "*",
+        "ext-hash": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sparkhizb\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sparkhizb\\Test\\": "test/"
+        }
+    }
+}
