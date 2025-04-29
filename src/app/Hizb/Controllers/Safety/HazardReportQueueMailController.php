@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Gcontrollers\Safety;
+namespace App\Hizb\Controllers\Safety;
 
 use CodeIgniter\RESTful\ResourceController;
 use Sparkhizb\Helpers\QueryHelper;
@@ -8,8 +8,8 @@ use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\UmmuPhotos;
 use Sparkhizb\UmmuUpload;
 
-use App\Gbuilder\Safety\HazardReportBuilder;
-use App\Gbuilder\Safety\HazardReportQueueMailBuilder;
+use App\Hizb\Builder\Safety\HazardReportBuilder;
+use App\Hizb\Builder\Safety\HazardReportQueueMailBuilder;
 
 class HazardReportQueueMailController extends ResourceController
 {

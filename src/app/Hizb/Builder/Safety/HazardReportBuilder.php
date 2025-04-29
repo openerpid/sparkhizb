@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Gbuilder\Safety;
+namespace App\Hizb\Builder\Safety;
 
 use Sparkhizb\UmmuHelper;
 use Sparkhizb\UmmuHazardReport;
-use App\Gmodels\Safety\HazardReportQueueMailModel;
-use App\Gmodels\Safety\HazardReportNumberModel;
+use App\Hizb\Models\Safety\HazardReportQueueMailModel;
+use App\Hizb\Models\Safety\HazardReportNumberModel;
 
 class HazardReportBuilder
 {

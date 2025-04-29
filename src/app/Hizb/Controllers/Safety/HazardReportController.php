@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Gcontrollers\Safety;
+namespace App\Hizb\Controllers\Safety;
 
 use CodeIgniter\RESTful\ResourceController;
 use Sparkhizb\Helpers\IdentityHelper;
@@ -9,7 +9,7 @@ use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\UmmuPhotos;
 use Sparkhizb\UmmuUpload;
 
-use App\Gbuilder\Safety\HazardReportBuilder;
+use App\Hizb\Builder\Safety\HazardReportBuilder;
 
 class HazardReportController extends ResourceController
 {

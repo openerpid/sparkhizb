@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Gcontrollers\Safety;
+namespace App\Hizb\Controllers\Safety;
 
 use CodeIgniter\RESTful\ResourceController;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
+use Sparkhizb\Helpers\IdentityHelper;
 use Sparkhizb\UmmuPhotos;
 use Sparkhizb\UmmuUpload;
 
-use App\Gbuilder\Safety\LpaBuilder;
+use App\Hizb\Builder\Safety\LpaBuilder;
 
 class LpaController extends ResourceController
 {
@@ -16,6 +17,7 @@ class LpaController extends ResourceController
     {
         $this->request = \Config\Services::request();
         $this->qHelp = new QueryHelper();
+        $this->identity = new IdentityHelper();
         $this->umUpl = new UmmuUpload();
         $this->umPhot = new UmmuPhotos();
 
@@ -48,7 +50,7 @@ class LpaController extends ResourceController
         $total = $this->qHelp->_total($builder);
         $rows = $this->qHelp->_rowsBui($builder);
         $count = count($rows);
-
+        $rows = $this->qBuilder->joinData($rows);
         if ($rows) {
             foreach ($rows as $key => $value) {
                 if ($show_detail_orang_terlibat) {
@@ -58,6 +60,11 @@ class LpaController extends ResourceController
 
                 if ($show_detail_foto) {
                     $foto = $this->qBuilder->show_d_foto($value->id);
+                    if ($foto) {
+                        foreach ($foto as $key2 => $value2) {
+                            $foto[$key2]->file_url = base_url() . $value2->filepath;
+                        }
+                    }
                     $rows[$key]->foto = $foto;
                 }
 

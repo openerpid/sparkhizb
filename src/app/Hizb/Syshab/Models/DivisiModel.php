@@ -1,37 +1,39 @@
 <?php
 
-namespace App\Hizb\Models\Safety;
+namespace App\Hizb\Syshab\Models;
 
 use CodeIgniter\Model;
 
-class LpadOrangModel extends Model
+class DivisiModel extends Model
 {
-    protected $DBGroup = 'openerpid';
-    protected $table = 'lpa_d_orang';
+    protected $DBGroup = 'default';
+    protected $table = 'H_A140';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $insertID = 0;
     protected $returnType = 'array';
-    protected $useSoftDeletes = true;
+    protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        "id",
-        "company_id",
-        "lpa_id",
-        "status_karyawan",
-        "nik",
-        "name",
-        "jk",
-        "jabatan",
-        "atasan",
-        "umur",
-        "pengalaman_tahun",
-        "pengalaman_bulan",
-        "sebagai",
-        "perusahaan",
-        "created_at",
-        "updated_at",
-        "deleted_at"
+        "KdDivisi",
+        "NmDivisi",
+        "KdDir",
+        "tStatus",
+        "CreatedBy",
+        "CreatedIn",
+        "CreatedTime",
+        "ModifiedBy",
+        "ModifiedIn",
+        "ModifiedTime",
+        "ReceiveBy",
+        "ReceiveIn",
+        "ReceiveFile",
+        "ReceiveTime",
+        "StEdit",
+        "VoidBy",
+        "VoidIn",
+        "DeleteBy",
+        "DeleteTime"
     ];
 
     // Dates
@@ -57,9 +59,4 @@ class LpadOrangModel extends Model
     protected $afterFind = [];
     protected $beforeDelete = [];
     protected $afterDelete = [];
-
-    public function __construct()
-    {
-        $this->DBGroup = (getenv('DBGroup')) ? getenv('DBGroup') : 'dorbitt_she';
-    }
 }

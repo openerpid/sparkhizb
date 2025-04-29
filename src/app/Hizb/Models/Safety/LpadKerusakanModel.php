@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Gmodels\Safety;
+namespace App\Hizb\Models\Safety;
 
 use CodeIgniter\Model;
 

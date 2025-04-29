@@ -46,6 +46,7 @@ class BuilderHelper
 
         $this->selects    = $this->request->getJsonVar('selects');
         $this->where      = $this->request->getJsonVar('where');
+        $this->condt      = $this->request->getJsonVar('conditions');
     }
 
     public function conditions($params)

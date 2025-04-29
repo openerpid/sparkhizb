@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Gbuilder\Safety;
+namespace App\Hizb\Builder\Safety;
 
 use Sparkhizb\Helpers\IdentityHelper;
 use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\QueryHelper;
-use Sparkhizb\UmmuHelper;
+use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\UmmuHazardReport;
 
-use App\Gmodels\Safety\LpahModel;
-use App\Gmodels\Safety\LpadUnitModel;
-use App\Gmodels\Safety\LpadOrangModel;
-use App\Gmodels\Safety\LpadFotoModel;
-use App\Gmodels\Safety\LpadKerusakanModel;
+use App\Hizb\Models\Safety\LpahModel;
+use App\Hizb\Models\Safety\LpadUnitModel;
+use App\Hizb\Models\Safety\LpadOrangModel;
+use App\Hizb\Models\Safety\LpadFotoModel;
+use App\Hizb\Models\Safety\LpadKerusakanModel;
 
 // use App\Models\Safety\HazardReportQueueMailModel;
 // use App\Models\Safety\HazardReportNumberModel;
@@ -24,7 +24,7 @@ class LpaBuilder
         $this->db = \Config\Database::connect();
         $this->iescm = \Config\Database::connect('iescm');
         $this->request = \Config\Services::request();
-        $this->identify = new IdentityHelper();
+        $this->identity = new IdentityHelper();
         $this->bHelp = new BuilderHelper();
         $this->qHelp = new QueryHelper();
         $this->umHelp = new UmmuHelper();
@@ -84,6 +84,7 @@ class LpaBuilder
 
     public function show($id = null)
     {
+
         $builder = $this->qbAlya();
 
         // /**
@@ -289,4 +290,58 @@ class LpaBuilder
     //     $builder = $this->model->update($id, $body);
     //     return $builder;
     // }
+
+    public function joinData($rows)
+    {
+        if ($rows) {
+            if ($this->identity->company_id() == 4) {
+                $mSite = new \App\Models\SiteProjectModel();
+                $sites = $mSite->findAll();
+                if ($sites) {
+                    foreach ($rows as $key => $value) {
+                        $kode = $value->site;
+                        $region_name = '';
+                        foreach ($sites as $key2 => $value2) {
+                            if ($value2['region_code'] == $kode) {
+                                $region_name = $value2['region_name'];
+                            }
+                        }
+                        $rows[$key]->site_name = $region_name;
+                    }
+                }
+
+                $mDivisi = new \App\Models\DivisiModel();
+                $divisi = $mDivisi->findAll();
+                if ($divisi) {
+                    foreach ($rows as $key => $value) {
+                        $kode = $value->divisi;
+                        $NmDivisi = '';
+                        foreach ($divisi as $key2 => $value2) {
+                            if ($value2['KdDivisi'] == $kode) {
+                                $NmDivisi = $value2['NmDivisi'];
+                            }
+                        }
+                        $rows[$key]->divisi_name = $NmDivisi;
+                    }
+                }
+
+                $mDepartemen = new \App\Models\DepartemenModel();
+                $departemen = $mDepartemen->findAll();
+                if ($divisi) {
+                    foreach ($rows as $key => $value) {
+                        $kode = $value->departemen;
+                        $NmDepar = '';
+                        foreach ($departemen as $key2 => $value2) {
+                            if ($value2['KdDepar'] == $kode) {
+                                $NmDepar = $value2['NmDepar'];
+                            }
+                        }
+                        $rows[$key]->departemen_name = $NmDepar;
+                    }
+                }
+            }
+        }
+
+        return $rows;
+    }
 }
