@@ -74,6 +74,7 @@ class HazardReportBuilder
     public function show_number_unused_by_accountid($account_id)
     {
         $builder = $this->mNum
+            ->where('created_by', $account_id)
             ->where('used_at IS NULL')
             ->where('YEAR(created_at)', date('Y'))
             ->where('MONTH(created_at)', date('m'))
