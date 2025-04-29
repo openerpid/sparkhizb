@@ -2,7 +2,7 @@
 
 namespace App\Hizb\Builder\Safety;
 
-use Sparkhizb\UmmuHelper;
+use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\UmmuHazardReport;
 use App\Hizb\Models\Safety\HazardReportQueueMailModel;
 use App\Hizb\Models\Safety\HazardReportNumberModel;
