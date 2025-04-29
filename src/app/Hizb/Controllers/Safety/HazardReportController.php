@@ -84,7 +84,7 @@ class HazardReportController extends ResourceController
                 "nik" => $nik,
                 "number" => $number
             ];
-            
+
         } else {
 
             $getLastRow = $this->qBuilder->getLastRow();
@@ -110,7 +110,7 @@ class HazardReportController extends ResourceController
 
         $response = [$number];
 
-        return $this->respond($payload, 200);
+        return $this->respond($response, 200);
     }
 
     // public function number_document()
