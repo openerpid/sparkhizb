@@ -249,53 +249,11 @@ class LpaBuilder
         return $builder;
     }
 
-    // public function show_queue_mail()
-    // {
-    //     $builder = $this->model
-    //         ->where('send_mail IS NULL')
-    //         ->find();
-
-    //     return $builder;
-    // }
-
-    // public function show_queue_mail_detail($id)
-    // {
-    //     $payload = [
-    //         "limit" => 10,
-    //         "offset" => 0,
-    //         "sort" => "id",
-    //         "order" => "desc",
-    //         "search" => "",
-    //         "selects" => "*"
-    //     ];
-
-    //     $params = [
-    //         "id" => $id,
-    //         "payload" => $payload,
-    //         "token" => getenv('OPEN_INTEGRASI_TOKEN_SAFETY')
-    //     ];
-
-    //     $builder = $this->ummu->show($params);
-    //     return $builder;
-    // }
-
-    // public function create_queue_mail($document_id)
-    // {
-    //     $builder = $this->model->insert(["document_id" => $document_id]);
-    //     return $builder;
-    // }
-
-    // public function update_queue_mail($id, $body)
-    // {
-    //     $builder = $this->model->update($id, $body);
-    //     return $builder;
-    // }
-
     public function joinData($rows)
     {
         if ($rows) {
             if ($this->identity->company_id() == 4) {
-                $mSite = new \App\Models\SiteProjectModel();
+                $mSite = new \App\Hizb\Syshab\Models\SiteProjectModel();
                 $sites = $mSite->findAll();
                 if ($sites) {
                     foreach ($rows as $key => $value) {
@@ -310,7 +268,7 @@ class LpaBuilder
                     }
                 }
 
-                $mDivisi = new \App\Models\DivisiModel();
+                $mDivisi = new \App\Hizb\Syshab\Models\DivisiModel();
                 $divisi = $mDivisi->findAll();
                 if ($divisi) {
                     foreach ($rows as $key => $value) {
@@ -325,7 +283,7 @@ class LpaBuilder
                     }
                 }
 
-                $mDepartemen = new \App\Models\DepartemenModel();
+                $mDepartemen = new \App\Hizb\Syshab\Models\DepartemenModel();
                 $departemen = $mDepartemen->findAll();
                 if ($divisi) {
                     foreach ($rows as $key => $value) {
@@ -337,6 +295,21 @@ class LpaBuilder
                             }
                         }
                         $rows[$key]->departemen_name = $NmDepar;
+                    }
+                }
+
+                $mSeksi = new \App\Hizb\Syshab\Models\SeksiModel();
+                $seksi = $mSeksi->findAll();
+                if ($divisi) {
+                    foreach ($rows as $key => $value) {
+                        $kode = $value->section;
+                        $NmSec = '';
+                        foreach ($seksi as $key2 => $value2) {
+                            if ($value2['KdSec'] == $kode) {
+                                $NmSec = $value2['NmSec'];
+                            }
+                        }
+                        $rows[$key]->section_name = $NmSec;
                     }
                 }
             }

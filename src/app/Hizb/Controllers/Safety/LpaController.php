@@ -164,73 +164,81 @@ class LpaController extends ResourceController
      */
     public function create()
     {
-        $payload = (array) $this->request->getJsonVar();
-        $builder = $this->qBuilder->insert($payload);
-        return $this->respond($builder, 200);
-    }
-
-    public function create2()
-    {
         $body = (array) $this->request->getVar();
-        $foto_temuan = $this->request->getFile("foto_temuan");
-        $foto_perbaikan = $this->request->getFile("foto_perbaikan");
-        $foto_temuan_id = null;
-        $foto_perbaikan_id = null;
+        // $foto_temuan = $this->request->getFile("foto_temuan");
+        // $foto_perbaikan = $this->request->getFile("foto_perbaikan");
+        // $foto_temuan_id = null;
+        // $foto_perbaikan_id = null;
 
-        if (isset($foto_temuan)) {
-            $ci_foto_temuan = new \CodeIgniter\Files\File($foto_temuan);
-            if ($ci_foto_temuan->getBasename()) {
-                $foto_temuan_upload = $this->umUpl->create2($foto_temuan);
-                if ($foto_temuan_upload['status'] == true) {
-                    $payload = [
-                        "filename" => $foto_temuan_upload["name"],
-                        "folder" => $foto_temuan_upload["folder"],
-                        "paht" => null,
-                        "url" => $foto_temuan_upload["url"]
-                    ];
-                    $params = [
-                        "payload" => $payload,
-                        "token" => $this->qHelp->token()
-                    ];
-                    $photos_create = $this->umPhot->create($params);
-                    if ($photos_create->status == true) {
-                        $foto_temuan_id = $photos_create->data->id;
-                    }
-                }
-            }
+        // if (isset($foto_temuan)) {
+        //     $ci_foto_temuan = new \CodeIgniter\Files\File($foto_temuan);
+        //     if ($ci_foto_temuan->getBasename()) {
+        //         $foto_temuan_upload = $this->umUpl->create2($foto_temuan);
+        //         if ($foto_temuan_upload['status'] == true) {
+        //             $payload = [
+        //                 "filename" => $foto_temuan_upload["name"],
+        //                 "folder" => $foto_temuan_upload["folder"],
+        //                 "paht" => null,
+        //                 "url" => $foto_temuan_upload["url"]
+        //             ];
+        //             $params = [
+        //                 "payload" => $payload,
+        //                 "token" => $this->qHelp->token()
+        //             ];
+        //             $photos_create = $this->umPhot->create($params);
+        //             if ($photos_create->status == true) {
+        //                 $foto_temuan_id = $photos_create->data->id;
+        //             }
+        //         }
+        //     }
+        // }
+
+        // if (isset($foto_perbaikan)) {
+        //     $ci_foto_perbaikan = new \CodeIgniter\Files\File($foto_perbaikan);
+        //     if ($ci_foto_perbaikan->getBasename()) {
+        //         $foto_perbaikan_upload = $this->umUpl->create2($foto_perbaikan);
+        //         if ($foto_perbaikan_upload['status'] == true) {
+        //             $payload = [
+        //                 "filename" => $foto_perbaikan_upload["name"],
+        //                 "folder" => $foto_perbaikan_upload["folder"],
+        //                 "paht" => null,
+        //                 "url" => $foto_perbaikan_upload["url"]
+        //             ];
+        //             $params = [
+        //                 "payload" => $payload,
+        //                 "token" => $this->qHelp->token()
+        //             ];
+        //             $photos_create = $this->umPhot->create($params);
+        //             if ($photos_create->status == true) {
+        //                 $foto_perbaikan_id = $photos_create->data->id;
+        //             }
+        //         }
+        //     }
+        // }
+
+        // $payload = array_merge(
+        //     $body,
+        //     ["foto_temuan_id" => $foto_temuan_id],
+        //     ["foto_perbaikan_id" => $foto_perbaikan_id]
+        // );
+        // $builder = $this->qBuilder->insert($payload);
+
+        $foto = $this->request->getVar('foto');
+        $payload_foto = [];
+        foreach ($foto as $key => $value) {
+            // $category = $this->request->getVar('foto.' . $key . '.category');
+            $file = $this->request->getFile('foto.' . $key . '.file');
+
+            $payload_foto[] = [
+                "category" => $value['category'],
+                "filename" => $file->getName(),
+                "real_path" => $file->getRealPath()
+            ];
         }
 
-        if (isset($foto_perbaikan)) {
-            $ci_foto_perbaikan = new \CodeIgniter\Files\File($foto_perbaikan);
-            if ($ci_foto_perbaikan->getBasename()) {
-                $foto_perbaikan_upload = $this->umUpl->create2($foto_perbaikan);
-                if ($foto_perbaikan_upload['status'] == true) {
-                    $payload = [
-                        "filename" => $foto_perbaikan_upload["name"],
-                        "folder" => $foto_perbaikan_upload["folder"],
-                        "paht" => null,
-                        "url" => $foto_perbaikan_upload["url"]
-                    ];
-                    $params = [
-                        "payload" => $payload,
-                        "token" => $this->qHelp->token()
-                    ];
-                    $photos_create = $this->umPhot->create($params);
-                    if ($photos_create->status == true) {
-                        $foto_perbaikan_id = $photos_create->data->id;
-                    }
-                }
-            }
-        }
+        $payload = array_merge($body, ["foto" => $payload_foto]);
 
-        $payload = array_merge(
-            $body,
-            ["foto_temuan_id" => $foto_temuan_id],
-            ["foto_perbaikan_id" => $foto_perbaikan_id]
-        );
-        $builder = $this->qBuilder->insert($payload);
-        return $this->respond($builder, 200);
-        // return $this->respond(["OK"], 200);
+        return $this->respond($payload, 200);
     }
 
 
