@@ -102,7 +102,7 @@ class LpaBuilder
         // $release = $this->request->getJsonVar('release');
         // $nomor_dokumen = $this->request->getJsonVar('nomor_dokumen');
 
-        // $allowedFields = $this->model->allowedFields;
+        $allowedFields = $this->model->allowedFields;
         // $account_id = $this->identity->account_id();
         // $crud = $this->identity->crud();
         // $identity_id = null;
@@ -145,7 +145,7 @@ class LpaBuilder
         ];
 
         $builder = $this->bHelp->conditions($params);
-        // $builder = $this->qHelp->orderBy($builder, $allowedFields);
+        $builder = $this->qHelp->orderBy($builder, $allowedFields);
         return $builder;
     }
 
@@ -385,5 +385,23 @@ class LpaBuilder
         }
 
         return $rows;
+    }
+
+    /**
+     * DELETE
+     *  */
+    public function delete($id)
+    {
+        $builder = $this->model
+            ->delete($id);
+
+        if ($builder) {
+            $this->model
+                ->where('id', $id)
+                ->set('deleted_by', $this->identity->account_id())
+                ->update();
+        }
+
+        return $builder;
     }
 }

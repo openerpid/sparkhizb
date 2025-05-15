@@ -383,7 +383,10 @@ class LpaController extends ResourceController
                     }
                 }
 
-                $response = $insert;
+                $response = [
+                    "status" => true,
+                    "message" => 'Insert data success.',
+                ];
             } else {
                 $response = [
                     "status" => false,
@@ -423,7 +426,22 @@ class LpaController extends ResourceController
      */
     public function delete($id = null)
     {
-        // 
+        $builder = $this->qBuilder->delete($id);
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => "Delete success.",
+            ];
+            $rescod = 200;
+        } else {
+            $response = [
+                "status" => false,
+                "message" => "Delete error.",
+            ];
+            $rescod = 200;
+        }
+
+        return $this->respond($response, $rescod);
     }
 
 

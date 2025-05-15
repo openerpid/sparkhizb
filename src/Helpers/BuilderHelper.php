@@ -14,6 +14,7 @@ namespace Sparkhizb\Helpers;
 use Sparkhizb\Helpers\GlobalHelper;
 use Sparkhizb\Helpers\IdentityHelper;
 use Sparkhizb\Helpers\UmmuHelper;
+use Sparkhizb\Helpers\RequestHelper;
 
 class BuilderHelper
 {
@@ -23,6 +24,7 @@ class BuilderHelper
         $this->identity = new IdentityHelper();
         $this->gHelp = new GlobalHelper();
         $this->UmHelp = new UmmuHelper();
+        $this->reqH = new RequestHelper();
 
         /**
          * Vars*/
@@ -757,5 +759,15 @@ class BuilderHelper
         $builder->update();
         
         return $builder;
+    }
+
+
+    public function dynamic_conditions($params)
+    {
+        if ($this->identity->isAJAX_datatables()) {
+            // if (condition) {
+            //     // code...
+            // }
+        }
     }
 }

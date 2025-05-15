@@ -78,4 +78,35 @@ class RequestHelper
 
         return $token;
     }
+
+    public function is_ajax()
+    {
+        $a = $this->request->header("X-Requested-With");
+        $a = $a->getValue();
+
+        if ($a == 'XMLHttpRequest') {
+            return true;
+        }else{
+            return false;
+        }        
+    }
+
+    public function isAjax_datatables()
+    {
+        if ($this->request->isAJAX()) {
+            $a = $this->request->header("Ajax-Vendor");
+            if ($a) {
+                $a = $a->getValue();
+            }
+            
+            if ($a == 'datatables') {
+                return true;
+            }else{
+                return false;
+            }        
+        }else{
+            return false;
+        }
+
+    }
 }
