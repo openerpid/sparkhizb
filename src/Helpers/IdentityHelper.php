@@ -3,6 +3,7 @@
 namespace Sparkhizb\Helpers;
 
 use Sparkhizb\Helpers\JwtHelper;
+use Sparkhizb\Auth;
 
 class IdentityHelper 
 {
@@ -10,6 +11,7 @@ class IdentityHelper
     {
         $this->jwt = new JwtHelper();
         $this->request = \Config\Services::request();
+        $this->auth = new Auth();
     }
 
     public function company_id()
@@ -158,5 +160,33 @@ class IdentityHelper
         }
 
         return $crud;
-    }    
+    }
+
+    private function login()
+    {
+        $params = [
+            "payload" => [
+                "username" => getenv('openerp.username'),
+                "password" => getenv('openerp.password')
+            ],
+            "headers" => [
+                "Content-Type:application/json"
+            ]
+        ];
+
+        return $this->auth->login2($params);
+    }
+
+    public function login_token()
+    {
+        $a = $this->login();
+
+        if ($a->status == true) {
+            $token = $a->data->token;
+        }else{
+            $token = '';
+        }
+
+        return $token;
+    }
 }

@@ -20,7 +20,7 @@ class LpahModel extends Model
         "nomor_dokumen",
         "insident_classification",
         "site",
-        "devisi",
+        "divisi",
         "departemen",
         "section",
         "tanggal_kejadian",

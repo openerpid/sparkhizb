@@ -29,9 +29,14 @@ class LpadOrangModel extends Model
         "pengalaman_bulan",
         "sebagai",
         "perusahaan",
+
         "created_at",
         "updated_at",
-        "deleted_at"
+        "deleted_at",
+
+        "created_by",
+        "updated_by",
+        "deleted_by"
     ];
 
     // Dates

@@ -12,6 +12,7 @@ namespace Sparkhizb\Helpers;
 */
 
 use Sparkhizb\Helpers\GlobalHelper;
+use Sparkhizb\Helpers\IdentityHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 
 class BuilderHelper
@@ -19,6 +20,7 @@ class BuilderHelper
     public function __construct()
     {
         $this->request = \Config\Services::request();
+        $this->identity = new IdentityHelper();
         $this->gHelp = new GlobalHelper();
         $this->UmHelp = new UmmuHelper();
 
@@ -710,4 +712,50 @@ class BuilderHelper
     // {
     //     return if(getenv('gdb')) ? getenv('gdb') : 'Sparkhizb_she';
     // }
+
+    public function delete_conditions($params)
+    {
+        $where = $this->request->getJsonVar('where');
+
+        $builder        = $params['builder'];
+
+        $company_id     = $params['company_id'];
+        $created_by     = $params['created_by'];
+        $deleted_by      = $params['deleted_by'];
+
+        if ($deleted_by == true) {
+            $payload = [
+                "deleted_at" => date('Y-m-d H:i:s'),
+                "deleted_by" => $this->identity->account_id()
+            ];
+        }else{
+            $payload = [
+                "deleted_at" => date('Y-m-d H:i:s')
+            ];
+        }
+
+        $builder->set($payload);
+
+        foreach ($where as $key => $value) {
+            if ($value) {
+                if (is_array($value)) {
+                    $builder->whereIn($key, $value);
+                }else{
+                    $builder->where($key, $value);
+                }
+            }
+        }
+
+        if ($company_id == true) {
+            $builder->where('company_id', $this->identity->company_id());
+        }
+
+        if ($created_by == true) {
+            $builder->where('created_by', $this->identity->account_id());
+        }
+
+        $builder->update();
+        
+        return $builder;
+    }
 }

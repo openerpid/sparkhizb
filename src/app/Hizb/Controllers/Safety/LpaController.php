@@ -3,6 +3,8 @@
 namespace App\Hizb\Controllers\Safety;
 
 use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\Files\File;
+use CodeIgniter\HTTP\Files\UploadedFile;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\IdentityHelper;
@@ -89,43 +91,13 @@ class LpaController extends ResourceController
      *
      * @return mixed
      */
-    public function number_document()
+    public function new()
     {
-        $site = $this->request->getJsonVar('site');
-        $nik = $this->request->getJsonVar('nik');
-
-        $payload = [
-            "site" => $site,
-            "nik" => $nik
-        ];
-
-        $show_number_unused = $this->qBuilder->show_number_unused($nik, $site);
+        $show_number_unused = $this->qBuilder->show_number_unused()->get()->getFirstRow();
         if ($show_number_unused) { /* jika ada nomor dokumen yang belum digunakan pada bulan dan tahun yang sama dengan sekarang */
             $row = $show_number_unused;
-            $number = $row['number'];
+            $number = $row->number;
         } else {
-            // $show_new = $this->qBuilder->show_new($nik, $site); /* ambil row yang belum ada nomor dokumen nya */
-
-            // if ($show_new) { /* jika ada, maka tampilkan seq */
-            //     $seq = $show_new['seq'];
-            // } else {
-            //     // $getLastRow = $this->qBuilder->getLastRow();
-            //     // if ($getLastRow) {
-            //     // }else{
-            //     $create_seq = $this->qBuilder->create_id($payload);
-            //     $seq = $create_seq;
-            //     // }
-            // }
-            // $n = sprintf('%08d', $id);
-            // $number = $site . 'HZR' . date('Ym') . $n;
-
-            // $payload = [
-            //     "number" => $number
-            // ];
-            // $update_new = $this->qBuilder->update_new($id, $payload);
-
-
-
             $getLastRow = $this->qBuilder->getLastRow();
             if ($getLastRow) {
                 $seq = $getLastRow->seq;
@@ -135,13 +107,13 @@ class LpaController extends ResourceController
             }
 
             $n = sprintf('%06d', $seq);
-            $number = $site . 'HZR' . date('Ym') . $n;
+            $number = 'INCIDENT' . date('Ym') . $n;
 
             $payload = [
+                "docat_id" => 2,
                 "seq" => $seq,
-                "site" => $site,
-                "nik" => $nik,
-                "number" => $number
+                "number" => $number,
+                "created_by" => $this->identity->account_id()
             ];
             $insert_number = $this->qBuilder->insert_number($payload);
         }
@@ -164,7 +136,7 @@ class LpaController extends ResourceController
      */
     public function create()
     {
-        $body = (array) $this->request->getVar();
+        // $body = (array) $this->request->getVar();
         // $foto_temuan = $this->request->getFile("foto_temuan");
         // $foto_perbaikan = $this->request->getFile("foto_perbaikan");
         // $foto_temuan_id = null;
@@ -222,23 +194,205 @@ class LpaController extends ResourceController
         //     ["foto_perbaikan_id" => $foto_perbaikan_id]
         // );
         // $builder = $this->qBuilder->insert($payload);
+        $nomor_dokumen = $this->request->getVar('nomor_dokumen');
+        $insident_classification = $this->request->getVar('insident_classification');
+        $site = $this->request->getVar('site');
+        $divisi = $this->request->getVar('divisi');
+        $departemen = $this->request->getVar('departemen');
+        $section = $this->request->getVar('section');
+        $tanggal_kejadian = $this->request->getVar('tanggal_kejadian');
+        $tanggal_pelaporan = $this->request->getVar('tanggal_pelaporan');
+        $waktu_pelaporan = $this->request->getVar('waktu_pelaporan');
+        $shift_kerja = $this->request->getVar('shift_kerja');
+        $mulai_shift = $this->request->getVar('mulai_shift');
+        $selesai_shift = $this->request->getVar('selesai_shift');
+        $waktu_kejadian = $this->request->getVar('waktu_kejadian');
+        $lokasi_insiden = $this->request->getVar('lokasi_insiden');
+        $detail_lokasi_insiden = $this->request->getVar('detail_lokasi_insiden');
+        $cidera = $this->request->getVar('cidera');
+        $detail_cidera_lainnya = $this->request->getVar('detail_cidera_lainnya');
+        $kronologi = $this->request->getVar('kronologi');
+        $instansi_pemerintah = $this->request->getVar('instansi_pemerintah');
+        $nama_pejabat = $this->request->getVar('nama_pejabat');
+        $pemerintah_disampaikan_oleh = $this->request->getVar('pemerintah_disampaikan_oleh');
+        $pemerintah_tanggal = $this->request->getVar('pemerintah_tanggal');
+        $asuransi = $this->request->getVar('asuransi');
+        $nama_perusahaan = $this->request->getVar('nama_perusahaan');
+        $asuransi_disampaikan_oleh = $this->request->getVar('asuransi_disampaikan_oleh');
+        $asuransi_tanggal = $this->request->getVar('asuransi_tanggal');
+        $pihak_tiga = $this->request->getVar('pihak_tiga');
+        $nama_pihak_ketiga = $this->request->getVar('nama_pihak_ketiga');
+        $pihak_tiga_disampaikan_oleh = $this->request->getVar('pihak_tiga_disampaikan_oleh');
+        $pihak_tiga_tanggal = $this->request->getVar('pihak_tiga_tanggal');
+        $tipe_insiden = $this->request->getVar('tipe_insiden');
+        $penjelasan_insiden = $this->request->getVar('penjelasan_insiden');
 
-        $foto = $this->request->getVar('foto');
-        $payload_foto = [];
-        foreach ($foto as $key => $value) {
-            // $category = $this->request->getVar('foto.' . $key . '.category');
-            $file = $this->request->getFile('foto.' . $key . '.file');
+        $payload = [
+            "nomor_dokumen" => $nomor_dokumen,
+            "insident_classification" => $insident_classification,
+            "site" => $site,
+            "divisi" => $divisi,
+            "departemen" => $departemen,
+            "section" => $section,
+            "tanggal_kejadian" => $tanggal_kejadian,
+            "tanggal_pelaporan" => $tanggal_pelaporan,
+            "waktu_pelaporan" => $waktu_pelaporan,
+            "shift_kerja" => $shift_kerja,
+            "mulai_shift" => $mulai_shift,
+            "selesai_shift" => $selesai_shift,
+            "waktu_kejadian" => $waktu_kejadian,
+            "lokasi_insiden" => $lokasi_insiden,
+            "detail_lokasi_insiden" => $detail_lokasi_insiden,
+            "cidera" => $cidera,
+            "detail_cidera_lainnya" => $detail_cidera_lainnya,
+            "kronologi" => $kronologi,
+            "instansi_pemerintah" => $instansi_pemerintah,
+            "nama_pejabat" => $nama_pejabat,
+            "pemerintah_disampaikan_oleh" => $pemerintah_disampaikan_oleh,
+            "pemerintah_tanggal" => $pemerintah_tanggal,
+            "asuransi" => $asuransi,
+            "nama_perusahaan" => $nama_perusahaan,
+            "asuransi_disampaikan_oleh" => $asuransi_disampaikan_oleh,
+            "asuransi_tanggal" => $asuransi_tanggal,
+            "pihak_tiga" => $pihak_tiga,
+            "nama_pihak_ketiga" => $nama_pihak_ketiga,
+            "pihak_tiga_disampaikan_oleh" => $pihak_tiga_disampaikan_oleh,
+            "pihak_tiga_tanggal" => $pihak_tiga_tanggal,
+            "tipe_insiden" => $tipe_insiden,
+            "penjelasan_insiden" => $penjelasan_insiden,
+            // "orang_terlibat_arr" => $orang_terlibat_arr,
+            // "kerusakan_arr" => $kerusakan_arr,
+            // "unit_arr" => $unit_arr
+        ];
 
-            $payload_foto[] = [
-                "category" => $value['category'],
-                "filename" => $file->getName(),
-                "real_path" => $file->getRealPath()
+        $show_by_number = $this->qBuilder->show_by_number($nomor_dokumen)->get()->getFirstRow();
+        if ($show_by_number) {
+            // $validation = $this->qVal->insert();
+            // if ($validation)
+            $response = [
+                "status" => false,
+                "message" => 'Nomor dokumen already exists.',
             ];
+        } else {
+            $isValid_number = $this->qBuilder->show_number_isValid($nomor_dokumen)->get()->getFirstRow();
+            if ($isValid_number) {
+                $insert = $this->qBuilder->insert($payload);
+                $used_number = $this->qBuilder->used_number($nomor_dokumen);
+
+                // ############## ORANG TERLIBAT #################
+                $orang_terlibat = $this->request->getVar('orang_terlibat');
+                foreach ($orang_terlibat as $key => $value) {
+                    $status_karyawan = $value['status_karyawan'];
+                    $nik = $value['nik'];
+                    $name = $value['name'];
+                    $jk = $value['jk'];
+                    $jabatan = $value['jabatan'];
+                    $atasan = $value['atasan'];
+                    $umur = $value['umur'];
+                    $pengalaman_tahun = $value['pengalaman_tahun'];
+                    $pengalaman_bulan = $value['pengalaman_bulan'];
+                    $sebagai = $value['sebagai'];
+                    $perusahaan = $value['perusahaan'];
+
+                    $orang_terlibat_payload = [
+                        "lpa_id" => $insert,
+                        "status_karyawan" => $status_karyawan,
+                        "nik" => $nik,
+                        "name" => $name,
+                        "jk" => $jk,
+                        "jabatan" => $jabatan,
+                        "atasan" => $atasan,
+                        "umur" => $umur,
+                        "pengalaman_tahun" => $pengalaman_tahun,
+                        "pengalaman_bulan" => $pengalaman_bulan,
+                        "sebagai" => $sebagai,
+                        "perusahaan" => $perusahaan
+                    ];
+                    $insert_orangTerlibat = $this->qBuilder->insert_orangTerlibat($orang_terlibat_payload);
+                }
+
+                //############## KERUSAKAN #################
+                $kerusakan = $this->request->getVar('kerusakan');
+                foreach ($kerusakan as $key => $value) {
+                    $name = $value['name'];
+                    $tipe_komponen = $value['tipe_komponen'];
+                    $kerusakan_keparahan = $value['kerusakan_keparahan'];
+                    $detail_kerusakan_kerugian = $value['detail_kerusakan_kerugian'];
+                    $perkiraan_biaya = $value['perkiraan_biaya'];
+
+                    $kerusakan_payload = [
+                        "lpa_id" => $insert,
+                        "name" => $name,
+                        "tipe_komponen" => $tipe_komponen,
+                        "kerusakan_keparahan" => $kerusakan_keparahan,
+                        "detail_kerusakan_kerugian" => $detail_kerusakan_kerugian,
+                        "perkiraan_biaya" => $perkiraan_biaya
+                    ];
+
+                    $insert_kerusakan = $this->qBuilder->insert_kerusakan($kerusakan_payload);
+                }
+
+                //############## UNIT #################
+                $unit = $this->request->getVar('unit');
+                foreach ($unit as $key => $value) {
+                    $tipe_equipment_kendaraan = $value['tipe_equipment_kendaraan'];
+                    $model_serial = $value['model_serial'];
+                    $aset_perusahaan = $value['aset_perusahaan'];
+                    $keterangan_bukan_aset = $value['keterangan_bukan_aset'];
+
+                    $unit_payload = [
+                        "lpa_id" => $insert,
+                        "tipe_equipment_kendaraan" => $tipe_equipment_kendaraan,
+                        "model_serial" => $model_serial,
+                        "aset_perusahaan" => $aset_perusahaan,
+                        "keterangan_bukan_aset" => $keterangan_bukan_aset
+                    ];
+
+                    $insert_unit = $this->qBuilder->insert_unit($unit_payload);
+                }
+
+                //############## FOTO #################
+                $foto = $this->request->getVar('foto');
+                foreach ($foto as $key => $value) {
+                    $file = $this->request->getFile('foto.' . $key . '.file');
+                    if ($file != NULL) {
+                        $isFile = $file->isValid();
+                        $category = $value['category'];
+                        if ($isFile) {
+                            $newName = $file->getRandomName();
+                            // $filename = $file->getName();
+                            // $real_path = $file->getRealPath();
+                            $filename = $newName;
+                            // $real_path = date('Ymd') . '/upploads/' . $newName;
+                            // $file->move(WRITEPATH . 'uploads', $newName);
+                            if (!$file->hasMoved()) {
+                                // $filepath = WRITEPATH . 'uploads/' . $file->store();
+                                // $filepath = 'uploads/' . $file->store();
+                                // $real_path = new File($filepath);
+                                $real_path = 'uploads/' . $file->store();
+                            }
+
+                            $foto_payload = [
+                                "lpa_id" => $insert,
+                                "category" => $category,
+                                "filepath" => $real_path
+                            ];
+
+                            $insert_foto = $this->qBuilder->insert_foto($foto_payload);
+                        }
+                    }
+                }
+
+                $response = $insert;
+            } else {
+                $response = [
+                    "status" => false,
+                    "message" => 'Invalid document number!',
+                ];
+            }
         }
 
-        $payload = array_merge($body, ["foto" => $payload_foto]);
-
-        return $this->respond($payload, 200);
+        return $this->respond($response, 200);
     }
 
 

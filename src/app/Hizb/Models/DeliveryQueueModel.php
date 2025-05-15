@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Hizb\Models\Safety;
+namespace App\Hizb\Models;
 
 use CodeIgniter\Model;
 
-class LpadUnitModel extends Model
+class DeliveryQueueModel extends Model
 {
     protected $DBGroup = 'openerpid';
-    protected $table = 'lpa_d_unit';
+    protected $table = 'delivery_queue';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $insertID = 0;
@@ -15,23 +15,10 @@ class LpadUnitModel extends Model
     protected $useSoftDeletes = true;
     protected $protectFields = true;
     protected $allowedFields = [
-        "id",
-        "company_id",
-        "lpa_id",
-        "tipe_equipment_kendaraan",
-        "model_serial",
-        "nama_or_tipe",
-        "aset_perusahaan",
-        "keterangan_aset_tipe",
-        "detail_kerusakan_kerugian_tipe",
-
-        "created_at",
-        "updated_at",
-        "deleted_at",
-
-        "created_by",
-        "updated_by",
-        "deleted_by"
+        "docat_id",
+        "document_id",
+        "doc_number",
+        "send_mail"
     ];
 
     // Dates
@@ -60,6 +47,6 @@ class LpadUnitModel extends Model
 
     public function __construct()
     {
-        $this->DBGroup = (getenv('DBGroup')) ? getenv('DBGroup') : 'dorbitt_she';
+        $this->DBGroup = (getenv('DBGroup')) ? getenv('DBGroup') : 'dorbitt';
     }
 }

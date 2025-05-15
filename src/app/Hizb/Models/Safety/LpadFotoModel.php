@@ -19,6 +19,7 @@ class LpadFotoModel extends Model
         "company_id",
         "lpa_id",
         "category",
+        "filepath",
         "created_at",
         "updated_at",
         "deleted_at"

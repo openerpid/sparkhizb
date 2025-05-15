@@ -893,4 +893,21 @@ class UmmuHelper
             return true;
         }
     }
+
+    public function delete_custom_validation()
+    {
+        $where = $this->request->getJsonVar('where');
+        $is_value = [];
+        foreach ($where as $key => $value) {
+            if ($value) {
+                $is_value[] = $value;
+            }
+        }
+
+        if ($is_value) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

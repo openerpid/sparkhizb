@@ -16,6 +16,7 @@ use App\Hizb\Models\Safety\LpadKerusakanModel;
 
 // use App\Models\Safety\HazardReportQueueMailModel;
 // use App\Models\Safety\HazardReportNumberModel;
+use App\Hizb\Models\DocumentNumbersModel;
 
 class LpaBuilder
 {
@@ -37,6 +38,7 @@ class LpaBuilder
         $this->mFoto = new LpadFotoModel();
         $this->mKerusakan = new LpadKerusakanModel();
         $this->mUnit = new LpadUnitModel();
+        $this->mDoc = new DocumentNumbersModel();
 
         // $this->db->defaultGroup = 'iescm';
     }
@@ -147,6 +149,25 @@ class LpaBuilder
         return $builder;
     }
 
+    public function show_by_number($number)
+    {
+
+        $builder = $this->qbAlya();
+        $builder->where('nomor_dokumen', $number);
+
+        $params = [
+            "builder" => $builder,
+            "id" => null,
+            "search_params" => [],
+            "company_id" => null,
+            "account_id" => null
+        ];
+
+        $builder = $this->bHelp->conditions($params);
+        // $builder = $this->qHelp->orderBy($builder, $allowedFields);
+        return $builder;
+    }
+
     public function show_d_orang($h_id)
     {
         return $this->mOrang->where('lpa_id', $h_id)->get()->getResult();
@@ -167,15 +188,10 @@ class LpaBuilder
         return $this->mUnit->where('lpa_id', $h_id)->get()->getResult();
     }
 
-
-
-
-
     public function show_new($nik, $site)
     {
-        $builder = $this->mNum
-            ->where('nik', $nik)
-            ->where('site', $site)
+        $builder = $this->mDoc
+            ->where('created_by', $this->identity->id)
             ->where('number IS NULL')
             ->where('used_at IS NULL')
             ->where('YEAR(created_at)', date('Y'))
@@ -185,22 +201,23 @@ class LpaBuilder
         return $builder;
     }
 
-    public function show_number_unused($nik, $site)
+    public function show_number_unused()
     {
-        $builder = $this->mNum
-            ->where('nik', $nik)
-            ->where('site', $site)
+        $builder = $this->mDoc
+            ->where('created_by', $this->identity->account_id())
             ->where('used_at IS NULL')
             ->where('YEAR(created_at)', date('Y'))
-            ->where('MONTH(created_at)', date('m'))
-            ->first();
+            ->where('MONTH(created_at)', date('m'));
+        // ->first();
+        // ->get()
+        // ->getFirstRow();
 
         return $builder;
     }
 
     public function getLastRow()
     {
-        $builder = $this->iescm->table($this->mNum->table)
+        $builder = $this->iescm->table($this->mDoc->table)
             ->where('YEAR(created_at)', date('Y'))
             ->where('MONTH(created_at)', date('m'))
             ->get()
@@ -209,9 +226,82 @@ class LpaBuilder
         return $builder;
     }
 
+    public function show_number_isValid($number)
+    {
+        $builder = $this->mDoc
+            ->where('docat_id', 2)
+            ->where('number', $number)
+            ->where('created_by', $this->identity->account_id())
+            ->where('used_at IS NULL')
+            ->where('YEAR(created_at)', date('Y'))
+            ->where('MONTH(created_at)', date('m'));
+
+        return $builder;
+    }
+
+
+
+    /**
+     * INSERT
+     */
+    public function create_id($payload)
+    {
+        return $this->mDoc->insert($payload);
+    }
+
+    public function insert_number($payload)
+    {
+        return $this->mDoc->insert($payload);
+    }
+
+    public function insert($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->model->insert($payload);
+
+        return $builder;
+    }
+
+    public function insert_orangTerlibat($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mOrang->insert($payload);
+
+        return $builder;
+    }
+
+    public function insert_kerusakan($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mKerusakan->insert($payload);
+
+        return $builder;
+    }
+
+    public function insert_unit($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mUnit->insert($payload);
+
+        return $builder;
+    }
+
+    public function insert_foto($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mFoto->insert($payload);
+
+        return $builder;
+    }
+
+
+
+    /**
+     * UPDATE
+     */
     public function update_new($id, $payload)
     {
-        $builder = $this->mNum
+        $builder = $this->mDoc
             ->where('id', $id)
             ->set($payload)
             ->update();
@@ -219,34 +309,13 @@ class LpaBuilder
         return $builder;
     }
 
-    public function create_id($payload)
+    public function used_number($number)
     {
-        return $this->mNum->insert($payload);
-    }
-
-    public function insert_number($payload)
-    {
-        return $this->mNum->insert($payload);
-    }
-
-    function used_number($number)
-    {
-        return $this->mNum
+        return $this->mDoc
             ->where('number', $number)
+            ->where('created_by', $this->identity->account_id())
             ->set('used_at', date('Y-m-d H:i:s'))
             ->update();
-    }
-
-    public function insert($payload)
-    {
-        $params = [
-            "id" => null,
-            "payload" => $payload,
-            "token" => $this->umHelp->token()
-        ];
-
-        $builder = $this->ummu->insert($params);
-        return $builder;
     }
 
     public function joinData($rows)
