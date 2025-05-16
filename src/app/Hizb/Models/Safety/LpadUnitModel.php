@@ -22,6 +22,7 @@ class LpadUnitModel extends Model
         "model_serial",
         "nama_or_tipe",
         "aset_perusahaan",
+        "keterangan_bukan_aset",
         "keterangan_aset_tipe",
         "detail_kerusakan_kerugian_tipe",
 

@@ -19,6 +19,7 @@ class LpadKerusakanModel extends Model
         "company_id",
         "lpa_id",
         "name",
+        "tipe_komponen",
         "kerusakan_keparahan",
         "detail_kerusakan_kerugian",
         "perkiraan_biaya",

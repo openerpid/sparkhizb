@@ -118,6 +118,7 @@ class LpaController extends ResourceController
             $insert_number = $this->qBuilder->insert_number($payload);
         }
 
+        // $response = ["nomor_dokument" => $number];
         $response = [$number];
 
         return $this->respond($response, 200);
