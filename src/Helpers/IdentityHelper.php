@@ -189,4 +189,32 @@ class IdentityHelper
 
         return $token;
     }
+
+    private function static_login()
+    {
+        $params = [
+            "payload" => [
+                "username" => getenv('openerp.username'),
+                "password" => getenv('openerp.password')
+            ],
+            "headers" => [
+                "Content-Type:application/json"
+            ]
+        ];
+
+        return $this->auth->login2($params);
+    }
+
+    public function token_static_login()
+    {
+        $a = $this->static_login();
+
+        if ($a->status == true) {
+            $token = $a->data->token;
+        }else{
+            $token = '';
+        }
+
+        return $token;
+    }
 }

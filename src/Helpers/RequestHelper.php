@@ -107,6 +107,5 @@ class RequestHelper
         }else{
             return false;
         }
-
     }
 }
