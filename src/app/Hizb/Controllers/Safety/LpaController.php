@@ -315,16 +315,26 @@ class LpaController extends ResourceController
                 //############## KERUSAKAN #################
                 $kerusakan = $this->request->getVar('kerusakan');
                 foreach ($kerusakan as $key => $value) {
+                    $jenis_kerusakan = $value['jenis_kerusakan'];
                     $name = $value['name'];
+                    $tipe = $value['tipe'];
                     $tipe_komponen = $value['tipe_komponen'];
+                    $aset_perusahaan = $value['aset_perusahaan'];
+                    $serial_number = $value['serial_number'];
+                    $tingkat_kerusakan = $value['tingkat_kerusakan'];
                     $kerusakan_keparahan = $value['kerusakan_keparahan'];
                     $detail_kerusakan_kerugian = $value['detail_kerusakan_kerugian'];
                     $perkiraan_biaya = $value['perkiraan_biaya'];
 
                     $kerusakan_payload = [
                         "lpa_id" => $insert,
+                        "jenis_kerusakan" => $jenis_kerusakan,
                         "name" => $name,
+                        "tipe" => $tipe,
                         "tipe_komponen" => $tipe_komponen,
+                        "aset_perusahaan" => $aset_perusahaan,
+                        "serial_number" => $serial_number,
+                        "tingkat_kerusakan" => $tingkat_kerusakan,
                         "kerusakan_keparahan" => $kerusakan_keparahan,
                         "detail_kerusakan_kerugian" => $detail_kerusakan_kerugian,
                         "perkiraan_biaya" => $perkiraan_biaya

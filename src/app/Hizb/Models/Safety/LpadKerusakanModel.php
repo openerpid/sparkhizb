@@ -17,9 +17,17 @@ class LpadKerusakanModel extends Model
     protected $allowedFields = [
         "id",
         "company_id",
+        
         "lpa_id",
+        "jenis_kerusakan_id",
+        "jenis_kerusakan",
         "name",
+        "tipe",
         "tipe_komponen",
+        "aset_perusahaan",
+        "serial_number",
+        "tingkat_kerusakan_id",
+        "tingkat_kerusakan",
         "kerusakan_keparahan",
         "detail_kerusakan_kerugian",
         "perkiraan_biaya",
