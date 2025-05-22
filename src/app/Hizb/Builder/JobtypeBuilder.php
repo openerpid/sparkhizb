@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Hizb\Builder;
+
+use Sparkhizb\Helpers\Curl;
+use Sparkhizb\Helpers\CurlHelper;
+use Sparkhizb\Helpers\RequestHelper;
+use SaintSystems\OData\ODataClient;
+use Sparkhizb\UmmuPmJobtype;
+
+class JobtypeBuilder
+{
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+        $this->request = \Config\Services::request();
+        $this->curl = new Curl();
+        $this->curlH = new CurlHelper();
+        $this->reqH = new RequestHelper();
+        $this->ummu = new UmmuPmJobtype();
+    }
+
+    public function show($id = null)
+    {
+        // $payload = [
+        //     "limit" => 10,
+        //     "offset" => 0,
+        //     "sort" => "id",
+        //     "order" => "desc",
+        //     "search" => "",
+        //     "selects" => "*"
+        // ];
+
+        // $params = [
+        //     "id" => $id,
+        //     "payload" => $payload,
+        //     "token" => $this->reqH->myToken()
+        // ];
+
+        // $builder = $this->ummu->show($params);
+        // return $builder;
+        return $this->show_from_openapi2($id);
+    }
+
+    public function show_from_openapi2($id)
+    {
+        $payload = [
+            "limit" => 10,
+            "offset" => 0,
+            "sort" => "id",
+            "order" => "desc",
+            "search" => "",
+            "selects" => "*"
+        ];
+
+        $params = [
+            "id" => $id,
+            "payload" => $payload,
+            "token" => $this->reqH->myToken()
+        ];
+
+        $builder = $this->ummu->show($params);
+        return $builder;
+    }
+}
