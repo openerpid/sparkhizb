@@ -283,17 +283,17 @@ class LpaController extends ResourceController
                 // ############## ORANG TERLIBAT #################
                 $orang_terlibat = $this->request->getVar('orang_terlibat');
                 foreach ($orang_terlibat as $key => $value) {
-                    $status_karyawan = $value['status_karyawan'];
-                    $nik = $value['nik'];
-                    $name = $value['name'];
-                    $jk = $value['jk'];
-                    $jabatan = $value['jabatan'];
-                    $atasan = $value['atasan'];
-                    $umur = $value['umur'];
-                    $pengalaman_tahun = $value['pengalaman_tahun'];
-                    $pengalaman_bulan = $value['pengalaman_bulan'];
-                    $sebagai = $value['sebagai'];
-                    $perusahaan = $value['perusahaan'];
+                    $status_karyawan = (isset($value['status_karyawan']) ? $value['status_karyawan'] : null);
+                    $nik = (isset($value['nik']) ? $value['nik'] : null);
+                    $name = (isset($value['name']) ? $value['name'] : null);
+                    $jk = (isset($value['jk']) ? $value['jk'] : null);
+                    $jabatan = (isset($value['jabatan']) ? $value['jabatan'] : null);
+                    $atasan = (isset($value['atasan']) ? $value['atasan'] : null);
+                    $umur = (isset($value['umur']) ? $value['umur'] : null);
+                    $pengalaman_tahun = (isset($value['pengalaman_tahun']) ? $value['pengalaman_tahun'] : null);
+                    $pengalaman_bulan = (isset($value['pengalaman_bulan']) ? $value['pengalaman_bulan'] : null);
+                    $sebagai = (isset($value['sebagai']) ? $value['sebagai'] : null);
+                    $perusahaan = (isset($value['perusahaan']) ? $value['perusahaan'] : null);
 
                     $orang_terlibat_payload = [
                         "lpa_id" => $insert,
@@ -315,16 +315,16 @@ class LpaController extends ResourceController
                 //############## KERUSAKAN #################
                 $kerusakan = $this->request->getVar('kerusakan');
                 foreach ($kerusakan as $key => $value) {
-                    $jenis_kerusakan = $value['jenis_kerusakan'];
-                    $name = $value['name'];
-                    $tipe = $value['tipe'];
-                    $tipe_komponen = $value['tipe_komponen'];
-                    $aset_perusahaan = $value['aset_perusahaan'];
-                    $serial_number = $value['serial_number'];
-                    $tingkat_kerusakan = $value['tingkat_kerusakan'];
-                    $kerusakan_keparahan = $value['kerusakan_keparahan'];
-                    $detail_kerusakan_kerugian = $value['detail_kerusakan_kerugian'];
-                    $perkiraan_biaya = $value['perkiraan_biaya'];
+                    $tipe_komponen = (isset($value['tipe_komponen']) ? $value['tipe_komponen'] : null);
+                    $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
+                    $name = (isset($value['name']) ? $value['name'] : null);
+                    $tipe = (isset($value['tipe']) ? $value['tipe'] : null);
+                    $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
+                    $serial_number = (isset($value['serial_number']) ? $value['serial_number'] : null);
+                    $tingkat_kerusakan = (isset($value['tingkat_kerusakan']) ? $value['tingkat_kerusakan'] : null);
+                    $kerusakan_keparahan = (isset($value['kerusakan_keparahan']) ? $value['kerusakan_keparahan'] : null);
+                    $detail_kerusakan_kerugian = (isset($value['detail_kerusakan_kerugian']) ? $value['detail_kerusakan_kerugian'] : null);
+                    $perkiraan_biaya = (isset($value['perkiraan_biaya']) ? $value['perkiraan_biaya'] : null);
 
                     $kerusakan_payload = [
                         "lpa_id" => $insert,
@@ -346,10 +346,10 @@ class LpaController extends ResourceController
                 //############## UNIT #################
                 $unit = $this->request->getVar('unit');
                 foreach ($unit as $key => $value) {
-                    $tipe_equipment_kendaraan = $value['tipe_equipment_kendaraan'];
-                    $model_serial = $value['model_serial'];
-                    $aset_perusahaan = $value['aset_perusahaan'];
-                    $keterangan_bukan_aset = $value['keterangan_bukan_aset'];
+                    $tipe_equipment_kendaraan = (isset($value['tipe_equipment_kendaraan']) ? $value['tipe_equipment_kendaraan'] : null);
+                    $model_serial = (isset($value['model_serial']) ? $value['model_serial'] : null);
+                    $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
+                    $keterangan_bukan_aset = (isset($value['keterangan_bukan_aset']) ? $value['keterangan_bukan_aset'] : null);
 
                     $unit_payload = [
                         "lpa_id" => $insert,
