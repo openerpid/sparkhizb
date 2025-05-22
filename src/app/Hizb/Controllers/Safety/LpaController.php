@@ -315,7 +315,7 @@ class LpaController extends ResourceController
                 //############## KERUSAKAN #################
                 $kerusakan = $this->request->getVar('kerusakan');
                 foreach ($kerusakan as $key => $value) {
-                    $tipe_komponen = (isset($value['tipe_komponen']) ? $value['tipe_komponen'] : null);
+                    // $tipe_komponen = (isset($value['tipe_komponen']) ? $value['tipe_komponen'] : null);
                     $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
                     $name = (isset($value['name']) ? $value['name'] : null);
                     $tipe = (isset($value['tipe']) ? $value['tipe'] : null);
@@ -331,7 +331,7 @@ class LpaController extends ResourceController
                         "jenis_kerusakan" => $jenis_kerusakan,
                         "name" => $name,
                         "tipe" => $tipe,
-                        "tipe_komponen" => $tipe_komponen,
+                        // "tipe_komponen" => $tipe_komponen,
                         "aset_perusahaan" => $aset_perusahaan,
                         "serial_number" => $serial_number,
                         "tingkat_kerusakan" => $tingkat_kerusakan,
@@ -344,22 +344,24 @@ class LpaController extends ResourceController
                 }
 
                 //############## UNIT #################
-                $unit = $this->request->getVar('unit');
-                foreach ($unit as $key => $value) {
-                    $tipe_equipment_kendaraan = (isset($value['tipe_equipment_kendaraan']) ? $value['tipe_equipment_kendaraan'] : null);
-                    $model_serial = (isset($value['model_serial']) ? $value['model_serial'] : null);
-                    $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
-                    $keterangan_bukan_aset = (isset($value['keterangan_bukan_aset']) ? $value['keterangan_bukan_aset'] : null);
+                if ($this->request->getVar('unit')) {
+                    $unit = $this->request->getVar('unit');
+                    foreach ($unit as $key => $value) {
+                        $tipe_equipment_kendaraan = (isset($value['tipe_equipment_kendaraan']) ? $value['tipe_equipment_kendaraan'] : null);
+                        $model_serial = (isset($value['model_serial']) ? $value['model_serial'] : null);
+                        $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
+                        $keterangan_bukan_aset = (isset($value['keterangan_bukan_aset']) ? $value['keterangan_bukan_aset'] : null);
 
-                    $unit_payload = [
-                        "lpa_id" => $insert,
-                        "tipe_equipment_kendaraan" => $tipe_equipment_kendaraan,
-                        "model_serial" => $model_serial,
-                        "aset_perusahaan" => $aset_perusahaan,
-                        "keterangan_bukan_aset" => $keterangan_bukan_aset
-                    ];
+                        $unit_payload = [
+                            "lpa_id" => $insert,
+                            "tipe_equipment_kendaraan" => $tipe_equipment_kendaraan,
+                            "model_serial" => $model_serial,
+                            "aset_perusahaan" => $aset_perusahaan,
+                            "keterangan_bukan_aset" => $keterangan_bukan_aset
+                        ];
 
-                    $insert_unit = $this->qBuilder->insert_unit($unit_payload);
+                        $insert_unit = $this->qBuilder->insert_unit($unit_payload);
+                    }
                 }
 
                 //############## FOTO #################
