@@ -1,0 +1,268 @@
+<?php
+
+namespace App\Hizb\Validations;
+
+use Sparkhizb\Helpers\IdentityHelper;
+
+use App\Hizb\Models\Safety\LpahModel;
+use App\Hizb\Models\Safety\LpadOrangModel;
+use App\Hizb\Models\Safety\LpadFotoModel;
+use App\Hizb\Models\Safety\LpadKerusakanModel;
+
+class LpaValidation 
+{
+	public function __construct()
+    {
+        $this->iescm = \Config\Database::connect('iescm');
+        $this->validation = \Config\Services::validation();
+        $this->request = \Config\Services::request();
+        $this->identity = new IdentityHelper();
+
+        $this->model = new LpahModel();
+        $this->mOrang = new LpadOrangModel();
+        $this->mFoto = new LpadFotoModel();
+        $this->mKerusakan = new LpadKerusakanModel();
+    }
+
+    private function cekID($id)
+    {
+        $builder = $this->iescm->table($this->model->table)
+        ->select("id")
+        ->where('id', $id)
+        ->get()
+        ->getRow();
+
+        return $builder;
+    }
+
+    private function cekID_orangTerlibat($id)
+    {
+        $builder = $this->iescm->table($this->mOrang->table)
+        ->select("id")
+        ->where('id', $id)
+        ->get()
+        ->getRow();
+
+        return $builder;
+    }
+
+    private function cekID_kerusakan($id)
+    {
+        $builder = $this->iescm->table($this->mKerusakan->table)
+        ->select("id")
+        ->where('id', $id)
+        ->get()
+        ->getRow();
+
+        return $builder;
+    }
+
+    private function cekID_foto($id)
+    {
+        $builder = $this->iescm->table($this->mFoto->table)
+        ->select("id")
+        ->where('id', $id)
+        ->get()
+        ->getRow();
+
+        return $builder;
+    }
+
+    private function find_by_fekb($fekb)
+    {
+        $builder = $this->model
+        ->where('fekb_number', $fekb)
+        ->find();
+
+        return $find_by_fekb;
+    }
+
+    public function new()
+    {
+        // $rules = [
+        //     'site_project_kode' => 'required',
+        //     'kode' => 'required',
+        //     'uom_id' => 'required',
+        // ];
+
+        // $this->validation->setRules($rules);
+        // $this->validation->withRequest($this->request)->run();
+        // $errors = $this->validation->getErrors();
+        //     if($errors) return $errors;
+    }
+
+    public function insert()
+    {
+        $site_project_id        = $this->request->getJsonVar('site_project_id');
+        $site_project_kode      = $this->request->getJsonVar('site_project_kode');
+
+        $po_number              = $this->request->getJsonVar('po_number');
+        $pic_code               = $this->request->getJsonVar('pic_code');
+        $pic                    = $this->request->getJsonVar('pic');
+        $vendor                 = $this->request->getJsonVar('vendor');
+        $reference              = $this->request->getJsonVar('reference');
+        $reference_number       = $this->request->getJsonVar('reference_number');
+
+        $item_code              = $this->request->getJsonVar('item_code');
+        $item_name              = $this->request->getJsonVar('item_name');
+        $qty                    = $this->request->getJsonVar('qty');
+        $uom                    = $this->request->getJsonVar('uom');
+        $item_category_id       = $this->request->getJsonVar('item_category_id');
+
+        $received_at            = $this->request->getJsonVar('received_at');
+        $installed_at           = $this->request->getJsonVar('installed_at');
+        $problem_category_id    = $this->request->getJsonVar('problem_category_id');
+        $fekb_number            = $this->request->getJsonVar('fekb_number');
+        $description            = $this->request->getJsonVar('description');
+        $report_by_name         = $this->request->getJsonVar('report_by_name');
+
+        $remark                 = $this->request->getJsonVar('remark');
+        $action                 = $this->request->getJsonVar('action');
+        $filename               = $this->request->getJsonVar('filename');
+        $folder                 = $this->request->getJsonVar('folder');
+        $url                    = $this->request->getJsonVar('url');
+        $status_id              = $this->request->getJsonVar('status_id');
+
+        $rules = [
+            "po_number" => 'required',
+            "pic_code" => 'required',
+            "pic" => 'required',
+            "vendor" => 'required',
+
+            "item_code" => 'required',
+            "item_name" => 'required',
+            "qty" => 'required',
+            "uom" => 'required',
+            "item_category_id" => 'required',
+
+            "received_at" => 'required',
+            // "installed_at" => 'required',
+            "problem_category_id" => 'required',
+            "fekb_number" => 'required',
+            "description" => 'required',
+            "report_by_name" => 'required',
+
+            "url" => 'required',
+            "status_id" => 'required'
+        ];
+
+        $this->validation->setRules($rules);
+        $this->validation->withRequest($this->request)->run();
+        $errors = $this->validation->getErrors();
+            if($errors) return $errors;
+
+        $findByFekb = $this->model->where('fekb_number', $fekb_number)->first();
+            if ($findByFekb) return ["fekb_number" => "FEKB Number already exist."];
+    }
+
+    public function update($id)
+    {
+        if (!$this->cekID($id)) return ["id" => "ID ".$id." not found!"];
+
+        $orang_terlibat = $this->request->getVar('orang_terlibat');
+        $kerusakan = $this->request->getVar('kerusakan');
+        $foto = $this->request->getVar('foto');
+
+        foreach ($orang_terlibat as $key => $value) {
+            if (!$this->cekID_orangTerlibat($key)) return ["orang_terlibat_id" => "ID ".$key." not found!"];
+        }
+
+        foreach ($kerusakan as $key => $value) {
+            if (!$this->cekID_kerusakan($key)) return ["kerusakan_id" => "ID ".$key." not found!"];
+        }
+
+        foreach ($foto as $key => $value) {
+            if (!$this->cekID_foto($key)) return ["foto_id" => "ID ".$key." not found!"];
+        }
+
+        // $is_pic                 = $this->request->getJsonVar('is_pic');
+
+        // $site_project_id        = $this->request->getJsonVar('site_project_id');
+        // $site_project_kode      = $this->request->getJsonVar('site_project_kode');
+
+        // $po_number              = $this->request->getJsonVar('po_number');
+        // $pic_code               = $this->request->getJsonVar('pic_code');
+        // $pic                    = $this->request->getJsonVar('pic');
+        // $vendor                 = $this->request->getJsonVar('vendor');
+        // $reference              = $this->request->getJsonVar('reference');
+        // $reference_number       = $this->request->getJsonVar('reference_number');
+
+        // $item_code              = $this->request->getJsonVar('item_code');
+        // $item_name              = $this->request->getJsonVar('item_name');
+        // $qty                    = $this->request->getJsonVar('qty');
+        // $uom                    = $this->request->getJsonVar('uom');
+        // $item_category_id       = $this->request->getJsonVar('item_category_id');
+
+        // $received_at            = $this->request->getJsonVar('received_at');
+        // $installed_at           = $this->request->getJsonVar('installed_at');
+        // $problem_category_id    = $this->request->getJsonVar('problem_category_id');
+        // $fekb_number            = $this->request->getJsonVar('fekb_number');
+        // $description            = $this->request->getJsonVar('description');
+        // $report_by_name         = $this->request->getJsonVar('report_by_name');
+
+        // $status_id              = $this->request->getJsonVar('status_id');
+        // $remark                 = $this->request->getJsonVar('remark');
+        // $action                 = $this->request->getJsonVar('action');
+
+        // $filename               = $this->request->getJsonVar('filename');
+        // $folder                 = $this->request->getJsonVar('folder');
+        // $path                   = $this->request->getJsonVar('path');
+        // $url                    = $this->request->getJsonVar('url');
+
+        // if ($is_pic == 1) {
+        //     $rules = [
+        //         "status_id" => 'required',
+        //         "remark" => 'required',
+        //         "action" => 'required'
+        //     ];
+        // }else{
+        //     $rules = [
+        //         "po_number" => 'required',
+        //         "pic_code" => 'required',
+        //         "pic" => 'required',
+        //         "vendor" => 'required',
+
+        //         "item_code" => 'required',
+        //         "item_name" => 'required',
+        //         "qty" => 'required',
+        //         "uom" => 'required',
+        //         "item_category_id" => 'required',
+
+        //         "received_at" => 'required',
+        //         "installed_at" => 'required',
+        //         "problem_category_id" => 'required',
+        //         "fekb_number" => 'required',
+        //         "description" => 'required',
+        //         "report_by_name" => 'required',
+
+        //         "status_id" => 'required'
+        //     ];
+
+        //     if(isset($filename)) $rules["filename"] = 'required';
+        //     if(isset($folder)) $rules["folder"] = 'required';
+        //     if(isset($path)) $rules["path"] = 'required';
+        //     if(isset($url)) $rules["url"] = 'required';
+        // }
+
+        // $this->validation->setRules($rules);
+        // $this->validation->withRequest($this->request)->run();
+        // $errors = $this->validation->getErrors();
+        //     if($errors) return $errors;
+
+        // // $findByFekb = $this->model->where('fekb_number', $fekb_number)->first();
+        // //     if ($findByFekb) return ["fekb_number" => "FEKB Number already exist."];
+        
+        // // $qUsername = $this->model->like('username', $username)->where('id != ', $id)->first();
+        // //     if ($qUsername) return ["username" => "Username has already on this system"];
+
+        /*$table = $this->model->table;
+        $subquery = $this->iescm->table($table)
+        ->select("id")
+        ->where('id', $id)
+        ->get()
+        // ->getResultArray();
+        ->getRow();
+
+        return $subquery;*/
+    }
+}
