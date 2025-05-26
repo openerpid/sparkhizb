@@ -246,6 +246,7 @@ class LpaController extends ResourceController
         $shift_kerja = $this->request->getVar('shift_kerja');
         $mulai_shift = $this->request->getVar('mulai_shift');
         $selesai_shift = $this->request->getVar('selesai_shift');
+        $hari_kerja_ke = $this->request->getVar('hari_kerja_ke');
         $waktu_kejadian = $this->request->getVar('waktu_kejadian');
         $lokasi_insiden = $this->request->getVar('lokasi_insiden');
         $detail_lokasi_insiden = $this->request->getVar('detail_lokasi_insiden');
@@ -280,6 +281,7 @@ class LpaController extends ResourceController
             "shift_kerja" => $shift_kerja,
             "mulai_shift" => $mulai_shift,
             "selesai_shift" => $selesai_shift,
+            "hari_kerja_ke" => $hari_kerja_ke,
             "waktu_kejadian" => $waktu_kejadian,
             "lokasi_insiden" => $lokasi_insiden,
             "detail_lokasi_insiden" => $detail_lokasi_insiden,

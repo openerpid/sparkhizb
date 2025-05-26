@@ -17,6 +17,7 @@ class LpahModel extends Model
     protected $allowedFields = [
         "id",
         "company_id",
+
         "nomor_dokumen",
         "insident_classification",
         "site",
@@ -29,6 +30,7 @@ class LpahModel extends Model
         "shift_kerja",
         "mulai_shift",
         "selesai_shift",
+        "hari_kerja_ke",
         "waktu_kejadian",
         "lokasi_insiden",
         "detail_lokasi_insiden",
@@ -49,9 +51,11 @@ class LpahModel extends Model
         "pihak_tiga_tanggal",
         "tipe_insiden",
         "penjelasan_insiden",
+
         "created_at",
         "updated_at",
         "deleted_at",
+
         "created_by",
         "updated_by",
         "deleted_by"
