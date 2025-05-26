@@ -24,31 +24,40 @@ class LpahModel extends Model
         "divisi",
         "departemen",
         "section",
-        "tanggal_kejadian",
-        "tanggal_pelaporan",
-        "waktu_pelaporan",
+
+        "hari_kejadian",
+        "tanggal_kejadian","waktu_kejadian",
+        "tanggal_pelaporan","waktu_pelaporan",
+
         "shift_kerja",
         "mulai_shift",
         "selesai_shift",
         "hari_kerja_ke",
-        "waktu_kejadian",
+
+        "lokasi_insiden_id",
         "lokasi_insiden",
         "detail_lokasi_insiden",
+
+        "cidera_id",
         "cidera",
         "detail_cidera_lainnya",
         "kronologi",
+
         "instansi_pemerintah",
         "nama_pejabat",
         "pemerintah_disampaikan_oleh",
         "pemerintah_tanggal",
+
         "asuransi",
         "nama_perusahaan",
         "asuransi_disampaikan_oleh",
         "asuransi_tanggal",
+
         "pihak_tiga",
         "nama_pihak_ketiga",
         "pihak_tiga_disampaikan_oleh",
         "pihak_tiga_tanggal",
+
         "tipe_insiden",
         "penjelasan_insiden",
 

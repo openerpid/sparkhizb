@@ -314,9 +314,9 @@ class LpaBuilder
     /**
      * UPDATE
      */
-    public function update_new($id, $payload)
+    public function update($id, $payload)
     {
-        $builder = $this->mDoc
+        $builder = $this->model
             ->where('id', $id)
             ->set($payload)
             ->update();

@@ -35,10 +35,11 @@ class LpaValidation
         return $builder;
     }
 
-    private function cekID_orangTerlibat($id)
+    private function cekID_orangTerlibat($id, $lpa_id)
     {
         $builder = $this->iescm->table($this->mOrang->table)
         ->select("id")
+        ->where("lpa_id", $lpa_id)
         ->where('id', $id)
         ->get()
         ->getRow();
@@ -46,35 +47,28 @@ class LpaValidation
         return $builder;
     }
 
-    private function cekID_kerusakan($id)
+    private function cekID_kerusakan($id, $lpa_id)
     {
         $builder = $this->iescm->table($this->mKerusakan->table)
         ->select("id")
         ->where('id', $id)
+        ->where("lpa_id", $lpa_id)
         ->get()
         ->getRow();
 
         return $builder;
     }
 
-    private function cekID_foto($id)
+    private function cekID_foto($id, $lpa_id)
     {
         $builder = $this->iescm->table($this->mFoto->table)
         ->select("id")
         ->where('id', $id)
+        ->where("lpa_id", $lpa_id)
         ->get()
         ->getRow();
 
         return $builder;
-    }
-
-    private function find_by_fekb($fekb)
-    {
-        $builder = $this->model
-        ->where('fekb_number', $fekb)
-        ->find();
-
-        return $find_by_fekb;
     }
 
     public function new()
@@ -159,20 +153,25 @@ class LpaValidation
     {
         if (!$this->cekID($id)) return ["id" => "ID ".$id." not found!"];
 
-        $orang_terlibat = $this->request->getVar('orang_terlibat');
-        $kerusakan = $this->request->getVar('kerusakan');
-        $foto = $this->request->getVar('foto');
-
-        foreach ($orang_terlibat as $key => $value) {
-            if (!$this->cekID_orangTerlibat($key)) return ["orang_terlibat_id" => "ID ".$key." not found!"];
+        if ($this->request->getVar('orang_terlibat')) {
+            $orang_terlibat = $this->request->getVar('orang_terlibat');
+            foreach ($orang_terlibat as $key => $value) {
+                if (!$this->cekID_orangTerlibat($key, $id)) return ["orang_terlibat_id" => "ID ".$key." not found!"];
+            }
         }
 
-        foreach ($kerusakan as $key => $value) {
-            if (!$this->cekID_kerusakan($key)) return ["kerusakan_id" => "ID ".$key." not found!"];
+        if ($this->request->getVar('kerusakan')) {
+            $kerusakan = $this->request->getVar('kerusakan');
+            foreach ($kerusakan as $key => $value) {
+                if (!$this->cekID_kerusakan($key, $id)) return ["kerusakan_id" => "ID ".$key." not found!"];
+            }
         }
 
-        foreach ($foto as $key => $value) {
-            if (!$this->cekID_foto($key)) return ["foto_id" => "ID ".$key." not found!"];
+        if ($this->request->getVar('foto')) {
+            $foto = $this->request->getVar('foto');
+            foreach ($foto as $key => $value) {
+                if (!$this->cekID_foto($key, $id)) return ["foto_id" => "ID ".$key." not found!"];
+            }
         }
 
         // $is_pic                 = $this->request->getJsonVar('is_pic');
