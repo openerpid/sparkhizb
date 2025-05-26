@@ -13,6 +13,7 @@ use App\Hizb\Models\Safety\LpadUnitModel;
 use App\Hizb\Models\Safety\LpadOrangModel;
 use App\Hizb\Models\Safety\LpadFotoModel;
 use App\Hizb\Models\Safety\LpadKerusakanModel;
+use App\Hizb\Models\Safety\LpadDivisiModel;
 
 // use App\Models\Safety\HazardReportQueueMailModel;
 // use App\Models\Safety\HazardReportNumberModel;
@@ -39,6 +40,7 @@ class LpaBuilder
         $this->mKerusakan = new LpadKerusakanModel();
         $this->mUnit = new LpadUnitModel();
         $this->mDoc = new DocumentNumbersModel();
+        $this->mDivisi = new LpadDivisiModel();
 
         // $this->db->defaultGroup = 'iescm';
     }
@@ -188,6 +190,11 @@ class LpaBuilder
         return $this->mUnit->where('lpa_id', $h_id)->get()->getResult();
     }
 
+    public function show_d_divisi($h_id)
+    {
+        return $this->mDivisi->where('lpa_id', $h_id)->get()->getResult();
+    }
+
     public function show_new($nik, $site)
     {
         $builder = $this->mDoc
@@ -290,6 +297,14 @@ class LpaBuilder
     {
         $payload = $this->identity->insert($payload);
         $builder = $this->mFoto->insert($payload);
+
+        return $builder;
+    }
+
+    public function insert_divisiTerkait($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mDivisi->insert($payload);
 
         return $builder;
     }

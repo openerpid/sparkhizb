@@ -4,10 +4,10 @@ namespace App\Hizb\Models\Safety;
 
 use CodeIgniter\Model;
 
-class LpadOrangModel extends Model
+class LpadDivisiModel extends Model
 {
     protected $DBGroup = 'openerpid';
-    protected $table = 'lpa_d_orang';
+    protected $table = 'lpa_d_divisi';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $insertID = 0;
@@ -18,18 +18,10 @@ class LpadOrangModel extends Model
         "id",
         "company_id",
         "lpa_id",
-        "status_karyawan",
-        "nik",
-        "name",
-        "jk",
-        "jabatan",
-        "atasan",
-        "umur",
-        "pengalaman_tahun",
-        "pengalaman_bulan",
-        "sebagai",
-        "perusahaan",
-        "hari_kerja_ke",
+        
+        "divisi_kode",
+        "departemen_kode",
+        "section",
 
         "created_at",
         "updated_at",

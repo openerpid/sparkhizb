@@ -48,7 +48,8 @@ class LpaController extends ResourceController
         $show_detail_orang_terlibat = $this->request->getJsonVar('show_detail_orang_terlibat');
         $show_detail_foto = $this->request->getJsonVar('show_detail_foto');
         $show_detail_kerusakan = $this->request->getJsonVar('show_detail_kerusakan');
-        $show_detail_unit = $this->request->getJsonVar('show_detail_unit');
+        // $show_detail_unit = $this->request->getJsonVar('show_detail_unit');
+        $show_detail_divisiTerkait = $this->request->getJsonVar('show_detail_divisiTerkait');
 
         $builder = $this->qBuilder->show($id);
         $total = $this->qHelp->_total($builder);
@@ -77,9 +78,14 @@ class LpaController extends ResourceController
                     $rows[$key]->kerusakan = $kerusakan;
                 }
 
-                if ($show_detail_unit) {
-                    $unit = $this->qBuilder->show_d_unit($value->id);
-                    $rows[$key]->unit = $unit;
+                // if ($show_detail_unit) {
+                //     $unit = $this->qBuilder->show_d_unit($value->id);
+                //     $rows[$key]->unit = $unit;
+                // }
+
+                if ($show_detail_divisiTerkait) {
+                    $divisi = $this->qBuilder->show_d_divisi($value->id);
+                    $rows[$key]->divisi_terkait = $divisi;
                 }
             }
         }
@@ -200,9 +206,9 @@ class LpaController extends ResourceController
         $nomor_dokumen = $this->request->getVar('nomor_dokumen');
         $insident_classification = $this->request->getVar('insident_classification');
         $site = $this->request->getVar('site');
-        $divisi = $this->request->getVar('divisi');
-        $departemen = $this->request->getVar('departemen');
-        $section = $this->request->getVar('section');
+        // $divisi = $this->request->getVar('divisi');
+        // $departemen = $this->request->getVar('departemen');
+        // $section = $this->request->getVar('section');
         $tanggal_kejadian = $this->request->getVar('tanggal_kejadian');
         $tanggal_pelaporan = $this->request->getVar('tanggal_pelaporan');
         $waktu_pelaporan = $this->request->getVar('waktu_pelaporan');
@@ -234,9 +240,9 @@ class LpaController extends ResourceController
             "nomor_dokumen" => $nomor_dokumen,
             "insident_classification" => $insident_classification,
             "site" => $site,
-            "divisi" => $divisi,
-            "departemen" => $departemen,
-            "section" => $section,
+            // "divisi" => $divisi,
+            // "departemen" => $departemen,
+            // "section" => $section,
             "tanggal_kejadian" => $tanggal_kejadian,
             "tanggal_pelaporan" => $tanggal_pelaporan,
             "waktu_pelaporan" => $waktu_pelaporan,
@@ -281,6 +287,22 @@ class LpaController extends ResourceController
             if ($isValid_number) {
                 $insert = $this->qBuilder->insert($payload);
                 $used_number = $this->qBuilder->used_number($nomor_dokumen);
+
+                // ############## Divisi terkait #################
+                $divisi = $this->request->getVar('divisi');
+                foreach ($divisi as $key => $value) {
+                    $divisi_kode = (isset($value['divisi_kode']) ? $value['divisi_kode'] : null);
+                    $departemen_kode = (isset($value['departemen_kode']) ? $value['departemen_kode'] : null);
+                    $section = (isset($value['section']) ? $value['section'] : null);
+
+                    $divisi_terkait = [
+                        "lpa_id" => $insert,
+                        "divisi_kode" => $divisi_kode,
+                        "departemen_kode" => $departemen_kode,
+                        "section" => $section
+                    ];
+                    $insert_divisi_terkait = $this->qBuilder->insert_divisiTerkait($divisi_terkait);
+                }
 
                 // ############## ORANG TERLIBAT #################
                 $orang_terlibat = $this->request->getVar('orang_terlibat');
