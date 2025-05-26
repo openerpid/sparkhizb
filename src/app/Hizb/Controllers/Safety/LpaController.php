@@ -176,7 +176,7 @@ class LpaController extends ResourceController
      */
     public function create()
     {
-        // $body = (array) $this->request->getVar();
+        $body = (array) $this->request->getVar();
         // $foto_temuan = $this->request->getFile("foto_temuan");
         // $foto_perbaikan = $this->request->getFile("foto_perbaikan");
         // $foto_temuan_id = null;
@@ -374,7 +374,18 @@ class LpaController extends ResourceController
                     $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
                     $name = (isset($value['name']) ? $value['name'] : null);
                     $tipe = (isset($value['tipe']) ? $value['tipe'] : null);
-                    $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
+
+                    if (isset($value['aset_perusahaan'])) {
+                        if ($value['aset_perusahaan']) {
+                            $aset_perusahaan = $value['aset_perusahaan'];
+                        }else{
+                            $aset_perusahaan = null;
+                        }
+                    }else{
+                        $aset_perusahaan = null;
+                    }
+                    
+                    // $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
                     $serial_number = (isset($value['serial_number']) ? $value['serial_number'] : null);
                     $tingkat_kerusakan = (isset($value['tingkat_kerusakan']) ? $value['tingkat_kerusakan'] : null);
                     $kerusakan_keparahan = (isset($value['kerusakan_keparahan']) ? $value['kerusakan_keparahan'] : null);
