@@ -57,6 +57,7 @@ class LpaController extends ResourceController
         $rows = $this->qHelp->_rowsBui($builder);
         $count = count($rows);
         $rows = $this->qBuilder->joinData($rows);
+        
         if ($rows) {
             foreach ($rows as $key => $value) {
                 if ($show_detail_orang_terlibat) {
@@ -150,9 +151,9 @@ class LpaController extends ResourceController
                         $rows[$key]->divisi_terkait = $divisi;
                     }
 
-                    // else{
-                    //     $rows[$key]->divisi_terkait = $divisi;
-                    // }
+                    else{
+                        $rows[$key]->divisi_terkait = $divisi;
+                    }
                 }
             }
         }
