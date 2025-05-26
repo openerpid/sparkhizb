@@ -351,6 +351,7 @@ class LpaController extends ResourceController
                     $pengalaman_bulan = (isset($value['pengalaman_bulan']) ? $value['pengalaman_bulan'] : null);
                     $sebagai = (isset($value['sebagai']) ? $value['sebagai'] : null);
                     $perusahaan = (isset($value['perusahaan']) ? $value['perusahaan'] : null);
+                    $hari_kerja_ke = (isset($value['hari_kerja_ke']) and $value['hari_kerja_ke']) ? $value['hari_kerja_ke'] : null;
 
                     $orang_terlibat_payload = [
                         "lpa_id" => $insert,
@@ -364,7 +365,8 @@ class LpaController extends ResourceController
                         "pengalaman_tahun" => $pengalaman_tahun,
                         "pengalaman_bulan" => $pengalaman_bulan,
                         "sebagai" => $sebagai,
-                        "perusahaan" => $perusahaan
+                        "perusahaan" => $perusahaan,
+                        "hari_kerja_ke" => $hari_kerja_ke
                     ];
                     $insert_orangTerlibat = $this->qBuilder->insert_orangTerlibat($orang_terlibat_payload);
                 }
@@ -375,19 +377,8 @@ class LpaController extends ResourceController
                     // $tipe_komponen = (isset($value['tipe_komponen']) ? $value['tipe_komponen'] : null);
                     $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
                     $name = (isset($value['name']) ? $value['name'] : null);
-                    $tipe = (isset($value['tipe']) ? $value['tipe'] : null);
-
-                    if (isset($value['aset_perusahaan'])) {
-                        if ($value['aset_perusahaan']) {
-                            $aset_perusahaan = $value['aset_perusahaan'];
-                        }else{
-                            $aset_perusahaan = null;
-                        }
-                    }else{
-                        $aset_perusahaan = null;
-                    }
-                    
-                    // $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
+                    $tipe = (isset($value['tipe']) ? $value['tipe'] : null);                    
+                    $aset_perusahaan = (isset($value['aset_perusahaan']) and $value['aset_perusahaan']) ? $value['aset_perusahaan'] : null;
                     $serial_number = (isset($value['serial_number']) ? $value['serial_number'] : null);
                     $tingkat_kerusakan = (isset($value['tingkat_kerusakan']) ? $value['tingkat_kerusakan'] : null);
                     $kerusakan_keparahan = (isset($value['kerusakan_keparahan']) ? $value['kerusakan_keparahan'] : null);
