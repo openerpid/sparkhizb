@@ -63,4 +63,13 @@ class DepartementBuilder
 
         return $builder;
     }
+
+    public function show_by_kode($kode = null)
+    {
+        $builder = $this->db->table($this->model->table)
+            ->where('KdDepar', $kode)
+            ->where('DeleteBy IS NULL');
+
+        return $builder;
+    }
 }

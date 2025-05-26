@@ -21,9 +21,14 @@ class DivisiBuilder
 
     public function show($id = null)
     {
+        $KdDivisi = $this->request->getJsonVar('KdDivisi');
         $allowedFields = [];
         $builder = $this->db->table($this->model->table)
             ->where('DeleteTime IS NULL');
+
+        if ($KdDivisi) {
+            $builder->where('KdDivisi', $KdDivisi);
+        }
 
         $params = [
             "builder" => $builder,
@@ -35,6 +40,15 @@ class DivisiBuilder
         $builder = $this->bHelp->conditions0($params);
         // $allowedFields = array_merge($allowedFields,[]);
         $builder = $this->qHelp->orderBy($builder, $allowedFields);
+
+        return $builder;
+    }
+
+    public function show_by_kode($kode = null)
+    {
+        $builder = $this->db->table($this->model->table)
+            ->where('KdDivisi', $kode)
+            ->where('DeleteTime IS NULL');
 
         return $builder;
     }

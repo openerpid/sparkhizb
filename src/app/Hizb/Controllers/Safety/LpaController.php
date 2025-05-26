@@ -50,6 +50,7 @@ class LpaController extends ResourceController
         $show_detail_kerusakan = $this->request->getJsonVar('show_detail_kerusakan');
         // $show_detail_unit = $this->request->getJsonVar('show_detail_unit');
         $show_detail_divisiTerkait = $this->request->getJsonVar('show_detail_divisiTerkait');
+        $join_syshab = $this->request->getJsonVar('join_syshab');
 
         $builder = $this->qBuilder->show($id);
         $total = $this->qHelp->_total($builder);
@@ -84,8 +85,74 @@ class LpaController extends ResourceController
                 // }
 
                 if ($show_detail_divisiTerkait) {
+
                     $divisi = $this->qBuilder->show_d_divisi($value->id);
-                    $rows[$key]->divisi_terkait = $divisi;
+
+                    // if ($join_syshab_divisi) {
+                    //     $qbDivisi = new \App\Hizb\Syshab\Builder\DivisiBuilder;
+
+                    //     $divisi_name = '';
+                    //     foreach ($divisi as $key2 => $value2) {
+                    //         $herp_divisi = $qbDivisi->show_by_kode($value2->divisi_kode)->get()->getRow();
+                    //         if ($herp_divisi) {
+                    //             $divisi_name = $herp_divisi->NmDivisi;
+                    //         }
+
+                    //         $divisi[$key2]->divisi_name = $divisi_name;
+                    //     }
+
+                    //     $rows[$key]->divisi_terkait = $divisi;
+                    // }
+
+                    // if ($join_syshab_departemen) {
+                    //     $qbDepar = new \App\Hizb\Syshab\Builder\DepartementBuilder;
+
+                    //     $depar_name = '';
+                    //     foreach ($divisi as $key3 => $value3) {
+                    //         $show_depar = $qbDepar->show_by_kode($value2->departemen_kode)->get()->getRow();
+                    //         if ($show_depar) {
+                    //             $depar_name = $show_depar->NmDepar;
+                    //         }
+
+                    //         $divisi[$key3]->depar_name = $depar_name;
+                    //     }
+
+                    //     $rows[$key]->divisi_terkait = $divisi;
+                    // }
+
+
+                    $divisi_name = '';
+                    $depar_name = '';
+                    foreach ($divisi as $key2 => $value2) {
+                        if (in_array("divisi", $join_syshab)) {
+                            $qbDivisi = new \App\Hizb\Syshab\Builder\DivisiBuilder;
+
+                            $herp_divisi = $qbDivisi->show_by_kode($value2->divisi_kode)->get()->getRow();
+                            if ($herp_divisi) {
+                                $divisi_name = $herp_divisi->NmDivisi;
+                            }
+
+                            $divisi[$key2]->divisi_name = $divisi_name;
+                        }
+
+                        if (in_array("departemen", $join_syshab)) {
+                            $qbDepar = new \App\Hizb\Syshab\Builder\DepartementBuilder;
+
+                            $show_depar = $qbDepar->show_by_kode($value2->departemen_kode)->get()->getRow();
+                            if ($show_depar) {
+                                $depar_name = $show_depar->NmDepar;
+                            }
+
+                            $divisi[$key2]->depar_name = $depar_name;
+
+                        }
+                        
+                        $rows[$key]->divisi_terkait = $divisi;
+                    }
+
+                    // else{
+                    //     $rows[$key]->divisi_terkait = $divisi;
+                    // }
                 }
             }
         }
