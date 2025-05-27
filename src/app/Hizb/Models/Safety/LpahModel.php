@@ -58,6 +58,7 @@ class LpahModel extends Model
         "pihak_tiga_disampaikan_oleh",
         "pihak_tiga_tanggal",
 
+        "tipe_insiden_id",
         "tipe_insiden",
         "penjelasan_insiden",
 

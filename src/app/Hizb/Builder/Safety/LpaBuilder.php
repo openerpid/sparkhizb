@@ -89,62 +89,23 @@ class LpaBuilder
     public function show($id = null)
     {
 
+        $allowedFields = $this->model->allowedFields;
+        $where = $this->request->getJsonVar('where');
+
         $builder = $this->qbAlya();
 
-        // /**
-        //  * 0 = Not Release
-        //  * 1 = Release
-        //  * 2 = Approve
-        //  * 3 = Reject
-        //  * 
-        //  * is_release 1 dan 2 tidak dapat lakukan (edit dan release), tapi dapat dilakukan approve dan reject oleh admin.
-        //  * Admin hanya dapat melihat semua data yang is_release = 1 dan 2.
-        //  * */
+        if ($where and $where->apply == true) {
+            $builder->where($where->column, $where->value);
+        }else{
+            $params = [
+                "builder" => $builder,
+                "id" => $id,
+                "search_params" => ["nomor_dokumen","site","hari_kejadian"],
+                "company_id" => null,
+                "account_id" => null
+            ];            
+        }
 
-        // $release = $this->request->getJsonVar('release');
-        // $nomor_dokumen = $this->request->getJsonVar('nomor_dokumen');
-
-        $allowedFields = $this->model->allowedFields;
-        // $account_id = $this->identity->account_id();
-        // $crud = $this->identity->crud();
-        // $identity_id = null;
-        // // $crud = [1,0,0,0];
-        // // $crud = [];
-
-        // if ($release) {
-        //     $release = $release;
-        // } else {
-        //     $release = [0, 1, 2, 3];
-        // }
-
-        // if ($nomor_dokumen) {
-        //     $builder->where('nomor_dokumen', $nomor_dokumen);
-        // } else {
-        //     if (isset($crud[1]) and $crud[1] == 1) { // jika Read All
-        //         // if ($release == 0 OR $release == 3) { // jika get data dengan status (not release atau reject)
-        //         if ($release == 0) { // jika get data dengan status (not release)
-        //             $identity_id = $this->identity->account_id();
-        //         }
-        //     } else {
-        //         $identity_id = $this->identity->account_id();
-        //     }
-
-
-        //     if (is_array($release)) {
-        //         $builder->whereIn('is_release', $release);
-        //     } else {
-        //         $builder->where('is_release', $release);
-        //     }
-
-        // }
-
-        $params = [
-            "builder" => $builder,
-            "id" => $id,
-            "search_params" => [],
-            "company_id" => null,
-            "account_id" => null
-        ];
 
         $builder = $this->bHelp->conditions($params);
         $builder = $this->qHelp->orderBy($builder, $allowedFields);
@@ -317,6 +278,17 @@ class LpaBuilder
     public function update($id, $payload)
     {
         $builder = $this->model
+            ->where('id', $id)
+            ->set($payload)
+            ->update();
+
+        return $builder;
+    }
+
+    public function update_orangTerlibat($lpa_id, $id, $payload)
+    {
+        $builder = $this->mOrang
+            ->where('lpa_id', $lpa_id)
             ->where('id', $id)
             ->set($payload)
             ->update();

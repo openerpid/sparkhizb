@@ -526,15 +526,6 @@ class LpaController extends ResourceController
         $kronologi = $this->request->getVar('kronologi');
 
         $instansi_pemerintah = $this->request->getVar('instansi_pemerintah');
-        // if (isset($instansi_pemerintah)) {
-        //     if ($instansi_pemerintah == "") {
-        //         $instansi_pemerintah = null;
-        //     }
-        // }else{
-        //     $nama_pejabat
-        //     $pemerintah_disampaikan_oleh
-        //     $pemerintah_tanggal
-        // }
         $nama_pejabat = $this->request->getVar('nama_pejabat');
         $pemerintah_disampaikan_oleh = $this->request->getVar('pemerintah_disampaikan_oleh');
         $pemerintah_tanggal = $this->request->getVar('pemerintah_tanggal');
@@ -549,6 +540,7 @@ class LpaController extends ResourceController
         $pihak_tiga_disampaikan_oleh = $this->request->getVar('pihak_tiga_disampaikan_oleh');
         $pihak_tiga_tanggal = $this->request->getVar('pihak_tiga_tanggal');
 
+        $tipe_insiden_id = $this->request->getVar('tipe_insiden_id');
         $tipe_insiden = $this->request->getVar('tipe_insiden');
         $penjelasan_insiden = $this->request->getVar('penjelasan_insiden');
 
@@ -594,13 +586,14 @@ class LpaController extends ResourceController
         if(isset($pihak_tiga_disampaikan_oleh)) $payload["pihak_tiga_disampaikan_oleh"] = (isset($pihak_tiga_disampaikan_oleh) and $pihak_tiga_disampaikan_oleh != "" and $pihak_tiga != "") ? $pihak_tiga_disampaikan_oleh : null;
         if(isset($pihak_tiga_tanggal)) $payload["pihak_tiga_tanggal"] = (isset($pihak_tiga_tanggal) and $pihak_tiga_tanggal != "" and $pihak_tiga != "") ? $pihak_tiga_tanggal : null;
 
-        // if(isset($tipe_insiden)) $payload["tipe_insiden"] = $tipe_insiden;
-        // if(isset($penjelasan_insiden)) $payload["penjelasan_insiden"] = $penjelasan_insiden;
+        if(isset($tipe_insiden_id)) $payload["tipe_insiden_id"] = (isset($tipe_insiden_id) and $tipe_insiden_id != "") ? $tipe_insiden_id : null;
+        if(isset($tipe_insiden)) $payload["tipe_insiden"] = (isset($tipe_insiden) and $tipe_insiden != "") ? $tipe_insiden : null;
+        if(isset($penjelasan_insiden)) $payload["penjelasan_insiden"] = (isset($penjelasan_insiden) and $penjelasan_insiden != "") ? $penjelasan_insiden : null;
         
         $builder = $this->qBuilder->update($id, $payload);
 
-        /*$payload['orang_terlibat'] = $this->update_orangTerlibat($id);        
-        $payload['kerusakan_payload'] = $this->update_kerusakan($id);*/
+        $payload['orang_terlibat'] = $this->update_orangTerlibat($id);        
+        // $payload['kerusakan_payload'] = $this->update_kerusakan($id);
 
         /*if(isset($item_category_id)) $payload["item_category_id"] = $item_category_id;
         if(isset($received_at)) $payload["received_at"] = $received_at;
@@ -652,6 +645,7 @@ class LpaController extends ResourceController
     {
         $orang_terlibat = $this->request->getVar('orang_terlibat');
         $payload_arr = [];
+        $builder = [];
         if ($orang_terlibat) {
             foreach ($orang_terlibat as $key => $value) {
                 $status_karyawan = (isset($value['status_karyawan']) ? $value['status_karyawan'] : null);
@@ -665,7 +659,7 @@ class LpaController extends ResourceController
                 $pengalaman_bulan = (isset($value['pengalaman_bulan']) ? $value['pengalaman_bulan'] : null);
                 $sebagai = (isset($value['sebagai']) ? $value['sebagai'] : null);
                 $perusahaan = (isset($value['perusahaan']) ? $value['perusahaan'] : null);
-                $hari_kerja_ke = (isset($value['hari_kerja_ke']) and $value['hari_kerja_ke']) ? $value['hari_kerja_ke'] : null;
+                $hari_kerja_ke = (isset($value['hari_kerja_ke']) ? $value['hari_kerja_ke'] : null);
 
                 $payload = [];
 
@@ -675,19 +669,20 @@ class LpaController extends ResourceController
                 if(isset($jk)) $payload["jk"] = $jk;
                 if(isset($jabatan)) $payload["jabatan"] = $jabatan;
                 if(isset($atasan)) $payload["atasan"] = $atasan;
-                if(isset($umur)) $payload["umur"] = $umur;
-                if(isset($pengalaman_tahun)) $payload["pengalaman_tahun"] = $pengalaman_tahun;
-                if(isset($pengalaman_bulan)) $payload["pengalaman_bulan"] = $pengalaman_bulan;
+                if(isset($umur)) $payload["umur"] = ($umur) ? $umur : null;
+                if(isset($pengalaman_tahun)) $payload["pengalaman_tahun"] = ($pengalaman_tahun) ? $pengalaman_tahun : null;
+                if(isset($pengalaman_bulan)) $payload["pengalaman_bulan"] = ($pengalaman_bulan) ? $pengalaman_bulan : null;
                 if(isset($sebagai)) $payload["sebagai"] = $sebagai;
                 if(isset($perusahaan)) $payload["perusahaan"] = $perusahaan;
+                if(isset($hari_kerja_ke)) $payload["hari_kerja_ke"] = ($hari_kerja_ke) ? $hari_kerja_ke : null;
 
                 $payload_arr[] = $payload;
 
-                // $update_orangTerlibat = $this->qBuilder->insert_orangTerlibat($key, $orang_terlibat_payload);
+                $builder = $this->qBuilder->update_orangTerlibat($lpi_id, $key, $payload);
             }
         }
 
-        return $payload_arr;
+        return $builder;
     }
 
     private function update_kerusakan($lpi_id)
