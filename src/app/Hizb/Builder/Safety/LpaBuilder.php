@@ -405,38 +405,36 @@ class LpaBuilder
 
     public function joinEmployee($rows)
     {
+        $join_syshab = $this->request->getJsonVar('join_syshab');
         if ($rows) {
             if ($this->identity->company_id() == 4) {
                 $nik = [];
                 foreach ($rows as $key => $value) {
                     $nik[] = $value->nik;
                 }
-                $builder = new \App\Hizb\Syshab\Models\EmployeeModel();
-                $table = $builder->getTable();
-                // $subquery = $this->db->table($table . ' a')
-                $query = $this->db->table($table . ' a')
-                    ->select("a.Nik,c.NmSec,f.NmDepar")
-                    ->join('H_A150 d', 'd.Kdjabat = a.Kdjabatan', 'left')
-                    ->join('H_A209 c', 'c.KdSec = d.KdSec', 'left')
-                    ->join('H_A130 f', 'f.KdDepar = a.KdDepar', 'left')
-                    ->whereIn('Nik', $nik)->get()->getResult();
-                if ($query) {
-                    foreach ($rows as $key => $value) {
-                        $nik = $value->nik;
-                        // $kode = $value->site;
-                        // $region_name = '';
-                        foreach ($query as $key2 => $value2) {
-                            if ($value2->Nik == $nik) {
-                                $NmSec = $value2->NmSec;
-                                $NmDepar = $value2->NmDepar;
+                if (in_array("employee", $join_syshab)) {
+                    $builder = new \App\Hizb\Syshab\Models\EmployeeModel();
+                    $table = $builder->getTable();
+                    $query = $this->db->table($table . ' a')
+                        ->select("a.Nik,c.NmSec,f.NmDepar")
+                        ->join('H_A150 d', 'd.Kdjabat = a.Kdjabatan', 'left')
+                        ->join('H_A209 c', 'c.KdSec = d.KdSec', 'left')
+                        ->join('H_A130 f', 'f.KdDepar = a.KdDepar', 'left')
+                        ->whereIn('Nik', $nik)->get()->getResult();
+                    if ($query) {
+                        foreach ($rows as $key => $value) {
+                            $nik = $value->nik;
+                            foreach ($query as $key2 => $value2) {
+                                if ($value2->Nik == $nik) {
+                                    $NmSec = $value2->NmSec;
+                                    $NmDepar = $value2->NmDepar;
+                                }
                             }
+                            $rows[$key]->NmSec = $NmSec;
+                            $rows[$key]->NmDepar = $NmDepar;
                         }
-                        $rows[$key]->NmSec = $NmSec;
-                        $rows[$key]->NmDepar = $NmDepar;
                     }
-                    // $rows[$key]->employeeeeeeee = $query;
                 }
-
             }
         }
 
