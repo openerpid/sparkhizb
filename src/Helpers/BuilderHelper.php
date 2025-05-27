@@ -804,4 +804,16 @@ class BuilderHelper
             // }
         }
     }
+
+    public function delete($id, $builder)
+    {
+        $payload = [
+            "deleted_at" => date('Y-m-d H:i:s'),
+            "deleted_by" => $this->identity->account_id()
+        ];
+
+        return $builder->where('id', $id)
+        ->set($payload)
+        ->update();
+    }
 }

@@ -265,6 +265,10 @@ class LpaValidation
         return $subquery;*/
     }
 
+
+    /**
+     * DETAIL ORANG TERLIBAT
+     * */
     public function insert_orangTerlibat()
     {
         $lpa_id = $this->request->getVar('lpa_id');
@@ -335,6 +339,81 @@ class LpaValidation
         if (!$show_id) return ["id" => "id not found!"];
 
         $show_lpaID = $this->mOrang
+        ->select('id')
+        ->where('id', $id)
+        ->where('lpa_id', $lpa_id)
+        ->get()
+        ->getRow();
+        if (!$show_lpaID) return ["lpa_id" => "lpa_id not found!"];
+    }
+    /**
+     * END DETAIL ORANG TERLIBAT*/
+
+
+    /**
+     * DETAIL KERUSAKAN*/
+    public function insert_kerusakan()
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $aset_perusahaan = $this->request->getVar('aset_perusahaan');
+        
+        $rules = [
+            "lpa_id" => 'required',
+            "jenis_kerusakan" => 'required',
+            "name" => 'required',
+            "tipe" => 'required',
+            "serial_number" => 'required',
+            "tingkat_kerusakan" => 'required',
+            "detail_kerusakan_kerugian" => 'required',
+            "perkiraan_biaya" => 'required'
+        ];
+
+        if (!$aset_perusahaan) {
+            $rules['bukan_aset_perusahaan_text'] = 'required';
+        }
+
+        $this->validation->setRules($rules);
+        $this->validation->withRequest($this->request)->run();
+        $errors = $this->validation->getErrors();
+            if($errors) return $errors;
+
+        $findLpaID = $this->model->select('id')->where('id', $lpa_id)->get()->getRow();
+            if (!$findLpaID) return ["id" => "lpa_id not found!"];
+    }
+
+    public function update_kerusakan($id)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $aset_perusahaan = $this->request->getVar('aset_perusahaan');
+        
+        $rules = [
+            "lpa_id" => 'required',
+            "jenis_kerusakan" => 'required',
+            "name" => 'required',
+            "tipe" => 'required',
+            "serial_number" => 'required',
+            "tingkat_kerusakan" => 'required',
+            "detail_kerusakan_kerugian" => 'required',
+            "perkiraan_biaya" => 'required'
+        ];
+
+        if (!$aset_perusahaan) {
+            $rules['bukan_aset_perusahaan_text'] = 'required';
+        }
+
+        $this->validation->setRules($rules);
+        $this->validation->withRequest($this->request)->run();
+        $errors = $this->validation->getErrors();
+            if($errors) return $errors;
+
+        $show_id = $this->mKerusakan
+        ->select('id')
+        ->where('id', $id)
+        ->get()
+        ->getRow();
+        if (!$show_id) return ["id" => "id not found!"];
+
+        $show_lpaID = $this->mKerusakan
         ->select('id')
         ->where('id', $id)
         ->where('lpa_id', $lpa_id)

@@ -231,22 +231,6 @@ class LpaBuilder
         return $builder;
     }
 
-    public function insert_orangTerlibat($payload)
-    {
-        $payload = $this->identity->insert($payload);
-        $builder = $this->mOrang->insert($payload);
-
-        return $builder;
-    }
-
-    public function insert_kerusakan($payload)
-    {
-        $payload = $this->identity->insert($payload);
-        $builder = $this->mKerusakan->insert($payload);
-
-        return $builder;
-    }
-
     public function insert_unit($payload)
     {
         $payload = $this->identity->insert($payload);
@@ -282,45 +266,6 @@ class LpaBuilder
             ->where('id', $id)
             ->set($payload)
             ->update();
-
-        return $builder;
-    }
-
-    public function update_orangTerlibat($id, $payload)
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-
-        $builder = $this->mOrang
-            ->where('lpa_id', $lpa_id)
-            ->where('id', $id)
-            ->set($payload)
-            ->update();
-
-        return $builder;
-    }
-
-    public function update_kerusakan($lpa_id, $id, $payload)
-    {
-        $builder = $this->mKerusakan
-            ->where('lpa_id', $lpa_id)
-            ->where('id', $id)
-            ->set($payload)
-            ->update();
-
-        return $builder;
-    }
-
-    public function delete_orang_terlibat($id)
-    {
-        $payload = [
-            "deleted_at" => date('Y-m-d H:i:s'),
-            "deleted_by" => $this->identity->account_id()
-        ];
-
-        $builder = $this->mOrang
-                ->where('id', $id)
-                ->set($payload)
-                ->update();
 
         return $builder;
     }
@@ -457,5 +402,64 @@ class LpaBuilder
         }
 
         return $builder;
+    }
+
+
+    /**
+     * Detail ORANG TERLIBAT*/
+    public function insert_orangTerlibat($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mOrang->insert($payload);
+
+        return $builder;
+    }
+
+    public function update_orangTerlibat($id, $payload)
+    {
+        return $this->bUpdate_detail($id, $payload, $this->mOrang);
+    }
+
+    public function delete_orang_terlibat($id)
+    {
+        return $this->bHelp->delete($id, $this->mOrang);
+    }
+    /**
+     * End Detail ORANG TERLIBAT*/
+
+
+
+    /**
+     * Detail KERUSAKAN*/
+    public function insert_kerusakan($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mKerusakan->insert($payload);
+
+        return $builder;
+    }
+
+    public function update_kerusakan($id, $payload)
+    {
+        return $this->bUpdate_detail($id, $payload, $this->mKerusakan);
+    }
+
+    public function delete_kerusakan($id)
+    {
+        return $this->bHelp->delete($id, $this->mKerusakan);
+    }
+    /**
+     * End Detail KERUSAKAN*/
+
+
+    private function bUpdate_detail($id, $payload ,$builder)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $payload = $this->identity->update($payload);
+
+        return $builder->where('lpa_id', $lpa_id)
+        ->where('id', $id)
+        ->set($payload)
+        ->update();
     }
 }

@@ -385,8 +385,9 @@ class LpaController extends ResourceController
                     // $tipe_komponen = (isset($value['tipe_komponen']) ? $value['tipe_komponen'] : null);
                     $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
                     $name = (isset($value['name']) ? $value['name'] : null);
-                    $tipe = (isset($value['tipe']) ? $value['tipe'] : null);                    
+                    $tipe = (isset($value['tipe']) ? $value['tipe'] : null);
                     $aset_perusahaan = (isset($value['aset_perusahaan']) and $value['aset_perusahaan']) ? $value['aset_perusahaan'] : null;
+                    $bukan_aset_perusahaan_text = (isset($value['bukan_aset_perusahaan_text']) and $value['bukan_aset_perusahaan_text']) ? $value['bukan_aset_perusahaan_text'] : null;
                     $serial_number = (isset($value['serial_number']) ? $value['serial_number'] : null);
                     $tingkat_kerusakan = (isset($value['tingkat_kerusakan']) ? $value['tingkat_kerusakan'] : null);
                     $kerusakan_keparahan = (isset($value['kerusakan_keparahan']) ? $value['kerusakan_keparahan'] : null);
@@ -400,6 +401,7 @@ class LpaController extends ResourceController
                         "tipe" => $tipe,
                         // "tipe_komponen" => $tipe_komponen,
                         "aset_perusahaan" => $aset_perusahaan,
+                        "bukan_aset_perusahaan_text" => $bukan_aset_perusahaan_text,
                         "serial_number" => $serial_number,
                         "tingkat_kerusakan" => $tingkat_kerusakan,
                         "kerusakan_keparahan" => $kerusakan_keparahan,
@@ -686,7 +688,7 @@ class LpaController extends ResourceController
         return $builder;
     }
 
-    public function update_kerusakan($lpi_id)
+    /*public function update_kerusakan($lpi_id)
     {
         $kerusakan = $this->request->getVar('kerusakan');
         $payload_arr = [];
@@ -722,7 +724,7 @@ class LpaController extends ResourceController
         }
 
         return $builder;
-    }
+    }*/
 
     /**
      * Delete the designated resource object from the model
@@ -750,6 +752,10 @@ class LpaController extends ResourceController
     }
 
 
+
+    /**
+     * Detail ORANG TERLIBAT
+     * */
     public function create_orang_terlibat()
     {
         $lpa_id = $this->request->getVar('lpa_id');
@@ -834,6 +840,7 @@ class LpaController extends ResourceController
             "perusahaan" => $perusahaan,
             "hari_kerja_ke" => $hari_kerja_ke
         ];
+
         $builder = $this->qBuilder->update_orangTerlibat($id, $payload);
 
         if ($builder) {
@@ -868,4 +875,123 @@ class LpaController extends ResourceController
 
         return $this->respond($response, 200);
     }
+    /**
+     * END Detail ORANG TERLIBAT*/
+
+
+
+    /**
+     * Detail KERUSAKAN
+     * */
+    public function create_kerusakan()
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $jenis_kerusakan = $this->request->getVar('jenis_kerusakan');
+        $name = $this->request->getVar('name');
+        $tipe = $this->request->getVar('tipe');
+        $serial_number = $this->request->getVar('serial_number');
+        $aset_perusahaan = $this->request->getVar('aset_perusahaan');
+        $bukan_aset_perusahaan_text = $this->request->getVar('bukan_aset_perusahaan_text');
+        $tingkat_kerusakan = $this->request->getVar('tingkat_kerusakan');
+        $detail_kerusakan_kerugian = $this->request->getVar('detail_kerusakan_kerugian');
+        $perkiraan_biaya = $this->request->getVar('perkiraan_biaya');
+
+        $validation = $this->qVal->insert_kerusakan();
+        if($validation) return $this->respond($validation, 200);
+
+        $payload = [
+            "lpa_id" => $lpa_id,
+            "jenis_kerusakan" => $jenis_kerusakan,
+            "name" => $name,
+            "tipe" => $tipe,
+            "serial_number" => $serial_number,
+            "aset_perusahaan" => (isset($aset_perusahaan) and $aset_perusahaan != "") ? $aset_perusahaan : null,
+            "bukan_aset_perusahaan_text" => (!$aset_perusahaan) ? $bukan_aset_perusahaan_text : null,
+            "tingkat_kerusakan" => $tingkat_kerusakan,
+            "detail_kerusakan_kerugian" => $detail_kerusakan_kerugian,
+            "perkiraan_biaya" => $perkiraan_biaya
+        ];
+
+        $builder = $this->qBuilder->insert_kerusakan($payload);
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Insert data success.',
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Insert data failed!',
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function update_kerusakan($id)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $jenis_kerusakan = $this->request->getVar('jenis_kerusakan');
+        $name = $this->request->getVar('name');
+        $tipe = $this->request->getVar('tipe');
+        $serial_number = $this->request->getVar('serial_number');
+        $aset_perusahaan = $this->request->getVar('aset_perusahaan');
+        $bukan_aset_perusahaan_text = $this->request->getVar('bukan_aset_perusahaan_text');
+        $tingkat_kerusakan = $this->request->getVar('tingkat_kerusakan');
+        $detail_kerusakan_kerugian = $this->request->getVar('detail_kerusakan_kerugian');
+        $perkiraan_biaya = $this->request->getVar('perkiraan_biaya');
+
+        $validation = $this->qVal->update_kerusakan($id);
+        if($validation) return $this->respond($validation, 200);
+
+        $payload = [
+            "lpa_id" => $lpa_id,
+            "jenis_kerusakan" => $jenis_kerusakan,
+            "name" => $name,
+            "tipe" => $tipe,
+            "serial_number" => $serial_number,
+            "aset_perusahaan" => (isset($aset_perusahaan) and $aset_perusahaan != "") ? $aset_perusahaan : null,
+            "bukan_aset_perusahaan_text" => (!$aset_perusahaan) ? $bukan_aset_perusahaan_text : null,
+            "tingkat_kerusakan" => $tingkat_kerusakan,
+            "detail_kerusakan_kerugian" => $detail_kerusakan_kerugian,
+            "perkiraan_biaya" => $perkiraan_biaya
+        ];
+
+        $builder = $this->qBuilder->update_kerusakan($id, $payload);
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Update data success.',
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Update data failed!',
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function delete_kerusakan($id)
+    {
+        $builder = $this->qBuilder->delete_kerusakan($id);
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => "Delete success.",
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => "Delete error.",
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+    /**
+     * END Detail KERUSAKAN*/
 }

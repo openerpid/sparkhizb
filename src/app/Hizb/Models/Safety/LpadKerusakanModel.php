@@ -25,6 +25,7 @@ class LpadKerusakanModel extends Model
         "tipe",
         "tipe_komponen",
         "aset_perusahaan",
+        "bukan_aset_perusahaan_text",
         "serial_number",
         "tingkat_kerusakan_id",
         "tingkat_kerusakan",
