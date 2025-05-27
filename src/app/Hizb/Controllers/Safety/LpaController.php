@@ -62,6 +62,7 @@ class LpaController extends ResourceController
             foreach ($rows as $key => $value) {
                 if ($show_detail_orang_terlibat) {
                     $orang = $this->qBuilder->show_d_orang($value->id);
+                    $orang = $this->qBuilder->joinEmployee($orang);
                     $rows[$key]->orang_terlibat = $orang;
                 }
 
@@ -799,7 +800,6 @@ class LpaController extends ResourceController
 
         return $this->respond($response, 200);
     }
-
 
     public function update_orang_terlibat($id)
     {

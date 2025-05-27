@@ -59,7 +59,6 @@ class EmployeeBuilder
         // $builder = $this->db->table($table)
         //     ->select($selectFields);
         $builder = $this->qbAlya();
-        // $builder = $this->db->newQuery()->fromSubquery($subquery, 't');
         // $builder->select('Nik,Nama');
 
         if ($where_by) {

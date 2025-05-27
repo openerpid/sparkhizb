@@ -91,7 +91,7 @@ class LpaBuilder
             "company_id" => null,
             "account_id" => null
         ];
-               
+
         $builder = $this->bHelp->conditions($params);        
         $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
@@ -353,50 +353,90 @@ class LpaBuilder
                     }
                 }
 
-                $mDivisi = new \App\Hizb\Syshab\Models\DivisiModel();
-                $divisi = $mDivisi->findAll();
-                if ($divisi) {
+                // $mDivisi = new \App\Hizb\Syshab\Models\DivisiModel();
+                // $divisi = $mDivisi->findAll();
+                // if ($divisi) {
+                //     foreach ($rows as $key => $value) {
+                //         $kode = $value->divisi;
+                //         $NmDivisi = '';
+                //         foreach ($divisi as $key2 => $value2) {
+                //             if ($value2['KdDivisi'] == $kode) {
+                //                 $NmDivisi = $value2['NmDivisi'];
+                //             }
+                //         }
+                //         $rows[$key]->divisi_name = $NmDivisi;
+                //     }
+                // }
+
+                // $mDepartemen = new \App\Hizb\Syshab\Models\DepartemenModel();
+                // $departemen = $mDepartemen->findAll();
+                // if ($divisi) {
+                //     foreach ($rows as $key => $value) {
+                //         $kode = $value->departemen;
+                //         $NmDepar = '';
+                //         foreach ($departemen as $key2 => $value2) {
+                //             if ($value2['KdDepar'] == $kode) {
+                //                 $NmDepar = $value2['NmDepar'];
+                //             }
+                //         }
+                //         $rows[$key]->departemen_name = $NmDepar;
+                //     }
+                // }
+
+                // $mSeksi = new \App\Hizb\Syshab\Models\SeksiModel();
+                // $seksi = $mSeksi->findAll();
+                // if ($divisi) {
+                //     foreach ($rows as $key => $value) {
+                //         $kode = $value->section;
+                //         $NmSec = '';
+                //         foreach ($seksi as $key2 => $value2) {
+                //             if ($value2['KdSec'] == $kode) {
+                //                 $NmSec = $value2['NmSec'];
+                //             }
+                //         }
+                //         $rows[$key]->section_name = $NmSec;
+                //     }
+                // }
+            }
+        }
+
+        return $rows;
+    }
+
+    public function joinEmployee($rows)
+    {
+        if ($rows) {
+            if ($this->identity->company_id() == 4) {
+                $nik = [];
+                foreach ($rows as $key => $value) {
+                    $nik[] = $value->nik;
+                }
+                $builder = new \App\Hizb\Syshab\Models\EmployeeModel();
+                $table = $builder->getTable();
+                // $subquery = $this->db->table($table . ' a')
+                $query = $this->db->table($table . ' a')
+                    ->select("a.Nik,c.NmSec,f.NmDepar")
+                    ->join('H_A150 d', 'd.Kdjabat = a.Kdjabatan', 'left')
+                    ->join('H_A209 c', 'c.KdSec = d.KdSec', 'left')
+                    ->join('H_A130 f', 'f.KdDepar = a.KdDepar', 'left')
+                    ->whereIn('Nik', $nik)->get()->getResult();
+                if ($query) {
                     foreach ($rows as $key => $value) {
-                        $kode = $value->divisi;
-                        $NmDivisi = '';
-                        foreach ($divisi as $key2 => $value2) {
-                            if ($value2['KdDivisi'] == $kode) {
-                                $NmDivisi = $value2['NmDivisi'];
+                        $nik = $value->nik;
+                        // $kode = $value->site;
+                        // $region_name = '';
+                        foreach ($query as $key2 => $value2) {
+                            if ($value2->Nik == $nik) {
+                                $NmSec = $value2->NmSec;
+                                $NmDepar = $value2->NmDepar;
                             }
                         }
-                        $rows[$key]->divisi_name = $NmDivisi;
+                        $rows[$key]->NmSec = $NmSec;
+                        $rows[$key]->NmDepar = $NmDepar;
                     }
+                    // $rows[$key]->employeeeeeeee = $query;
                 }
 
-                $mDepartemen = new \App\Hizb\Syshab\Models\DepartemenModel();
-                $departemen = $mDepartemen->findAll();
-                if ($divisi) {
-                    foreach ($rows as $key => $value) {
-                        $kode = $value->departemen;
-                        $NmDepar = '';
-                        foreach ($departemen as $key2 => $value2) {
-                            if ($value2['KdDepar'] == $kode) {
-                                $NmDepar = $value2['NmDepar'];
-                            }
-                        }
-                        $rows[$key]->departemen_name = $NmDepar;
-                    }
-                }
-
-                $mSeksi = new \App\Hizb\Syshab\Models\SeksiModel();
-                $seksi = $mSeksi->findAll();
-                if ($divisi) {
-                    foreach ($rows as $key => $value) {
-                        $kode = $value->section;
-                        $NmSec = '';
-                        foreach ($seksi as $key2 => $value2) {
-                            if ($value2['KdSec'] == $kode) {
-                                $NmSec = $value2['NmSec'];
-                            }
-                        }
-                        $rows[$key]->section_name = $NmSec;
-                    }
-                }
             }
         }
 

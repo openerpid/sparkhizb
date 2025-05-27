@@ -98,7 +98,7 @@ class BuilderHelper
 
         elseif ($this->anywhere) {
             if ($this->anywhere->anywhere == true) {
-                $builder->where($this->anywhere->column,$this->anywhere->value);
+                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
             }
         }
 
@@ -203,7 +203,7 @@ class BuilderHelper
 
         elseif ($this->anywhere) {
             if ($this->anywhere->anywhere == true) {
-                $builder->where($this->anywhere->column,$this->anywhere->value);
+                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
             }
         }
 
@@ -298,7 +298,7 @@ class BuilderHelper
 
         elseif ($this->anywhere) {
             if ($this->anywhere->anywhere == true) {
-                $builder->where($this->anywhere->column,$this->anywhere->value);
+                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
             }
         }
 
@@ -392,12 +392,11 @@ class BuilderHelper
 
         elseif ($this->anywhere) {
             if ($this->anywhere->anywhere == true) {
-                $builder->where($this->anywhere->column,$this->anywhere->value);
+                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
             }
         }
 
         else{
-
             if ($where) {
                 foreach ($where as $key => $value) {
                     if ($value != "") {
@@ -475,7 +474,7 @@ class BuilderHelper
 
         elseif ($this->anywhere) {
             if ($this->anywhere->anywhere == true) {
-                $builder->where($this->anywhere->column,$this->anywhere->value);
+                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
             }
         }
 
@@ -703,7 +702,7 @@ class BuilderHelper
 
         elseif ($this->anywhere) {
             if ($this->anywhere->anywhere == true) {
-                $builder->where($this->anywhere->column,$this->anywhere->value);
+                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
             }
         }
 
