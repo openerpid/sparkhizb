@@ -47,16 +47,6 @@ class LpaBuilder
 
     private function qbAlya()
     {
-        // $release = $this->request->getJsonVar('release');
-        // if ($release) {
-        //     $release2 = [];
-        //     foreach ($release as $key => $value) {
-        //         $release2[] = (string)$value;
-        //     }
-        // }else{
-        //     $release2 = ["0","1"];
-        // }
-
         $table = $this->model->table;
         // $selects = $this->model->selects;
         // $allowedFields = $this->model->allowedFields;
@@ -94,21 +84,17 @@ class LpaBuilder
 
         $builder = $this->qbAlya();
 
-        if ($where and $where->apply == true) {
-            $builder->where($where->column, $where->value);
-        }else{
-            $params = [
-                "builder" => $builder,
-                "id" => $id,
-                "search_params" => ["nomor_dokumen","site","hari_kejadian"],
-                "company_id" => null,
-                "account_id" => null
-            ];            
-        }
-
-
-        $builder = $this->bHelp->conditions($params);
+        $params = [
+            "builder" => $builder,
+            "id" => $id,
+            "search_params" => ["nomor_dokumen","site","hari_kejadian"],
+            "company_id" => null,
+            "account_id" => null
+        ];
+               
+        $builder = $this->bHelp->conditions($params);        
         $builder = $this->qHelp->orderBy($builder, $allowedFields);
+
         return $builder;
     }
 
@@ -133,27 +119,42 @@ class LpaBuilder
 
     public function show_d_orang($h_id)
     {
-        return $this->mOrang->where('lpa_id', $h_id)->get()->getResult();
+        return $this->mOrang
+        ->where('lpa_id', $h_id)
+        ->where('deleted_at IS NULL')
+        ->get()->getResult();
     }
 
     public function show_d_foto($h_id)
     {
-        return $this->mFoto->where('lpa_id', $h_id)->get()->getResult();
+        return $this->mFoto
+        ->where('lpa_id', $h_id)
+        ->where('deleted_at IS NULL')
+        ->get()->getResult();
     }
 
     public function show_d_kerusakan($h_id)
     {
-        return $this->mKerusakan->where('lpa_id', $h_id)->get()->getResult();
+        return $this->mKerusakan
+        ->where('lpa_id', $h_id)
+        ->where('deleted_at IS NULL')
+        ->get()->getResult();
     }
 
     public function show_d_unit($h_id)
     {
-        return $this->mUnit->where('lpa_id', $h_id)->get()->getResult();
+        return $this->mUnit
+        ->where('lpa_id', $h_id)
+        ->where('deleted_at IS NULL')
+        ->get()->getResult();
     }
 
     public function show_d_divisi($h_id)
     {
-        return $this->mDivisi->where('lpa_id', $h_id)->get()->getResult();
+        return $this->mDivisi
+        ->where('lpa_id', $h_id)
+        ->where('deleted_at IS NULL')
+        ->get()->getResult();
     }
 
     public function show_new($nik, $site)
@@ -285,13 +286,41 @@ class LpaBuilder
         return $builder;
     }
 
-    public function update_orangTerlibat($lpa_id, $id, $payload)
+    public function update_orangTerlibat($id, $payload)
     {
+        $lpa_id = $this->request->getVar('lpa_id');
+
         $builder = $this->mOrang
             ->where('lpa_id', $lpa_id)
             ->where('id', $id)
             ->set($payload)
             ->update();
+
+        return $builder;
+    }
+
+    public function update_kerusakan($lpa_id, $id, $payload)
+    {
+        $builder = $this->mKerusakan
+            ->where('lpa_id', $lpa_id)
+            ->where('id', $id)
+            ->set($payload)
+            ->update();
+
+        return $builder;
+    }
+
+    public function delete_orang_terlibat($id)
+    {
+        $payload = [
+            "deleted_at" => date('Y-m-d H:i:s'),
+            "deleted_by" => $this->identity->account_id()
+        ];
+
+        $builder = $this->mOrang
+                ->where('id', $id)
+                ->set($payload)
+                ->update();
 
         return $builder;
     }

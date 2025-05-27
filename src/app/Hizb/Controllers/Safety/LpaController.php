@@ -593,7 +593,7 @@ class LpaController extends ResourceController
         $builder = $this->qBuilder->update($id, $payload);
 
         $payload['orang_terlibat'] = $this->update_orangTerlibat($id);        
-        // $payload['kerusakan_payload'] = $this->update_kerusakan($id);
+        $payload['kerusakan_payload'] = $this->update_kerusakan($id);
 
         /*if(isset($item_category_id)) $payload["item_category_id"] = $item_category_id;
         if(isset($received_at)) $payload["received_at"] = $received_at;
@@ -625,7 +625,7 @@ class LpaController extends ResourceController
         if ($builder) {
             $response = array(
                 "status"    => true,
-                "message"   => "Updaate data finish.",
+                "message"   => "Updaate data success.",
                 "response"  => $builder,
                 "errors"    => null
             );
@@ -685,10 +685,11 @@ class LpaController extends ResourceController
         return $builder;
     }
 
-    private function update_kerusakan($lpi_id)
+    public function update_kerusakan($lpi_id)
     {
         $kerusakan = $this->request->getVar('kerusakan');
         $payload_arr = [];
+        $builder = [];
         if ($kerusakan) {
             foreach ($kerusakan as $key => $value) {
                 $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
@@ -715,11 +716,11 @@ class LpaController extends ResourceController
 
                 $payload_arr[] = $payload;
 
-                // $update_kerusakan = $this->qBuilder->update_kerusakan($key, $kerusakan_payload);
+                $builder = $this->qBuilder->update_kerusakan($key, $kerusakan_payload);
             }
         }
 
-        return $payload_arr;
+        return $builder;
     }
 
     /**
@@ -745,5 +746,126 @@ class LpaController extends ResourceController
         }
 
         return $this->respond($response, $rescod);
+    }
+
+
+    public function create_orang_terlibat()
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $status_karyawan = $this->request->getVar('status_karyawan');
+        $nik = $this->request->getVar('nik');
+        $name = $this->request->getVar('name');
+        $jk = $this->request->getVar('jk');
+        $jabatan = $this->request->getVar('jabatan');
+        $atasan = $this->request->getVar('atasan');
+        $umur = $this->request->getVar('umur');
+        $pengalaman_bulan = $this->request->getVar('pengalaman_bulan');
+        $pengalaman_tahun = $this->request->getVar('pengalaman_tahun');
+        $sebagai = $this->request->getVar('sebagai');
+        $perusahaan = $this->request->getVar('perusahaan');
+        $hari_kerja_ke = $this->request->getVar('hari_kerja_ke');
+
+        $validation = $this->qVal->insert_orangTerlibat();
+        if($validation) return $this->respond($validation, 200);
+
+        $payload = [
+            "lpa_id" => $lpa_id,
+            "status_karyawan" => $status_karyawan,
+            "nik" => $nik,
+            "name" => $name,
+            "jk" => $jk,
+            "jabatan" => $jabatan,
+            "atasan" => $atasan,
+            "umur" => $umur,
+            "pengalaman_tahun" => $pengalaman_tahun,
+            "pengalaman_bulan" => $pengalaman_bulan,
+            "sebagai" => $sebagai,
+            "perusahaan" => $perusahaan,
+            "hari_kerja_ke" => $hari_kerja_ke
+        ];
+        $builder = $this->qBuilder->insert_orangTerlibat($payload);
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Insert data success.',
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Insert data failed!',
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+
+    public function update_orang_terlibat($id)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $status_karyawan = $this->request->getVar('status_karyawan');
+        $nik = $this->request->getVar('nik');
+        $name = $this->request->getVar('name');
+        $jk = $this->request->getVar('jk');
+        $jabatan = $this->request->getVar('jabatan');
+        $atasan = $this->request->getVar('atasan');
+        $umur = $this->request->getVar('umur');
+        $pengalaman_bulan = $this->request->getVar('pengalaman_bulan');
+        $pengalaman_tahun = $this->request->getVar('pengalaman_tahun');
+        $sebagai = $this->request->getVar('sebagai');
+        $perusahaan = $this->request->getVar('perusahaan');
+        $hari_kerja_ke = $this->request->getVar('hari_kerja_ke');
+
+        $validation = $this->qVal->update_orangTerlibat($id);
+        if($validation) return $this->respond($validation, 200);
+
+        $payload = [
+            "status_karyawan" => $status_karyawan,
+            "nik" => $nik,
+            "name" => $name,
+            "jk" => $jk,
+            "jabatan" => $jabatan,
+            "atasan" => $atasan,
+            "umur" => $umur,
+            "pengalaman_tahun" => $pengalaman_tahun,
+            "pengalaman_bulan" => $pengalaman_bulan,
+            "sebagai" => $sebagai,
+            "perusahaan" => $perusahaan,
+            "hari_kerja_ke" => $hari_kerja_ke
+        ];
+        $builder = $this->qBuilder->update_orangTerlibat($id, $payload);
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Update data success.',
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Update data failed!',
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function delete_orang_terlibat($id)
+    {
+        $builder = $this->qBuilder->delete_orang_terlibat($id);
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => "Delete success.",
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => "Delete error.",
+            ];
+        }
+
+        return $this->respond($response, 200);
     }
 }

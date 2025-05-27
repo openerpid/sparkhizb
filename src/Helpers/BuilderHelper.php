@@ -42,6 +42,7 @@ class BuilderHelper
 
         $this->order      = $this->request->getJsonVar('order');
         $this->search     = $this->request->getJsonVar('search');
+        $this->anywhere     = $this->request->getJsonVar('anywhere');
 
         $this->from_date  = $this->request->getJsonVar('from_date');
         $this->to_date    = $this->request->getJsonVar('to_date');
@@ -93,6 +94,12 @@ class BuilderHelper
 
         if ($id) {
             $builder->where('id',$id);
+        }
+
+        elseif ($this->anywhere) {
+            if ($this->anywhere->anywhere == true) {
+                $builder->where($this->anywhere->column,$this->anywhere->value);
+            }
         }
 
         else{
@@ -194,6 +201,12 @@ class BuilderHelper
             $builder->where('id',$id);
         }
 
+        elseif ($this->anywhere) {
+            if ($this->anywhere->anywhere == true) {
+                $builder->where($this->anywhere->column,$this->anywhere->value);
+            }
+        }
+
         else{
             if ($this->where) {
                 foreach ($this->where as $key => $value) {
@@ -280,11 +293,16 @@ class BuilderHelper
         }
 
         if ($id) {
-
             $builder->where('a.id',$id);
+        }
 
-        }else{
+        elseif ($this->anywhere) {
+            if ($this->anywhere->anywhere == true) {
+                $builder->where($this->anywhere->column,$this->anywhere->value);
+            }
+        }
 
+        else{
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
@@ -372,6 +390,12 @@ class BuilderHelper
             $builder->where('id',$id);
         }
 
+        elseif ($this->anywhere) {
+            if ($this->anywhere->anywhere == true) {
+                $builder->where($this->anywhere->column,$this->anywhere->value);
+            }
+        }
+
         else{
 
             if ($where) {
@@ -446,11 +470,16 @@ class BuilderHelper
         }
 
         if ($id) {
-
             $builder->where('a.id',$id);
+        }
 
-        }else{
+        elseif ($this->anywhere) {
+            if ($this->anywhere->anywhere == true) {
+                $builder->where($this->anywhere->column,$this->anywhere->value);
+            }
+        }
 
+        else{
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
@@ -670,6 +699,12 @@ class BuilderHelper
 
         if ($id) {
             $builder->where('id',$id);
+        }
+
+        elseif ($this->anywhere) {
+            if ($this->anywhere->anywhere == true) {
+                $builder->where($this->anywhere->column,$this->anywhere->value);
+            }
         }
 
         else{

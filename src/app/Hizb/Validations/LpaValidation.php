@@ -264,4 +264,82 @@ class LpaValidation
 
         return $subquery;*/
     }
+
+    public function insert_orangTerlibat()
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $status_karyawan = $this->request->getVar('status_karyawan');
+        
+        $rules = [
+            "lpa_id" => 'required',
+            "status_karyawan" => 'required',
+            "nik" => 'required',
+            "name" => 'required',
+            "jk" => 'required',
+            "jabatan" => 'required',
+            // "atasan" => 'required',
+            "umur" => 'required',
+            "pengalaman_tahun" => 'required',
+            "pengalaman_bulan" => 'required',
+            "sebagai" => 'required',
+            "hari_kerja_ke" => 'required'
+        ];
+
+        if ($status_karyawan == "Eksternal") {
+            $rules["perusahaan"] = 'required';
+        }
+
+        $this->validation->setRules($rules);
+        $this->validation->withRequest($this->request)->run();
+        $errors = $this->validation->getErrors();
+            if($errors) return $errors;
+
+        $findLpaID = $this->model->select('id')->where('id', $lpa_id)->get()->getRow();
+            if (!$findLpaID) return ["id" => "lpa_id not found!"];
+    }
+
+    public function update_orangTerlibat($id)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $status_karyawan = $this->request->getVar('status_karyawan');
+        
+        $rules = [
+            "lpa_id" => 'required',
+            "status_karyawan" => 'required',
+            "nik" => 'required',
+            "name" => 'required',
+            "jk" => 'required',
+            "jabatan" => 'required',
+            // "atasan" => 'required',
+            "umur" => 'required',
+            "pengalaman_tahun" => 'required',
+            "pengalaman_bulan" => 'required',
+            "sebagai" => 'required',
+            "hari_kerja_ke" => 'required'
+        ];
+
+        if ($status_karyawan == "Eksternal") {
+            $rules["perusahaan"] = 'required';
+        }
+
+        $this->validation->setRules($rules);
+        $this->validation->withRequest($this->request)->run();
+        $errors = $this->validation->getErrors();
+            if($errors) return $errors;
+
+        $show_id = $this->mOrang
+        ->select('id')
+        ->where('id', $id)
+        ->get()
+        ->getRow();
+        if (!$show_id) return ["id" => "id not found!"];
+
+        $show_lpaID = $this->mOrang
+        ->select('id')
+        ->where('id', $id)
+        ->where('lpa_id', $lpa_id)
+        ->get()
+        ->getRow();
+        if (!$show_lpaID) return ["lpa_id" => "lpa_id not found!"];
+    }
 }
