@@ -359,18 +359,18 @@ class LpaValidation
         
         $rules = [
             "lpa_id" => 'required',
-            "jenis_kerusakan" => 'required',
-            "name" => 'required',
-            "tipe" => 'required',
-            "serial_number" => 'required',
-            "tingkat_kerusakan" => 'required',
-            "detail_kerusakan_kerugian" => 'required',
-            "perkiraan_biaya" => 'required'
+            // "jenis_kerusakan" => 'required',
+            // "name" => 'required',
+            // "tipe" => 'required',
+            // "serial_number" => 'required',
+            // "tingkat_kerusakan" => 'required',
+            // "detail_kerusakan_kerugian" => 'required',
+            // "perkiraan_biaya" => 'required'
         ];
 
-        if (!$aset_perusahaan) {
-            $rules['bukan_aset_perusahaan_text'] = 'required';
-        }
+        // if (!$aset_perusahaan) {
+        //     $rules['bukan_aset_perusahaan_text'] = 'required';
+        // }
 
         $this->validation->setRules($rules);
         $this->validation->withRequest($this->request)->run();
@@ -388,18 +388,18 @@ class LpaValidation
         
         $rules = [
             "lpa_id" => 'required',
-            "jenis_kerusakan" => 'required',
-            "name" => 'required',
-            "tipe" => 'required',
-            "serial_number" => 'required',
-            "tingkat_kerusakan" => 'required',
-            "detail_kerusakan_kerugian" => 'required',
-            "perkiraan_biaya" => 'required'
+            // "jenis_kerusakan" => 'required',
+            // "name" => 'required',
+            // "tipe" => 'required',
+            // "serial_number" => 'required',
+            // "tingkat_kerusakan" => 'required',
+            // "detail_kerusakan_kerugian" => 'required',
+            // "perkiraan_biaya" => 'required'
         ];
 
-        if (!$aset_perusahaan) {
-            $rules['bukan_aset_perusahaan_text'] = 'required';
-        }
+        // if (!$aset_perusahaan) {
+        //     $rules['bukan_aset_perusahaan_text'] = 'required';
+        // }
 
         $this->validation->setRules($rules);
         $this->validation->withRequest($this->request)->run();
