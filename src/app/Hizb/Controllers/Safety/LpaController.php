@@ -946,7 +946,7 @@ class LpaController extends ResourceController
         if($validation) return $this->respond($validation, 200);
 
         $payload = [
-            "lpa_id" => $lpa_id,
+            // "lpa_id" => $lpa_id,
             "jenis_kerusakan" => $jenis_kerusakan,
             "name" => $name,
             "tipe" => $tipe,
@@ -1045,7 +1045,7 @@ class LpaController extends ResourceController
         // if($validation) return $this->respond($validation, 200);
 
         $payload = [
-            "lpa_id" => $lpa_id,
+            // "lpa_id" => $lpa_id,
             "divisi_kode" => $divisi_kode,
             "departemen_kode" => $departemen_kode,
             "section" => $section
@@ -1087,4 +1087,119 @@ class LpaController extends ResourceController
     }
     /**
      * END Detail DIVISI TERKAIT*/
+
+
+
+    /**
+     * Detail FOTO
+     * */
+    public function create_d_foto()
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $category = $this->request->getVar('category');
+        $file = $this->request->getFile('file');
+
+        // $validation = $this->qVal->insert_divisi_terkait();
+        // if($validation) return $this->respond($validation, 200);
+
+        $builder = null;
+        if ($file != NULL) {
+            $isFile = $file->isValid();
+            if ($isFile) {
+                $newName = $file->getRandomName();
+                if (!$file->hasMoved()) {
+                    $real_path = 'uploads/' . $file->store();
+                }
+
+                $foto_payload = [
+                    "lpa_id" => $lpa_id,
+                    "category" => $category,
+                    "filepath" => $real_path
+                ];
+
+                $builder = $this->qBuilder->insert_d_foto($foto_payload);
+            }
+        }
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Insert data success.',
+                "response" => $builder
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Insert data failed!',
+                "response" => $builder
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function update_d_foto($id)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $lpa_id = $this->request->getVar('lpa_id');
+        $category = $this->request->getVar('category');
+        $file = $this->request->getFile('file');
+
+        // $validation = $this->qVal->update_d_foto();
+        // if($validation) return $this->respond($validation, 200);
+
+        $builder = null;
+        if ($file != NULL) {
+            $isFile = $file->isValid();
+            if ($isFile) {
+                $newName = $file->getRandomName();
+                if (!$file->hasMoved()) {
+                    $real_path = 'uploads/' . $file->store();
+                }
+
+                $foto_payload = [
+                    "category" => $category,
+                    "filepath" => $real_path
+                ];
+
+                $builder = $this->qBuilder->update_d_foto($id, $foto_payload);
+            }
+        }
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Update data success.',
+                "response" => $builder
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Update data failed!',
+                "response" => $builder
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function delete_d_foto($id)
+    {
+        $builder = $this->qBuilder->delete_d_foto($id);
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => "Delete success.",
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => "Delete error.",
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+    /**
+     * END Detail FOTO*/
 }

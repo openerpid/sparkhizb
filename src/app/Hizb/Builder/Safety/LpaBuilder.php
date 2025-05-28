@@ -477,6 +477,30 @@ class LpaBuilder
 
 
 
+    /**
+     * Detail DIVISI TERKAIT*/
+    public function insert_d_foto($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mFoto->insert($payload);
+
+        return $builder;
+    }
+
+    public function update_d_foto($id, $payload)
+    {
+        return $this->bUpdate_detail($id, $payload, $this->mFoto);
+    }
+
+    public function delete_d_foto($id)
+    {
+        return $this->bHelp->delete($id, $this->mFoto);
+    }
+    /**
+     * End Detail DIVISI TERKAIT*/
+
+
+
 
     private function bUpdate_detail($id, $payload ,$builder)
     {
