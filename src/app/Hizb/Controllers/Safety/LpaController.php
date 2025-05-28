@@ -994,4 +994,97 @@ class LpaController extends ResourceController
     }
     /**
      * END Detail KERUSAKAN*/
+
+
+
+    /**
+     * Detail DIVISI TERKAIT
+     * */
+    public function create_divisi_terkait()
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $divisi_kode = $this->request->getVar('divisi_kode');
+        $departemen_kode = $this->request->getVar('departemen_kode');
+        $section = $this->request->getVar('section');
+
+        // $validation = $this->qVal->insert_divisi_terkait();
+        // if($validation) return $this->respond($validation, 200);
+
+        $payload = [
+            "lpa_id" => $lpa_id,
+            "divisi_kode" => $divisi_kode,
+            "departemen_kode" => $departemen_kode,
+            "section" => $section
+        ];
+
+        $builder = $this->qBuilder->insert_divisi_terkait($payload);
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Insert data success.',
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Insert data failed!',
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function update_divisi_terkait($id)
+    {
+        $lpa_id = $this->request->getVar('lpa_id');
+        $divisi_kode = $this->request->getVar('divisi_kode');
+        $departemen_kode = $this->request->getVar('departemen_kode');
+        $section = $this->request->getVar('section');
+
+        // $validation = $this->qVal->update_divisi_terkait($id);
+        // if($validation) return $this->respond($validation, 200);
+
+        $payload = [
+            "lpa_id" => $lpa_id,
+            "divisi_kode" => $divisi_kode,
+            "departemen_kode" => $departemen_kode,
+            "section" => $section
+        ];
+
+        $builder = $this->qBuilder->update_divisi_terkait($id, $payload);
+
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Update data success.',
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Update data failed!',
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+
+    public function delete_divisi_terkait($id)
+    {
+        $builder = $this->qBuilder->delete_divisi_terkait($id);
+        if ($builder) {
+            $response = [
+                "status" => true,
+                "message" => "Delete success.",
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => "Delete error.",
+            ];
+        }
+
+        return $this->respond($response, 200);
+    }
+    /**
+     * END Detail DIVISI TERKAIT*/
 }

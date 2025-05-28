@@ -452,6 +452,32 @@ class LpaBuilder
      * End Detail KERUSAKAN*/
 
 
+
+    /**
+     * Detail DIVISI TERKAIT*/
+    public function insert_divisi_terkait($payload)
+    {
+        $payload = $this->identity->insert($payload);
+        $builder = $this->mDivisi->insert($payload);
+
+        return $builder;
+    }
+
+    public function update_divisi_terkait($id, $payload)
+    {
+        return $this->bUpdate_detail($id, $payload, $this->mDivisi);
+    }
+
+    public function delete_divisi_terkait($id)
+    {
+        return $this->bHelp->delete($id, $this->mDivisi);
+    }
+    /**
+     * End Detail DIVISI TERKAIT*/
+
+
+
+
     private function bUpdate_detail($id, $payload ,$builder)
     {
         $lpa_id = $this->request->getVar('lpa_id');
