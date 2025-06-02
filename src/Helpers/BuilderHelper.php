@@ -97,8 +97,17 @@ class BuilderHelper
         }
 
         elseif ($this->anywhere) {
-            if ($this->anywhere->anywhere == true) {
-                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+            if (is_array($this->anywhere)) {
+                foreach ($this->anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        $builder->whereIn($value->column,$value->value);
+                    }
+                }
+            }
+            else{
+                if ($this->anywhere->anywhere == true) {
+                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                }
             }
         }
 
@@ -202,8 +211,17 @@ class BuilderHelper
         }
 
         elseif ($this->anywhere) {
-            if ($this->anywhere->anywhere == true) {
-                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+            if (is_array($this->anywhere)) {
+                foreach ($this->anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        $builder->whereIn($value->column,$value->value);
+                    }
+                }
+            }
+            else{
+                if ($this->anywhere->anywhere == true) {
+                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                }
             }
         }
 
@@ -297,8 +315,17 @@ class BuilderHelper
         }
 
         elseif ($this->anywhere) {
-            if ($this->anywhere->anywhere == true) {
-                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+            if (is_array($this->anywhere)) {
+                foreach ($this->anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        $builder->whereIn($value->column,$value->value);
+                    }
+                }
+            }
+            else{
+                if ($this->anywhere->anywhere == true) {
+                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                }
             }
         }
 
@@ -391,8 +418,17 @@ class BuilderHelper
         }
 
         elseif ($this->anywhere) {
-            if ($this->anywhere->anywhere == true) {
-                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+            if (is_array($this->anywhere)) {
+                foreach ($this->anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        $builder->whereIn($value->column,$value->value);
+                    }
+                }
+            }
+            else{
+                if ($this->anywhere->anywhere == true) {
+                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                }
             }
         }
 
@@ -473,8 +509,17 @@ class BuilderHelper
         }
 
         elseif ($this->anywhere) {
-            if ($this->anywhere->anywhere == true) {
-                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+            if (is_array($this->anywhere)) {
+                foreach ($this->anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        $builder->whereIn($value->column,$value->value);
+                    }
+                }
+            }
+            else{
+                if ($this->anywhere->anywhere == true) {
+                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                }
             }
         }
 
@@ -701,8 +746,17 @@ class BuilderHelper
         }
 
         elseif ($this->anywhere) {
-            if ($this->anywhere->anywhere == true) {
-                $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+            if (is_array($this->anywhere)) {
+                foreach ($this->anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        $builder->whereIn($value->column,$value->value);
+                    }
+                }
+            }
+            else{
+                if ($this->anywhere->anywhere == true) {
+                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                }
             }
         }
 
