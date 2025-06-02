@@ -43,6 +43,7 @@ class BuilderHelper
         $this->order      = $this->request->getJsonVar('order');
         $this->search     = $this->request->getJsonVar('search');
         $this->anywhere     = $this->request->getJsonVar('anywhere');
+        $this->anydate      = $this->request->getJsonVar('anydate');
 
         $this->from_date  = $this->request->getJsonVar('from_date');
         $this->to_date    = $this->request->getJsonVar('to_date');
@@ -96,20 +97,20 @@ class BuilderHelper
             $builder->where('id',$id);
         }
 
-        elseif ($this->anywhere) {
-            if (is_array($this->anywhere)) {
-                foreach ($this->anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        $builder->whereIn($value->column,$value->value);
-                    }
-                }
-            }
-            else{
-                if ($this->anywhere->anywhere == true) {
-                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                }
-            }
-        }
+        // elseif ($this->anywhere) {
+        //     if (is_array($this->anywhere)) {
+        //         foreach ($this->anywhere as $key => $value) {
+        //             if ($value->anywhere == true) {                        
+        //                 $builder->whereIn($value->column,$value->value);                            
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         if ($this->anywhere->anywhere == true) {
+        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+        //         }
+        //     }
+        // }
 
         else{
             if ($this->where) {
@@ -133,6 +134,44 @@ class BuilderHelper
                         }
                     $builder->groupEnd();
                 // }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    // $builder->where('id BETWEEN 1 AND 5');
+                                    // $builder->where("created_at BETWEEN '2024-10-01 00:00:00' AND '2024-11-01 00:00:00'");
+                                    if ($value->copr == "BETWEEN") {
+                                        if (isset($value->type)) {
+                                            if ($value->type == "date") {
+                                                $from = $this->gHelp->dtfFormatter($value->value[0]);
+                                                $to = $this->gHelp->dtfFormatter($value->value[1]);
+                                                $builder->where($value->column." BETWEEN '".$from."' AND '".$to."' ");
+                                            }
+                                        }else{
+                                            // $builder->where($value->column." BETWEEN ".$value->value." ");
+                                            $builder->where($value->column." BETWEEN ".$value->value[0]." AND ".$value->value[1]);
+                                        }
+                                    }else{
+                                        $builder->where($value->column." ".$value->copr." ",$value->value);
+                                    }
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
+                }
             }
 
             if ($this->from_date) {
@@ -160,6 +199,22 @@ class BuilderHelper
 
                 if ($this->datetime->to) {
                     $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->datetime->to));
+                }
+            }
+
+            if ($this->anydate) {
+                $anydate = $this->anydate->anydate;
+                $from = $this->anydate->from;
+                $to = $this->anydate->to;
+
+                if ($anydate == true) {
+                    if ($from) {
+                        $builder->where('created_at >= ', $this->gHelp->dtfFormatter($from));
+                    }
+
+                    if ($to) {
+                        $builder->where('created_at <= ', $this->gHelp->dtfFormatter($to));
+                    }
                 }
             }
         }
@@ -210,20 +265,20 @@ class BuilderHelper
             $builder->where('id',$id);
         }
 
-        elseif ($this->anywhere) {
-            if (is_array($this->anywhere)) {
-                foreach ($this->anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        $builder->whereIn($value->column,$value->value);
-                    }
-                }
-            }
-            else{
-                if ($this->anywhere->anywhere == true) {
-                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                }
-            }
-        }
+        // elseif ($this->anywhere) {
+        //     if (is_array($this->anywhere)) {
+        //         foreach ($this->anywhere as $key => $value) {
+        //             if ($value->anywhere == true) {
+        //                 $builder->whereIn($value->column,$value->value);
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         if ($this->anywhere->anywhere == true) {
+        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+        //         }
+        //     }
+        // }
 
         else{
             if ($this->where) {
@@ -247,6 +302,29 @@ class BuilderHelper
                         }
                     $builder->groupEnd();
                 // }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
+                }
             }
 
             if ($this->from_date) {
@@ -314,20 +392,20 @@ class BuilderHelper
             $builder->where('a.id',$id);
         }
 
-        elseif ($this->anywhere) {
-            if (is_array($this->anywhere)) {
-                foreach ($this->anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        $builder->whereIn($value->column,$value->value);
-                    }
-                }
-            }
-            else{
-                if ($this->anywhere->anywhere == true) {
-                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                }
-            }
-        }
+        // elseif ($this->anywhere) {
+        //     if (is_array($this->anywhere)) {
+        //         foreach ($this->anywhere as $key => $value) {
+        //             if ($value->anywhere == true) {
+        //                 $builder->whereIn($value->column,$value->value);
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         if ($this->anywhere->anywhere == true) {
+        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+        //         }
+        //     }
+        // }
 
         else{
             if ($search) {
@@ -342,6 +420,29 @@ class BuilderHelper
                             }
                         }
                     $builder->groupEnd();
+                }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
                 }
             }
 
@@ -417,20 +518,20 @@ class BuilderHelper
             $builder->where('id',$id);
         }
 
-        elseif ($this->anywhere) {
-            if (is_array($this->anywhere)) {
-                foreach ($this->anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        $builder->whereIn($value->column,$value->value);
-                    }
-                }
-            }
-            else{
-                if ($this->anywhere->anywhere == true) {
-                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                }
-            }
-        }
+        // elseif ($this->anywhere) {
+        //     if (is_array($this->anywhere)) {
+        //         foreach ($this->anywhere as $key => $value) {
+        //             if ($value->anywhere == true) {
+        //                 $builder->whereIn($value->column,$value->value);
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         if ($this->anywhere->anywhere == true) {
+        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+        //         }
+        //     }
+        // }
 
         else{
             if ($where) {
@@ -453,6 +554,29 @@ class BuilderHelper
                             }
                         }
                     $builder->groupEnd();
+                }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
                 }
             }
 
@@ -508,20 +632,20 @@ class BuilderHelper
             $builder->where('a.id',$id);
         }
 
-        elseif ($this->anywhere) {
-            if (is_array($this->anywhere)) {
-                foreach ($this->anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        $builder->whereIn($value->column,$value->value);
-                    }
-                }
-            }
-            else{
-                if ($this->anywhere->anywhere == true) {
-                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                }
-            }
-        }
+        // elseif ($this->anywhere) {
+        //     if (is_array($this->anywhere)) {
+        //         foreach ($this->anywhere as $key => $value) {
+        //             if ($value->anywhere == true) {
+        //                 $builder->whereIn($value->column,$value->value);
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         if ($this->anywhere->anywhere == true) {
+        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+        //         }
+        //     }
+        // }
 
         else{
             if ($search) {
@@ -536,6 +660,29 @@ class BuilderHelper
                             }
                         }
                     $builder->groupEnd();
+                }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
                 }
             }
 
@@ -745,20 +892,20 @@ class BuilderHelper
             $builder->where('id',$id);
         }
 
-        elseif ($this->anywhere) {
-            if (is_array($this->anywhere)) {
-                foreach ($this->anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        $builder->whereIn($value->column,$value->value);
-                    }
-                }
-            }
-            else{
-                if ($this->anywhere->anywhere == true) {
-                    $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                }
-            }
-        }
+        // elseif ($this->anywhere) {
+        //     if (is_array($this->anywhere)) {
+        //         foreach ($this->anywhere as $key => $value) {
+        //             if ($value->anywhere == true) {
+        //                 $builder->whereIn($value->column,$value->value);
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         if ($this->anywhere->anywhere == true) {
+        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+        //         }
+        //     }
+        // }
 
         else{
             if ($this->where) {
@@ -781,6 +928,29 @@ class BuilderHelper
                             }
                         }
                     $builder->groupEnd();
+                }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    $builder->where($value->column." ".$value->copr." ",$value->value);
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
                 }
             }
 
