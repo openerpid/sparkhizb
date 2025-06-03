@@ -16,7 +16,13 @@ class IdentityHelper
 
     public function company_id()
     {
-        return $this->jwt->decode()->company_id;
+        if(isset($this->jwt->decode()->company_id)) {
+            $company_id = $this->jwt->decode()->company_id;
+        }else{
+            $company_id = null;
+        }
+
+        return $company_id;
     }
 
     public function role()
@@ -52,7 +58,13 @@ class IdentityHelper
 
     public function account_id()
     {
-        return $this->jwt->decode()->id;
+        if(isset($this->jwt->decode()->id)) {
+            $id = $this->jwt->decode()->id;
+        }else{
+            $id = null;
+        }
+        
+        return $id;
     }
 
     // public function account_id()

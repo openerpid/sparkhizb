@@ -37,7 +37,6 @@ class WorkorderBuilder
         $params = [
             "id" => $id,
             "payload" => $payload,
-            // "token" => $this->reqH->myToken()
             "token" => $this->identity->c04_token()
         ];
 

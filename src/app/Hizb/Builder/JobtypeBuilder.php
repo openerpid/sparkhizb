@@ -5,6 +5,7 @@ namespace App\Hizb\Builder;
 use Sparkhizb\Helpers\Curl;
 use Sparkhizb\Helpers\CurlHelper;
 use Sparkhizb\Helpers\RequestHelper;
+use Sparkhizb\Helpers\IdentityHelper;
 use SaintSystems\OData\ODataClient;
 use Sparkhizb\UmmuPmJobtype;
 
@@ -17,6 +18,7 @@ class JobtypeBuilder
         $this->curl = new Curl();
         $this->curlH = new CurlHelper();
         $this->reqH = new RequestHelper();
+        $this->identity = new IdentityHelper();
         $this->ummu = new UmmuPmJobtype();
     }
 
@@ -56,7 +58,7 @@ class JobtypeBuilder
         $params = [
             "id" => $id,
             "payload" => $payload,
-            "token" => $this->reqH->myToken()
+            "token" => $this->identity->c04_token()
         ];
 
         $builder = $this->ummu->show($params);
