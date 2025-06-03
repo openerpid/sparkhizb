@@ -15,52 +15,55 @@ class MechanicActivityModel extends Model
     protected $useSoftDeletes = true;
     protected $protectFields = true;
     protected $allowedFields = [
-        "id",
+        // "id",
         "company_id",
+        "msdb_id",
+        "plant_id",
+        "site_project_id",
 
-        "nomor_dokumen",
-        "insident_classification",
+        "activity_type",
+        "workorder_id",
+        "jobtype",
+        "job_type_id",
+        "tech_iden_no",
+        "operation_id",
+        "operation_kode",
+        "operation_name",
+        "unit_id",
+        "reason_id",
+        "mechanic_id",
+        "workstart",
+        "workend",
+        "description",
+        "nik",
+        "nikaryawan",
+        "testing",
+        "hm",
+        "workstart_date",
+        "workstart_time",
+        "workend_date",
+        "workend_time",
+        "actual_work",
+        "duration",
+        "duration_text",
+        "actual_duration",
+        "activity_description",
+        "mechanic_name",
+
+        "wo_number_sap",
+        "operation",
+        "operation_short_text",
+        "AUFNR_order",
+        "WERKS_plant",
+        "TIDNR_techIdentNo",
+        "VORNR_operation",
+        "system_status",
+        "is_sap",
+        "is_integration",
+        "remark",
         "site",
-        "divisi",
-        "departemen",
-        "section",
-
-        "hari_kejadian",
-        "tanggal_kejadian","waktu_kejadian",
-        "tanggal_pelaporan","waktu_pelaporan",
-
-        "shift_kerja",
-        "mulai_shift",
-        "selesai_shift",
-        "hari_kerja_ke",
-
-        "lokasi_insiden_id",
-        "lokasi_insiden",
-        "detail_lokasi_insiden",
-
-        "cidera_id",
-        "cidera",
-        "detail_cidera_lainnya",
-        "kronologi",
-
-        "instansi_pemerintah",
-        "nama_pejabat",
-        "pemerintah_disampaikan_oleh",
-        "pemerintah_tanggal",
-
-        "asuransi",
-        "nama_perusahaan",
-        "asuransi_disampaikan_oleh",
-        "asuransi_tanggal",
-
-        "pihak_tiga",
-        "nama_pihak_ketiga",
-        "pihak_tiga_disampaikan_oleh",
-        "pihak_tiga_tanggal",
-
-        "tipe_insiden_id",
-        "tipe_insiden",
-        "penjelasan_insiden",
+        "workorder",
+        "user",
 
         "created_at",
         "updated_at",
@@ -97,6 +100,6 @@ class MechanicActivityModel extends Model
 
     public function __construct()
     {
-        $this->DBGroup = (getenv('DBGroup')) ? getenv('DBGroup') : 'dorbitt_she';
+        $this->DBGroup = (getenv('DBGroup')) ? getenv('DBGroup') : 'default';
     }
 }

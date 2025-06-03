@@ -207,7 +207,7 @@ class MechanicActivityController extends ResourceController
             "remark" => $remark
         ];
 
-        // $builder = $this->qBuilder->insert($payload);
+        $builder = $this->qBuilder->insert($payload);
 
         // if($builder) {
         //     $response = [
@@ -221,7 +221,7 @@ class MechanicActivityController extends ResourceController
         //     ];
         // }
 
-        return $this->respond($payload, 200);
+        return $this->respond($builder, 200);
     }
 
     /**

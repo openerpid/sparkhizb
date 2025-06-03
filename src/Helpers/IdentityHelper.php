@@ -227,4 +227,15 @@ class IdentityHelper
     {
         return $this->jwt->decode()->project_area->region_code;
     }
+
+    public function c04_token()
+    {
+        if(isset($this->jwt->decode()->c04) and $this->jwt->decode()->c04 == true) {
+            $token = $this->login_token();
+        }else{
+            $token = $this->jwt->token();
+        }
+
+        return $token;
+    }
 }

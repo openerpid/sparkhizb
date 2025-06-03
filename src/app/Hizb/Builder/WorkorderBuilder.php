@@ -5,6 +5,7 @@ namespace App\Hizb\Builder;
 use Sparkhizb\Helpers\Curl;
 use Sparkhizb\Helpers\CurlHelper;
 use Sparkhizb\Helpers\RequestHelper;
+use Sparkhizb\Helpers\IdentityHelper;
 use SaintSystems\OData\ODataClient;
 use Sparkhizb\UmmuWorkorder;
 
@@ -17,7 +18,9 @@ class WorkorderBuilder
         $this->curl = new Curl();
         $this->curlH = new CurlHelper();
         $this->reqH = new RequestHelper();
+        $this->identity = new IdentityHelper();
         $this->ummu = new UmmuWorkorder();
+        $this->module_kode = "pm_workorder";
     }
 
     public function show($id = null)
@@ -34,7 +37,8 @@ class WorkorderBuilder
         $params = [
             "id" => $id,
             "payload" => $payload,
-            "token" => $this->reqH->myToken()
+            // "token" => $this->reqH->myToken()
+            "token" => $this->identity->c04_token()
         ];
 
         $builder = $this->ummu->show($params);

@@ -229,7 +229,7 @@ class MechanicActivityBuilder
 
     public function insert($payload)
     {
-        $payload = $this->identity->insert($payload);
+        // $payload = $this->identity->insert($payload);
         $builder = $this->model->insert($payload);
 
         return $builder;

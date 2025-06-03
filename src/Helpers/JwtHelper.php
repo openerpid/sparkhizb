@@ -43,5 +43,14 @@ class JwtHelper
         
         return $decoded;
     }
+
+    public function token()
+    {
+        $header = $this->request->getServer('HTTP_AUTHORIZATION');
+        if(!$header) return $this->failUnauthorized('Token Required');
+        $token = explode(' ', $header)[1];
+
+        return $token;
+    }
     
 }
