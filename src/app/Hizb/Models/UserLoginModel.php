@@ -18,6 +18,8 @@ class UserLoginModel extends Model
         "id",
         "company_id",
         "username",
+        "name",
+        "nik",
         "token",
         "openapi2_token",
 

@@ -75,6 +75,11 @@ class IdentityHelper
         return $this->jwt->decode()->username;
     }
 
+    public function name()
+    {
+        return $this->jwt->decode()->name;
+    }
+
     public function identity_id()
     {
         return $this->jwt->decode()->identity_id;
@@ -216,5 +221,10 @@ class IdentityHelper
         }
 
         return $token;
+    }
+
+    public function c04_project_area_kode()
+    {
+        return $this->jwt->decode()->project_area->region_code;
     }
 }

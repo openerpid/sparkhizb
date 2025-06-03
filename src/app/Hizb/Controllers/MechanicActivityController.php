@@ -195,6 +195,8 @@ class MechanicActivityController extends ResourceController
         $remark = $this->request->getJsonVar('remark');
 
         $payload = [
+            "user" => $this->identity->username(),
+            "site" => $this->identity->c04_project_area_kode(),
             "activity_type" => $activity_type,
             "wo_number" => $wo_number,
             "jobtype_kode" => $jobtype_kode,
@@ -205,21 +207,21 @@ class MechanicActivityController extends ResourceController
             "remark" => $remark
         ];
 
-        $builder = $this->qBuilder->insert($payload);
+        // $builder = $this->qBuilder->insert($payload);
 
-        if($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Insert data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Insert data failed!',
-            ];
-        }
+        // if($builder) {
+        //     $response = [
+        //         "status" => true,
+        //         "message" => 'Insert data success.',
+        //     ];
+        // } else {
+        //     $response = [
+        //         "status" => false,
+        //         "message" => 'Insert data failed!',
+        //     ];
+        // }
 
-        return $this->respond($response, 200);
+        return $this->respond($payload, 200);
     }
 
     /**
