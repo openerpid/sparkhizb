@@ -95,24 +95,7 @@ class BuilderHelper
 
         if ($id) {
             $builder->where('id',$id);
-        }
-
-        // elseif ($this->anywhere) {
-        //     if (is_array($this->anywhere)) {
-        //         foreach ($this->anywhere as $key => $value) {
-        //             if ($value->anywhere == true) {                        
-        //                 $builder->whereIn($value->column,$value->value);                            
-        //             }
-        //         }
-        //     }
-        //     else{
-        //         if ($this->anywhere->anywhere == true) {
-        //             $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-        //         }
-        //     }
-        // }
-
-        else{
+        }else{
             if ($this->where) {
                 foreach ($this->where as $key => $value) {
                     if ($value != "") {
@@ -219,7 +202,7 @@ class BuilderHelper
             }
         }
 
-        $builder->where('deleted_at', null);
+        // $builder->where('deleted_at', null);
         $builder->where('deleted_at IS NULL');
 
         return $builder;

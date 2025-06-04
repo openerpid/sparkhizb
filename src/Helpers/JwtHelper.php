@@ -16,8 +16,7 @@ class JwtHelper
     public function encode($params)
     {
         $data = array(
-            'iat' => 1356999524,
-            'nbf' => 1357000000,
+            'iat' => strtotime("now"),
             'dev'   => 'https://openapi2.com/',
             'lib' => 'https://sparkhizb.my.id/',
             'frmwk' => 'https://codeigniter.com/'

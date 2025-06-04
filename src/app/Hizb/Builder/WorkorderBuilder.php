@@ -6,6 +6,7 @@ use Sparkhizb\Helpers\Curl;
 use Sparkhizb\Helpers\CurlHelper;
 use Sparkhizb\Helpers\RequestHelper;
 use Sparkhizb\Helpers\IdentityHelper;
+use Sparkhizb\Helpers\UmmuHelper;
 use SaintSystems\OData\ODataClient;
 use Sparkhizb\UmmuWorkorder;
 
@@ -19,20 +20,21 @@ class WorkorderBuilder
         $this->curlH = new CurlHelper();
         $this->reqH = new RequestHelper();
         $this->identity = new IdentityHelper();
+        $this->umHelp = new UmmuHelper();
         $this->ummu = new UmmuWorkorder();
         $this->module_kode = "pm_workorder";
     }
 
     public function show($id = null)
     {
-        $payload = [
-            "limit" => 10,
-            "offset" => 0,
-            "sort" => "id",
-            "order" => "desc",
-            "search" => "",
-            "selects" => "*"
-        ];
+        $payload = $this->umHelp->filter_payload();
+
+        // $payload = array_merge($payload, [
+        //     "date" => [
+        //         "from" => "",
+        //         "to" => ""
+        //     ]
+        // ]);
 
         $params = [
             "id" => $id,

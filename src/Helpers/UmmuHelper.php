@@ -184,18 +184,29 @@ class UmmuHelper
 
     public function filter_payload()
     {
-        $limit = $this->request->getVar('limit');
-        $offset = $this->request->getVar('offset');
-        $sort = $this->request->getVar('sort');
-        $order = $this->request->getVar('order');
-        $search = $this->request->getVar('search');
+        if ($this->request->is('json')) {
+            $limit = $this->request->getJsonVar('limit');
+            $offset = $this->request->getJsonVar('offset');
+            $sort = $this->request->getJsonVar('sort');
+            $order = $this->request->getJsonVar('order');
+            $search = $this->request->getJsonVar('search');
+            $selects = $this->request->getJsonVar('selects');
+        }else{
+            $limit = $this->request->getVar('limit');
+            $offset = $this->request->getVar('offset');
+            $sort = $this->request->getVar('sort');
+            $order = $this->request->getVar('order');
+            $search = $this->request->getVar('search');
+            $selects = $this->request->getVar('selects');
+        }
 
         $payload = [
             "limit"     => (int)$limit,
             "offset"    => (int)$offset,
             "sort"      => (string)$sort,
             "order"     => (string)$order,
-            "search"    => (string)$search
+            "search"    => (string)$search,
+            "selects"   => (string)$selects
         ];
 
         return $payload;
