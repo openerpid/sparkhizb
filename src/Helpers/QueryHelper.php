@@ -386,6 +386,25 @@ class QueryHelper
         return $response;
     }
 
+    public function rescr($builder)
+    {
+        if($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Insert data success.',
+                "response" => $builder,
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Insert data failed!',
+                "response" => $builder,
+            ];
+        }
+
+        return $response;
+    }
+
     public function allowedFields()
     {
         return [

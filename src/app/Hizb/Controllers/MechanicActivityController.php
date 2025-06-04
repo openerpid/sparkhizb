@@ -187,41 +187,31 @@ class MechanicActivityController extends ResourceController
     {
         $activity_type = $this->request->getJsonVar('activity_type');
         $wo_number = $this->request->getJsonVar('wo_number');
-        $jobtype_kode = $this->request->getJsonVar('jobtype_kode');
-        $operation_kode = $this->request->getJsonVar('operation_kode');
+        $jobtype = $this->request->getJsonVar('jobtype');
+        $operation = $this->request->getJsonVar('operation');
         $workstart = $this->request->getJsonVar('workstart');
         $workend = $this->request->getJsonVar('workend');
         $duration = $this->request->getJsonVar('duration');
         $remark = $this->request->getJsonVar('remark');
+        $jobdesc = $this->request->getJsonVar('jobdesc');
 
         $payload = [
             "user" => $this->identity->username(),
             "site" => $this->identity->c04_project_area_kode(),
             "activity_type" => $activity_type,
             "wo_number" => $wo_number,
-            "jobtype_kode" => $jobtype_kode,
-            "operation_kode" => $operation_kode,
+            "jobtype" => $jobtype,
+            "operation" => $operation,
             "workstart" => $workstart,
             "workend" => $workend,
             "duration" => $duration,
-            "remark" => $remark
+            "remark" => $remark,
+            "jobdesc" => $jobdesc
         ];
 
         $builder = $this->qBuilder->insert($payload);
 
-        // if($builder) {
-        //     $response = [
-        //         "status" => true,
-        //         "message" => 'Insert data success.',
-        //     ];
-        // } else {
-        //     $response = [
-        //         "status" => false,
-        //         "message" => 'Insert data failed!',
-        //     ];
-        // }
-
-        return $this->respond($builder, 200);
+        return $this->respond($this->qHelp->rescr($builder), 200);
     }
 
     /**
