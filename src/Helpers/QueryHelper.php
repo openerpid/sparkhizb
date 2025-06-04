@@ -405,6 +405,44 @@ class QueryHelper
         return $response;
     }
 
+    public function resupd($builder)
+    {
+        if($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Update data success.',
+                "response" => $builder,
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Update data failed!',
+                "response" => $builder,
+            ];
+        }
+
+        return $response;
+    }
+
+    public function resapv($builder)
+    {
+        if($builder) {
+            $response = [
+                "status" => true,
+                "message" => 'Approve success.',
+                "response" => $builder,
+            ];
+        } else {
+            $response = [
+                "status" => false,
+                "message" => 'Approve failed!',
+                "response" => $builder,
+            ];
+        }
+
+        return $response;
+    }
+
     public function allowedFields()
     {
         return [

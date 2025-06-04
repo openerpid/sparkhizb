@@ -62,6 +62,9 @@ class MechanicActivityModel extends Model
         "site",
         "workorder",
         "user",
+        "appr_status_id",
+        "approved_at",
+        "approved_by_text",
 
         "created_at",
         "updated_at",

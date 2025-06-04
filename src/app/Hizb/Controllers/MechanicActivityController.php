@@ -8,12 +8,7 @@ use CodeIgniter\HTTP\Files\UploadedFile;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\IdentityHelper;
-use Sparkhizb\UmmuPhotos;
-use Sparkhizb\UmmuUpload;
-
-use App\Hizb\Builder\Safety\LpaBuilder;
-use App\Hizb\Validations\LpaValidation;
-
+// use App\Hizb\Validations\LpaValidation;
 use App\Hizb\Builder\MechanicActivityBuilder;
 
 class MechanicActivityController extends ResourceController
@@ -23,11 +18,8 @@ class MechanicActivityController extends ResourceController
         $this->request = \Config\Services::request();
         $this->qHelp = new QueryHelper();
         $this->identity = new IdentityHelper();
-        $this->umUpl = new UmmuUpload();
-        $this->umPhot = new UmmuPhotos();
-
         $this->qBuilder = new MechanicActivityBuilder();
-        $this->qVal = new LpaValidation();
+        // $this->qVal = new LpaValidation();
     }
 
     /**
@@ -141,41 +133,7 @@ class MechanicActivityController extends ResourceController
      */
     public function new()
     {
-        $show_number_unused = $this->qBuilder->show_number_unused()->get()->getFirstRow();
-        if ($show_number_unused) { /* jika ada nomor dokumen yang belum digunakan pada bulan dan tahun yang sama dengan sekarang */
-            $row = $show_number_unused;
-            $number = $row->number;
-        } else {
-            $getLastRow = $this->qBuilder->getLastRow();
-            if ($getLastRow) {
-                $seq = $getLastRow->seq;
-                $seq = $seq + 1;
-            } else {
-                $seq = 1;
-            }
-
-            $n = sprintf('%06d', $seq);
-            $number = 'INCIDENT' . date('Ym') . $n;
-
-            $payload = [
-                "docat_id" => 2,
-                "seq" => $seq,
-                "number" => $number,
-                "created_by" => $this->identity->account_id()
-            ];
-            $insert_number = $this->qBuilder->insert_number($payload);
-        }
-
-        // $response = ["nomor_dokument" => $number];
-        $response = [$number];
-
-        return $this->respond($response, 200);
-    }
-
-    public function used_number($number)
-    {
-        $builder = $this->qBuilder->used_number($number);
-        return $this->respond($builder, 200);
+        // 
     }
 
     /**
@@ -186,7 +144,7 @@ class MechanicActivityController extends ResourceController
     public function create()
     {
         $activity_type = $this->request->getJsonVar('activity_type');
-        $wo_number = $this->request->getJsonVar('wo_number');
+        $workorder = $this->request->getJsonVar('workorder');
         $jobtype = $this->request->getJsonVar('jobtype');
         $operation = $this->request->getJsonVar('operation');
         $workstart = $this->request->getJsonVar('workstart');
@@ -199,7 +157,7 @@ class MechanicActivityController extends ResourceController
             "user" => $this->identity->username(),
             "site" => $this->identity->c04_project_area_kode(),
             "activity_type" => $activity_type,
-            "wo_number" => $wo_number,
+            "workorder" => $workorder,
             "jobtype" => $jobtype,
             "operation" => $operation,
             "workstart" => $workstart,
@@ -378,87 +336,24 @@ class MechanicActivityController extends ResourceController
         return $this->respond($response, 200);
     }
 
-    private function update_orangTerlibat($lpi_id)
+    public function approve($id)
     {
-        $orang_terlibat = $this->request->getVar('orang_terlibat');
-        $payload_arr = [];
-        $builder = [];
-        if ($orang_terlibat) {
-            foreach ($orang_terlibat as $key => $value) {
-                $status_karyawan = (isset($value['status_karyawan']) ? $value['status_karyawan'] : null);
-                $nik = (isset($value['nik']) ? $value['nik'] : null);
-                $name = (isset($value['name']) ? $value['name'] : null);
-                $jk = (isset($value['jk']) ? $value['jk'] : null);
-                $jabatan = (isset($value['jabatan']) ? $value['jabatan'] : null);
-                $atasan = (isset($value['atasan']) ? $value['atasan'] : null);
-                $umur = (isset($value['umur']) ? $value['umur'] : null);
-                $pengalaman_tahun = (isset($value['pengalaman_tahun']) ? $value['pengalaman_tahun'] : null);
-                $pengalaman_bulan = (isset($value['pengalaman_bulan']) ? $value['pengalaman_bulan'] : null);
-                $sebagai = (isset($value['sebagai']) ? $value['sebagai'] : null);
-                $perusahaan = (isset($value['perusahaan']) ? $value['perusahaan'] : null);
-                $hari_kerja_ke = (isset($value['hari_kerja_ke']) ? $value['hari_kerja_ke'] : null);
+        $actual_duration = $this->request->getJsonVar('actual_duration');
+        $remark = $this->request->getJsonVar('remark');
+        $user = $this->identity->username();
 
-                $payload = [];
+        $payload = [
+            "actual_duration" => $actual_duration,
+            "remark" => $remark,
+            "approved_by_text" => $user,
+            "approved_at" => date('Y-m-d H:i:s'),
+            "appr_status_id" => 1
+        ];
 
-                if(isset($status_karyawan)) $payload["status_karyawan"] = $status_karyawan;
-                if(isset($nik)) $payload["nik"] = $nik;
-                if(isset($name)) $payload["name"] = $name;
-                if(isset($jk)) $payload["jk"] = $jk;
-                if(isset($jabatan)) $payload["jabatan"] = $jabatan;
-                if(isset($atasan)) $payload["atasan"] = $atasan;
-                if(isset($umur)) $payload["umur"] = ($umur) ? $umur : null;
-                if(isset($pengalaman_tahun)) $payload["pengalaman_tahun"] = ($pengalaman_tahun) ? $pengalaman_tahun : null;
-                if(isset($pengalaman_bulan)) $payload["pengalaman_bulan"] = ($pengalaman_bulan) ? $pengalaman_bulan : null;
-                if(isset($sebagai)) $payload["sebagai"] = $sebagai;
-                if(isset($perusahaan)) $payload["perusahaan"] = $perusahaan;
-                if(isset($hari_kerja_ke)) $payload["hari_kerja_ke"] = ($hari_kerja_ke) ? $hari_kerja_ke : null;
+        $builder = $this->qBuilder->update($id, $payload);
 
-                $payload_arr[] = $payload;
-
-                $builder = $this->qBuilder->update_orangTerlibat($lpi_id, $key, $payload);
-            }
-        }
-
-        return $builder;
+        return $this->respond($this->qHelp->resapv($builder), 200);
     }
-
-    /*public function update_kerusakan($lpi_id)
-    {
-        $kerusakan = $this->request->getVar('kerusakan');
-        $payload_arr = [];
-        $builder = [];
-        if ($kerusakan) {
-            foreach ($kerusakan as $key => $value) {
-                $jenis_kerusakan = (isset($value['jenis_kerusakan']) ? $value['jenis_kerusakan'] : null);
-                $name = (isset($value['name']) ? $value['name'] : null);
-                $tipe = (isset($value['tipe']) ? $value['tipe'] : null);
-                $aset_perusahaan = (isset($value['aset_perusahaan']) ? $value['aset_perusahaan'] : null);
-                $serial_number = (isset($value['serial_number']) ? $value['serial_number'] : null);
-                $tingkat_kerusakan = (isset($value['tingkat_kerusakan']) ? $value['tingkat_kerusakan'] : null);
-                $kerusakan_keparahan = (isset($value['kerusakan_keparahan']) ? $value['kerusakan_keparahan'] : null);
-                $detail_kerusakan_kerugian = (isset($value['detail_kerusakan_kerugian']) ? $value['detail_kerusakan_kerugian'] : null);
-                $perkiraan_biaya = (isset($value['perkiraan_biaya']) ? $value['perkiraan_biaya'] : null);
-
-                $payload = [];
-
-                if(isset($jenis_kerusakan)) $payload["jenis_kerusakan"] = $jenis_kerusakan;
-                if(isset($name)) $payload["name"] = $name;
-                if(isset($tipe)) $payload["tipe"] = $tipe;
-                if(isset($aset_perusahaan)) $payload["aset_perusahaan"] = $aset_perusahaan;
-                if(isset($serial_number)) $payload["serial_number"] = $serial_number;
-                if(isset($tingkat_kerusakan)) $payload["tingkat_kerusakan"] = $tingkat_kerusakan;
-                if(isset($kerusakan_keparahan)) $payload["kerusakan_keparahan"] = $kerusakan_keparahan;
-                if(isset($detail_kerusakan_kerugian)) $payload["detail_kerusakan_kerugian"] = $detail_kerusakan_kerugian;
-                if(isset($perkiraan_biaya)) $payload["perkiraan_biaya"] = $perkiraan_biaya;
-
-                $payload_arr[] = $payload;
-
-                $builder = $this->qBuilder->update_kerusakan($key, $kerusakan_payload);
-            }
-        }
-
-        return $builder;
-    }*/
 
     /**
      * Delete the designated resource object from the model
@@ -484,456 +379,4 @@ class MechanicActivityController extends ResourceController
 
         return $this->respond($response, $rescod);
     }
-
-
-
-    /**
-     * Detail ORANG TERLIBAT
-     * */
-    public function create_orang_terlibat()
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $status_karyawan = $this->request->getVar('status_karyawan');
-        $nik = $this->request->getVar('nik');
-        $name = $this->request->getVar('name');
-        $jk = $this->request->getVar('jk');
-        $jabatan = $this->request->getVar('jabatan');
-        $atasan = $this->request->getVar('atasan');
-        $umur = $this->request->getVar('umur');
-        $pengalaman_bulan = $this->request->getVar('pengalaman_bulan');
-        $pengalaman_tahun = $this->request->getVar('pengalaman_tahun');
-        $sebagai = $this->request->getVar('sebagai');
-        $perusahaan = $this->request->getVar('perusahaan');
-        $hari_kerja_ke = $this->request->getVar('hari_kerja_ke');
-
-        $validation = $this->qVal->insert_orangTerlibat();
-        if($validation) return $this->respond($validation, 200);
-
-        $payload = [
-            "lpa_id" => $lpa_id,
-            "status_karyawan" => $status_karyawan,
-            "nik" => $nik,
-            "name" => $name,
-            "jk" => $jk,
-            "jabatan" => $jabatan,
-            "atasan" => $atasan,
-            "umur" => $umur,
-            "pengalaman_tahun" => $pengalaman_tahun,
-            "pengalaman_bulan" => $pengalaman_bulan,
-            "sebagai" => $sebagai,
-            "perusahaan" => $perusahaan,
-            "hari_kerja_ke" => $hari_kerja_ke
-        ];
-        $builder = $this->qBuilder->insert_orangTerlibat($payload);
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Insert data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Insert data failed!',
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function update_orang_terlibat($id)
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $status_karyawan = $this->request->getVar('status_karyawan');
-        $nik = $this->request->getVar('nik');
-        $name = $this->request->getVar('name');
-        $jk = $this->request->getVar('jk');
-        $jabatan = $this->request->getVar('jabatan');
-        $atasan = $this->request->getVar('atasan');
-        $umur = $this->request->getVar('umur');
-        $pengalaman_bulan = $this->request->getVar('pengalaman_bulan');
-        $pengalaman_tahun = $this->request->getVar('pengalaman_tahun');
-        $sebagai = $this->request->getVar('sebagai');
-        $perusahaan = $this->request->getVar('perusahaan');
-        $hari_kerja_ke = $this->request->getVar('hari_kerja_ke');
-
-        $validation = $this->qVal->update_orangTerlibat($id);
-        if($validation) return $this->respond($validation, 200);
-
-        $payload = [
-            "status_karyawan" => $status_karyawan,
-            "nik" => $nik,
-            "name" => $name,
-            "jk" => $jk,
-            "jabatan" => $jabatan,
-            "atasan" => $atasan,
-            "umur" => $umur,
-            "pengalaman_tahun" => $pengalaman_tahun,
-            "pengalaman_bulan" => $pengalaman_bulan,
-            "sebagai" => $sebagai,
-            "perusahaan" => $perusahaan,
-            "hari_kerja_ke" => $hari_kerja_ke
-        ];
-
-        $builder = $this->qBuilder->update_orangTerlibat($id, $payload);
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Update data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Update data failed!',
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function delete_orang_terlibat($id)
-    {
-        $builder = $this->qBuilder->delete_orang_terlibat($id);
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => "Delete success.",
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => "Delete error.",
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-    /**
-     * END Detail ORANG TERLIBAT*/
-
-
-
-    /**
-     * Detail KERUSAKAN
-     * */
-    public function create_kerusakan()
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $jenis_kerusakan = $this->request->getVar('jenis_kerusakan');
-        $name = $this->request->getVar('name');
-        $tipe = $this->request->getVar('tipe');
-        $serial_number = $this->request->getVar('serial_number');
-        $aset_perusahaan = $this->request->getVar('aset_perusahaan');
-        $bukan_aset_perusahaan_text = $this->request->getVar('bukan_aset_perusahaan_text');
-        $tingkat_kerusakan = $this->request->getVar('tingkat_kerusakan');
-        $detail_kerusakan_kerugian = $this->request->getVar('detail_kerusakan_kerugian');
-        $perkiraan_biaya = $this->request->getVar('perkiraan_biaya');
-
-        $validation = $this->qVal->insert_kerusakan();
-        if($validation) return $this->respond($validation, 200);
-
-        $payload = [
-            "lpa_id" => $lpa_id,
-            "jenis_kerusakan" => $jenis_kerusakan,
-            "name" => $name,
-            "tipe" => $tipe,
-            "serial_number" => $serial_number,
-            "aset_perusahaan" => (isset($aset_perusahaan) and $aset_perusahaan != "") ? $aset_perusahaan : null,
-            "bukan_aset_perusahaan_text" => (!$aset_perusahaan) ? $bukan_aset_perusahaan_text : null,
-            "tingkat_kerusakan" => $tingkat_kerusakan,
-            "detail_kerusakan_kerugian" => $detail_kerusakan_kerugian,
-            "perkiraan_biaya" => $perkiraan_biaya
-        ];
-
-        $builder = $this->qBuilder->insert_kerusakan($payload);
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Insert data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Insert data failed!',
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function update_kerusakan($id)
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $jenis_kerusakan = $this->request->getVar('jenis_kerusakan');
-        $name = $this->request->getVar('name');
-        $tipe = $this->request->getVar('tipe');
-        $serial_number = $this->request->getVar('serial_number');
-        $aset_perusahaan = $this->request->getVar('aset_perusahaan');
-        $bukan_aset_perusahaan_text = $this->request->getVar('bukan_aset_perusahaan_text');
-        $tingkat_kerusakan = $this->request->getVar('tingkat_kerusakan');
-        $detail_kerusakan_kerugian = $this->request->getVar('detail_kerusakan_kerugian');
-        $perkiraan_biaya = $this->request->getVar('perkiraan_biaya');
-
-        $validation = $this->qVal->update_kerusakan($id);
-        if($validation) return $this->respond($validation, 200);
-
-        $payload = [
-            // "lpa_id" => $lpa_id,
-            "jenis_kerusakan" => $jenis_kerusakan,
-            "name" => $name,
-            "tipe" => $tipe,
-            "serial_number" => $serial_number,
-            "aset_perusahaan" => (isset($aset_perusahaan) and $aset_perusahaan != "") ? $aset_perusahaan : null,
-            "bukan_aset_perusahaan_text" => (!$aset_perusahaan) ? $bukan_aset_perusahaan_text : null,
-            "tingkat_kerusakan" => $tingkat_kerusakan,
-            "detail_kerusakan_kerugian" => $detail_kerusakan_kerugian,
-            "perkiraan_biaya" => $perkiraan_biaya
-        ];
-
-        $builder = $this->qBuilder->update_kerusakan($id, $payload);
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Update data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Update data failed!',
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function delete_kerusakan($id)
-    {
-        $builder = $this->qBuilder->delete_kerusakan($id);
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => "Delete success.",
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => "Delete error.",
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-    /**
-     * END Detail KERUSAKAN*/
-
-
-
-    /**
-     * Detail DIVISI TERKAIT
-     * */
-    public function create_divisi_terkait()
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $divisi_kode = $this->request->getVar('divisi_kode');
-        $departemen_kode = $this->request->getVar('departemen_kode');
-        $section = $this->request->getVar('section');
-
-        // $validation = $this->qVal->insert_divisi_terkait();
-        // if($validation) return $this->respond($validation, 200);
-
-        $payload = [
-            "lpa_id" => $lpa_id,
-            "divisi_kode" => $divisi_kode,
-            "departemen_kode" => $departemen_kode,
-            "section" => $section
-        ];
-
-        $builder = $this->qBuilder->insert_divisi_terkait($payload);
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Insert data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Insert data failed!',
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function update_divisi_terkait($id)
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $divisi_kode = $this->request->getVar('divisi_kode');
-        $departemen_kode = $this->request->getVar('departemen_kode');
-        $section = $this->request->getVar('section');
-
-        // $validation = $this->qVal->update_divisi_terkait($id);
-        // if($validation) return $this->respond($validation, 200);
-
-        $payload = [
-            // "lpa_id" => $lpa_id,
-            "divisi_kode" => $divisi_kode,
-            "departemen_kode" => $departemen_kode,
-            "section" => $section
-        ];
-
-        $builder = $this->qBuilder->update_divisi_terkait($id, $payload);
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Update data success.',
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Update data failed!',
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function delete_divisi_terkait($id)
-    {
-        $builder = $this->qBuilder->delete_divisi_terkait($id);
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => "Delete success.",
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => "Delete error.",
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-    /**
-     * END Detail DIVISI TERKAIT*/
-
-
-
-    /**
-     * Detail FOTO
-     * */
-    public function create_d_foto()
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $category = $this->request->getVar('category');
-        $file = $this->request->getFile('file');
-
-        // $validation = $this->qVal->insert_divisi_terkait();
-        // if($validation) return $this->respond($validation, 200);
-
-        $builder = null;
-        if ($file != NULL) {
-            $isFile = $file->isValid();
-            if ($isFile) {
-                $newName = $file->getRandomName();
-                if (!$file->hasMoved()) {
-                    $real_path = 'uploads/' . $file->store();
-                }
-
-                $foto_payload = [
-                    "lpa_id" => $lpa_id,
-                    "category" => $category,
-                    "filepath" => $real_path
-                ];
-
-                $builder = $this->qBuilder->insert_d_foto($foto_payload);
-            }
-        }
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Insert data success.',
-                "response" => $builder
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Insert data failed!',
-                "response" => $builder
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function update_d_foto($id)
-    {
-        $lpa_id = $this->request->getVar('lpa_id');
-        $lpa_id = $this->request->getVar('lpa_id');
-        $category = $this->request->getVar('category');
-        $file = $this->request->getFile('file');
-
-        // $validation = $this->qVal->update_d_foto();
-        // if($validation) return $this->respond($validation, 200);
-
-        $builder = null;
-        if ($file != NULL) {
-            $isFile = $file->isValid();
-            if ($isFile) {
-                $newName = $file->getRandomName();
-                if (!$file->hasMoved()) {
-                    $real_path = 'uploads/' . $file->store();
-                }
-
-                $foto_payload = [
-                    "category" => $category,
-                    "filepath" => $real_path
-                ];
-
-                $builder = $this->qBuilder->update_d_foto($id, $foto_payload);
-            }
-        }
-
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => 'Update data success.',
-                "response" => $builder
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => 'Update data failed!',
-                "response" => $builder
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-
-    public function delete_d_foto($id)
-    {
-        $builder = $this->qBuilder->delete_d_foto($id);
-        if ($builder) {
-            $response = [
-                "status" => true,
-                "message" => "Delete success.",
-            ];
-        } else {
-            $response = [
-                "status" => false,
-                "message" => "Delete error.",
-            ];
-        }
-
-        return $this->respond($response, 200);
-    }
-    /**
-     * END Detail FOTO*/
 }
