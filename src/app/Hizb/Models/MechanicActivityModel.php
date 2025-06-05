@@ -15,7 +15,7 @@ class MechanicActivityModel extends Model
     protected $useSoftDeletes = true;
     protected $protectFields = true;
     protected $allowedFields = [
-        // "id",
+        "id",
         "company_id",
         "msdb_id",
         "plant_id",
@@ -25,10 +25,11 @@ class MechanicActivityModel extends Model
         "workorder_id",
         "jobtype",
         "job_type_id",
-        "tech_iden_no",
         "unit_id",
         "reason_id",
         "mechanic_id",
+
+        "tech_iden_no",
         "workstart",
         "workend",
         "description",
@@ -57,23 +58,54 @@ class MechanicActivityModel extends Model
         "system_status",
         "is_sap",
         "is_integration",
+
         "remark",
         "jobdesc",
         "site",
         "workorder",
         "user",
         "appr_status_id",
-        "approved_at",
+        
         "approved_by_text",
+        "approved_at","approved_by",
 
-        "created_at",
-        "updated_at",
-        "deleted_at",
-
-        "created_by",
-        "updated_by",
-        "deleted_by"
+        "created_at","updated_at","deleted_at",
+        "created_by","updated_by","deleted_by"
     ];
+
+    protected $selects = ["
+        id,
+        company_id,
+        activity_type,
+        workorder_id,
+        jobtype,
+        job_type_id,
+        tech_iden_no,
+        unit_id,
+        workstart,
+        workend,
+        workstart_date,
+        workstart_time,
+        workend_date,
+        workend_time,
+        duration,
+        actual_duration,
+        mechanic_name,
+        operation,
+        operation_short_text,
+        remark,
+        jobdesc,
+        site,
+        workorder,
+        user,
+        appr_status_id,
+        approved_at,
+        approved_by_text,
+        created_at,
+        updated_at,
+        created_by,
+        updated_by,
+    "];
 
     // Dates
     protected $useTimestamps = true;

@@ -144,6 +144,7 @@ class MechanicActivityController extends ResourceController
     public function create()
     {
         $activity_type = $this->request->getJsonVar('activity_type');
+        $workorder_id = $this->request->getJsonVar('workorder_id');
         $workorder = $this->request->getJsonVar('workorder');
         $jobtype = $this->request->getJsonVar('jobtype');
         $operation = $this->request->getJsonVar('operation');
@@ -157,6 +158,7 @@ class MechanicActivityController extends ResourceController
             "user" => $this->identity->username(),
             "site" => $this->identity->c04_project_area_kode(),
             "activity_type" => $activity_type,
+            "workorder_id" => $workorder_id,
             "workorder" => $workorder,
             "jobtype" => $jobtype,
             "operation" => $operation,

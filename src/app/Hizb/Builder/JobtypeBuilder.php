@@ -8,6 +8,7 @@ use Sparkhizb\Helpers\RequestHelper;
 use Sparkhizb\Helpers\IdentityHelper;
 use SaintSystems\OData\ODataClient;
 use Sparkhizb\UmmuPmJobtype;
+use Sparkhizb\Helpers\UmmuHelper;
 
 class JobtypeBuilder
 {
@@ -20,6 +21,7 @@ class JobtypeBuilder
         $this->reqH = new RequestHelper();
         $this->identity = new IdentityHelper();
         $this->ummu = new UmmuPmJobtype();
+        $this->umHelp = new UmmuHelper();
     }
 
     public function show($id = null)
@@ -46,14 +48,14 @@ class JobtypeBuilder
 
     public function show_from_openapi2($id)
     {
-        $payload = [
-            "limit" => 10,
-            "offset" => 0,
-            "sort" => "id",
-            "order" => "desc",
-            "search" => "",
-            "selects" => "*"
-        ];
+        $payload = $this->umHelp->filter_payload();
+
+        // $payload = array_merge($payload, [
+        //     "date" => [
+        //         "from" => "",
+        //         "to" => ""
+        //     ]
+        // ]);
 
         $params = [
             "id" => $id,

@@ -6,19 +6,6 @@ use Sparkhizb\Helpers\IdentityHelper;
 use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
-use Sparkhizb\UmmuHazardReport;
-
-use App\Hizb\Models\Safety\LpahModel;
-use App\Hizb\Models\Safety\LpadUnitModel;
-use App\Hizb\Models\Safety\LpadOrangModel;
-use App\Hizb\Models\Safety\LpadFotoModel;
-use App\Hizb\Models\Safety\LpadKerusakanModel;
-use App\Hizb\Models\Safety\LpadDivisiModel;
-
-// use App\Models\Safety\HazardReportQueueMailModel;
-// use App\Models\Safety\HazardReportNumberModel;
-use App\Hizb\Models\DocumentNumbersModel;
-
 use App\Hizb\Models\MechanicActivityModel;
 
 class MechanicActivityBuilder
@@ -32,21 +19,7 @@ class MechanicActivityBuilder
         $this->bHelp = new BuilderHelper();
         $this->qHelp = new QueryHelper();
         $this->umHelp = new UmmuHelper();
-
-        // $this->ummu = new UmmuHazardReport();
-
-        // $this->model = new HazardReportQueueMailModel();
-        // $this->mNum = new HazardReportNumberModel();
         $this->model = new MechanicActivityModel();
-
-        $this->mOrang = new LpadOrangModel();
-        $this->mFoto = new LpadFotoModel();
-        $this->mKerusakan = new LpadKerusakanModel();
-        $this->mUnit = new LpadUnitModel();
-        $this->mDoc = new DocumentNumbersModel();
-        $this->mDivisi = new LpadDivisiModel();
-
-        // $this->db->defaultGroup = 'iescm';
     }
 
     private function qbAlya()
