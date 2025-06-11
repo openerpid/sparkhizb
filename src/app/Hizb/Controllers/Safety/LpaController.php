@@ -92,30 +92,44 @@ class LpaController extends ResourceController
 
                     $divisi_name = '';
                     $depar_name = '';
-                    foreach ($divisi as $key2 => $value2) {
-                        if (in_array("divisi", $join_syshab)) {
-                            $qbDivisi = new \App\Hizb\Syshab\Builder\DivisiBuilder;
+                    $section_name = '';
+                    if ($join_syshab) {
+                        foreach ($divisi as $key2 => $value2) {
+                            if (in_array("divisi", $join_syshab)) {
+                                $qbDivisi = new \App\Hizb\Syshab\Builder\DivisiBuilder;
 
-                            $herp_divisi = $qbDivisi->show_by_kode($value2->divisi_kode)->get()->getRow();
-                            if ($herp_divisi) {
-                                $divisi_name = $herp_divisi->NmDivisi;
+                                $herp_divisi = $qbDivisi->show_by_kode($value2->divisi_kode)->get()->getRow();
+                                if ($herp_divisi) {
+                                    $divisi_name = $herp_divisi->NmDivisi;
+                                }
+
+                                $divisi[$key2]->divisi_name = $divisi_name;
                             }
 
-                            $divisi[$key2]->divisi_name = $divisi_name;
-                        }
+                            if (in_array("departemen", $join_syshab)) {
+                                $qbDepar = new \App\Hizb\Syshab\Builder\DepartementBuilder;
 
-                        if (in_array("departemen", $join_syshab)) {
-                            $qbDepar = new \App\Hizb\Syshab\Builder\DepartementBuilder;
+                                $show_depar = $qbDepar->show_by_kode($value2->departemen_kode)->get()->getRow();
+                                if ($show_depar) {
+                                    $depar_name = $show_depar->NmDepar;
+                                }
 
-                            $show_depar = $qbDepar->show_by_kode($value2->departemen_kode)->get()->getRow();
-                            if ($show_depar) {
-                                $depar_name = $show_depar->NmDepar;
+                                $divisi[$key2]->depar_name = $depar_name;
+
                             }
 
-                            $divisi[$key2]->depar_name = $depar_name;
+                            if (in_array("section", $join_syshab)) {
+                                $qbSeksi = new \App\Hizb\Syshab\Builder\SeksiBuilder;
 
+                                $builder = $qbSeksi->show_by_kode($value2->section_kode)->get()->getRow();
+                                if ($builder) {
+                                    $section_name = $builder->NmSec;
+                                }
+
+                                $divisi[$key2]->section_name = $section_name;
+
+                            }
                         }
-                        
                     }
                     $rows[$key]->divisi_terkait = $divisi;
                 }

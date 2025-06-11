@@ -63,4 +63,13 @@ class SeksiBuilder
 
         return $builder;
     }
+
+    public function show_by_kode($kode = null)
+    {
+        $builder = $this->db->table($this->model->table)
+            ->where('KdSec', $kode)
+            ->where('DeleteTime IS NULL');
+
+        return $builder;
+    }
 }
