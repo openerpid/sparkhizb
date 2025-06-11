@@ -21,6 +21,7 @@ class LpadDivisiModel extends Model
         
         "divisi_kode",
         "departemen_kode",
+        "section_kode",
         "section",
 
         "created_at",

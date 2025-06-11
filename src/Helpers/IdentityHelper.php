@@ -211,8 +211,8 @@ class IdentityHelper
     {
         $params = [
             "payload" => [
-                "username" => getenv('openerp.username'),
-                "password" => getenv('openerp.password')
+                "username" => getenv('openapi2.username'),
+                "password" => getenv('openapi2.password')
             ],
             "headers" => [
                 "Content-Type:application/json"

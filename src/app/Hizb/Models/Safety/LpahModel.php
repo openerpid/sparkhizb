@@ -23,6 +23,7 @@ class LpahModel extends Model
         "site",
         "divisi",
         "departemen",
+        "section_kode",
         "section",
 
         "hari_kejadian",

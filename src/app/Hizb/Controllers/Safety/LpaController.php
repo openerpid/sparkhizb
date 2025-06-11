@@ -336,11 +336,13 @@ class LpaController extends ResourceController
                     $divisi_kode = (isset($value['divisi_kode']) ? $value['divisi_kode'] : null);
                     $departemen_kode = (isset($value['departemen_kode']) ? $value['departemen_kode'] : null);
                     $section = (isset($value['section']) ? $value['section'] : null);
+                    $section_kode = (isset($value['section_kode']) ? $value['section_kode'] : null);
 
                     $divisi_terkait = [
                         "lpa_id" => $insert,
                         "divisi_kode" => $divisi_kode,
                         "departemen_kode" => $departemen_kode,
+                        "section_kode" => $section_kode,
                         "section" => $section
                     ];
                     $insert_divisi_terkait = $this->qBuilder->insert_divisiTerkait($divisi_terkait);
@@ -1008,6 +1010,7 @@ class LpaController extends ResourceController
         $lpa_id = $this->request->getVar('lpa_id');
         $divisi_kode = $this->request->getVar('divisi_kode');
         $departemen_kode = $this->request->getVar('departemen_kode');
+        $section_kode = $this->request->getVar('section_kode');
         $section = $this->request->getVar('section');
 
         // $validation = $this->qVal->insert_divisi_terkait();
@@ -1017,6 +1020,7 @@ class LpaController extends ResourceController
             "lpa_id" => $lpa_id,
             "divisi_kode" => $divisi_kode,
             "departemen_kode" => $departemen_kode,
+            "section_kode" => $section_kode,
             "section" => $section
         ];
 
@@ -1042,6 +1046,7 @@ class LpaController extends ResourceController
         $lpa_id = $this->request->getVar('lpa_id');
         $divisi_kode = $this->request->getVar('divisi_kode');
         $departemen_kode = $this->request->getVar('departemen_kode');
+        $section_kode = $this->request->getVar('section_kode');
         $section = $this->request->getVar('section');
 
         // $validation = $this->qVal->update_divisi_terkait($id);
@@ -1051,6 +1056,7 @@ class LpaController extends ResourceController
             // "lpa_id" => $lpa_id,
             "divisi_kode" => $divisi_kode,
             "departemen_kode" => $departemen_kode,
+            "section_kode" => $section_kode,
             "section" => $section
         ];
 
