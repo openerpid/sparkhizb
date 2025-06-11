@@ -275,6 +275,7 @@ class LpaController extends ResourceController
 
         $tipe_insiden = $this->request->getVar('tipe_insiden');
         $penjelasan_insiden = $this->request->getVar('penjelasan_insiden');
+        $zona_waktu = $this->request->getVar('zona_waktu');
 
         $payload = [
             "nomor_dokumen" => $nomor_dokumen,
@@ -310,7 +311,7 @@ class LpaController extends ResourceController
             "pihak_tiga_tanggal" => $pihak_tiga_tanggal,
             "tipe_insiden" => $tipe_insiden,
             "penjelasan_insiden" => $penjelasan_insiden,
-            // "orang_terlibat_arr" => $orang_terlibat_arr,
+            "zona_waktu" => $zona_waktu,
             // "kerusakan_arr" => $kerusakan_arr,
             // "unit_arr" => $unit_arr
         ];
@@ -439,6 +440,7 @@ class LpaController extends ResourceController
                     $file = $this->request->getFile('foto.' . $key . '.file');
                     if ($file != NULL) {
                         $isFile = $file->isValid();
+                        $group_category = $value['group_category'];
                         $category = $value['category'];
                         if ($isFile) {
                             $newName = $file->getRandomName();
@@ -456,6 +458,7 @@ class LpaController extends ResourceController
 
                             $foto_payload = [
                                 "lpa_id" => $insert,
+                                "group_category" => $group_category,
                                 "category" => $category,
                                 "filepath" => $real_path
                             ];
@@ -1096,6 +1099,7 @@ class LpaController extends ResourceController
     public function create_d_foto()
     {
         $lpa_id = $this->request->getVar('lpa_id');
+        $group_category = $this->request->getVar('group_category');
         $category = $this->request->getVar('category');
         $file = $this->request->getFile('file');
 
@@ -1113,6 +1117,7 @@ class LpaController extends ResourceController
 
                 $foto_payload = [
                     "lpa_id" => $lpa_id,
+                    "group_category" => $group_category,
                     "category" => $category,
                     "filepath" => $real_path
                 ];
@@ -1141,7 +1146,7 @@ class LpaController extends ResourceController
     public function update_d_foto($id)
     {
         $lpa_id = $this->request->getVar('lpa_id');
-        $lpa_id = $this->request->getVar('lpa_id');
+        $group_category = $this->request->getVar('group_category');
         $category = $this->request->getVar('category');
         $file = $this->request->getFile('file');
 
@@ -1158,6 +1163,7 @@ class LpaController extends ResourceController
                 }
 
                 $foto_payload = [
+                    "group_category" => $group_category,
                     "category" => $category,
                     "filepath" => $real_path
                 ];

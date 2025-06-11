@@ -61,6 +61,7 @@ class LpahModel extends Model
         "tipe_insiden_id",
         "tipe_insiden",
         "penjelasan_insiden",
+        "zona_waktu",
 
         "created_at",
         "updated_at",
