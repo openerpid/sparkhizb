@@ -28,27 +28,31 @@ class MechanicActivityBuilder
         // $selects = $this->model->selects;
         // $allowedFields = $this->model->allowedFields;
 
-        $subquery = $this->iescm->table($table . ' a')
-            // ->select($selects)
+        $subquery = $this->iescm->table($table . ' a');
 
-            // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
-            // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
+        if ($this->request->getJsonVar('almi') == true) {
+            $subquery->select($this->model->almi);
+        }
+        // ->select($selects)
 
-            // ->join($this->mEmpl->database . '.' . $this->mEmpl->table . ' j', 'j.identity_id = c.id', 'left')
-            // ->join('Sparkhizb_she.lokasi_temuan d', 'd.id = a.lokasi_temuan_id', 'left')
-            // ->join('Sparkhizb_she.jenis_bahaya e', 'e.id = a.jenis_temuan_id', 'left')
-            // ->join('Sparkhizb_she.kode_bahaya f', 'f.id = a.kode_bahaya_id', 'left')
-            // ->join('Sparkhizb.document_kode g', 'g.document_id = 5', 'left')
-            // ->join('Sparkhizb_gallery.photos h', 'h.id = a.foto_temuan_id', 'left')
-            // ->join('Sparkhizb_gallery.photos i', 'i.id = a.foto_perbaikan_id', 'left')
+        // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
+        // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
 
-            // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' ll', 'll.id = a.approved_by', 'left')
-            // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' l', 'l.id = ll.identity_id', 'left')
+        // ->join($this->mEmpl->database . '.' . $this->mEmpl->table . ' j', 'j.identity_id = c.id', 'left')
+        // ->join('Sparkhizb_she.lokasi_temuan d', 'd.id = a.lokasi_temuan_id', 'left')
+        // ->join('Sparkhizb_she.jenis_bahaya e', 'e.id = a.jenis_temuan_id', 'left')
+        // ->join('Sparkhizb_she.kode_bahaya f', 'f.id = a.kode_bahaya_id', 'left')
+        // ->join('Sparkhizb.document_kode g', 'g.document_id = 5', 'left')
+        // ->join('Sparkhizb_gallery.photos h', 'h.id = a.foto_temuan_id', 'left')
+        // ->join('Sparkhizb_gallery.photos i', 'i.id = a.foto_perbaikan_id', 'left')
 
-            // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' kk', 'kk.id = a.rejected_by', 'left')
-            // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' k', 'k.id = kk.identity_id', 'left')
-            // // ->whereIn('a.is_release', $release2)
-            ->where('a.deleted_at IS NULL');
+        // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' ll', 'll.id = a.approved_by', 'left')
+        // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' l', 'l.id = ll.identity_id', 'left')
+
+        // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' kk', 'kk.id = a.rejected_by', 'left')
+        // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' k', 'k.id = kk.identity_id', 'left')
+        // // ->whereIn('a.is_release', $release2)
+        $subquery->where('a.deleted_at IS NULL');
 
         return $this->iescm->newQuery()->fromSubquery($subquery, 't');
     }

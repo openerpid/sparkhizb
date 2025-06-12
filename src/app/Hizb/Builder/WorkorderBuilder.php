@@ -39,7 +39,8 @@ class WorkorderBuilder
         $params = [
             "id" => $id,
             "payload" => $payload,
-            "token" => $this->identity->c04_token()
+            // "token" => $this->identity->token_openapi2()
+            "token" => getenv('openapi2.token')
         ];
 
         $builder = $this->ummu->show($params);

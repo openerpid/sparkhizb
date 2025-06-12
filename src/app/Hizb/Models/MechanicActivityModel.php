@@ -73,7 +73,7 @@ class MechanicActivityModel extends Model
         "created_by","updated_by","deleted_by"
     ];
 
-    protected $selects = ["
+    protected $selects = "
         id,
         company_id,
         activity_type,
@@ -105,7 +105,44 @@ class MechanicActivityModel extends Model
         updated_at,
         created_by,
         updated_by,
-    "];
+    ";
+
+    protected $almi = "
+        id,
+        activity_type,
+        jobtype,
+        jobtype_text,
+        tech_iden_no,
+        unit,
+        site,
+
+        workstart,
+        workend,
+        duration,
+        actual_duration,
+
+        operation,
+        operation_short_text,
+
+        remark,
+        jobdesc,
+        workorder as workorder_id,
+        workorder,
+
+        component_group,
+        component_group_text,
+
+        dayofftype_id,
+        dayofftype_text,
+        
+        appr_status_id,
+        approved_at,
+        approved_by_text,
+
+        user,
+        created_at,updated_at,deleted_at,
+        created_by,updated_by,deleted_by
+    ";
 
     // Dates
     protected $useTimestamps = true;
