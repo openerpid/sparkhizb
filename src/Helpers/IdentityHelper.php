@@ -183,8 +183,8 @@ class IdentityHelper
     {
         $params = [
             "payload" => [
-                "username" => getenv('openerp.username'),
-                "password" => getenv('openerp.password')
+                "username" => getenv('openapi2.username'),
+                "password" => getenv('openapi2.password')
             ],
             "headers" => [
                 "Content-Type:application/json"
@@ -196,13 +196,28 @@ class IdentityHelper
 
     public function login_token()
     {
-        $a = $this->login();
+        $token = getenv('openapi2.token');
+        // $a = $this->login();
 
-        if ($a->status == true) {
-            $token = $a->data->token;
-        }else{
-            $token = '';
-        }
+        // if ($a->status == true) {
+        //     $token = $a->data->token;
+        // }else{
+        //     $token = '';
+        // }
+
+        return $token;
+    }
+
+    public function token_openapi2()
+    {
+        $token = getenv('openapi2.token');
+        // $a = $this->login();
+
+        // if ($a->status == true) {
+        //     $token = $a->data->token;
+        // }else{
+        //     $token = '';
+        // }
 
         return $token;
     }
@@ -224,13 +239,14 @@ class IdentityHelper
 
     public function token_static_login()
     {
-        $a = $this->static_login();
+        $token = getenv('openapi2.token');
+        // $a = $this->static_login();
 
-        if ($a->status == true) {
-            $token = $a->data->token;
-        }else{
-            $token = '';
-        }
+        // if ($a->status == true) {
+        //     $token = $a->data->token;
+        // }else{
+        //     $token = '';
+        // }
 
         return $token;
     }
@@ -246,6 +262,20 @@ class IdentityHelper
             $token = $this->login_token();
         }else{
             $token = $this->jwt->token();
+        }
+
+        return $token;
+    }
+
+    public function openapi2_autoken()
+    {
+        $token = $this->jwt->token();
+
+        if(isset($this->jwt->decode()->vendor)) {
+            if ($this->jwt->decode()->vendor == 'syshab') {
+                /*maka, token-nya menggunakan hasil login ke openapi2 dengan username dan password yg sudah ditentukan di .env*/
+                $token = $this->login_token();
+            }
         }
 
         return $token;
