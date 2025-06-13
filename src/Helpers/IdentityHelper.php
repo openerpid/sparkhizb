@@ -181,17 +181,19 @@ class IdentityHelper
 
     private function login()
     {
-        $params = [
-            "payload" => [
-                "username" => getenv('openapi2.username'),
-                "password" => getenv('openapi2.password')
-            ],
-            "headers" => [
-                "Content-Type:application/json"
-            ]
-        ];
+        // $params = [
+        //     "payload" => [
+        //         "username" => getenv('openapi2.username'),
+        //         "password" => getenv('openapi2.password')
+        //     ],
+        //     "headers" => [
+        //         "Content-Type:application/json"
+        //     ]
+        // ];
 
-        return $this->auth->login2($params);
+        // return $this->auth->login2($params);
+
+        return getenv('openapi2.token');
     }
 
     public function login_token()
@@ -224,17 +226,18 @@ class IdentityHelper
 
     private function static_login()
     {
-        $params = [
-            "payload" => [
-                "username" => getenv('openapi2.username'),
-                "password" => getenv('openapi2.password')
-            ],
-            "headers" => [
-                "Content-Type:application/json"
-            ]
-        ];
+        // $params = [
+        //     "payload" => [
+        //         "username" => getenv('openapi2.username'),
+        //         "password" => getenv('openapi2.password')
+        //     ],
+        //     "headers" => [
+        //         "Content-Type:application/json"
+        //     ]
+        // ];
 
-        return $this->auth->login2($params);
+        // return $this->auth->login2($params);
+        return getenv('openapi2.token');
     }
 
     public function token_static_login()

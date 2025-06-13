@@ -143,6 +143,31 @@ class MechanicActivityController extends ResourceController
      */
     public function create()
     {
+        // "activity_type": 1,
+        // "site": "REI",
+        // "workorder": "910000000005",
+        // "tech_iden_no": "BDKM85032",
+        // "unit": "BULDOZER",
+        
+        // "workstart": "2025-06-03 07:00:00",
+        // "workend": "2025-06-03 08:30:00",
+        // "duration": "1,5",
+
+        // "jobtype": "GOH",
+        // "jobtype_text": "General Overhaul",
+        // "operation": "A000007",
+        // "operation_short_text": "PS 500",
+        // "component_group": "6550",
+        // "component_group_text": "CABIN ACCESORIES",
+        // "dayofftype_id": 1,
+        // "dayofftype_text": "Ijin",
+        // "jobdesc": "test apa saja"
+
+        // "actual_duration": null,
+        // "remark": "Testing Via postman untuk tikus istana"
+
+
+        
         $activity_type = $this->request->getJsonVar('activity_type');
         $workorder_id = $this->request->getJsonVar('workorder_id');
         $workorder = $this->request->getJsonVar('workorder');

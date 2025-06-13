@@ -167,4 +167,24 @@ class Auth
 
         return json_decode($response, false);
     }
+
+    public function show_msdb($params)
+    {
+        $payload = $params['payload'];
+        $token = $params['token'];
+        
+        $path = "show_msdb";
+
+        $params = [
+            "path"           => $path,
+            "method"         => "GET",
+            "payload"        => $payload,
+            "module_code"    => "msdb",
+            "token"          => $token
+        ];
+
+        $response = $this->curli->request3($params);
+
+        return json_decode($response, false);
+    }
 }
