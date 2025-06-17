@@ -1138,7 +1138,7 @@ class LpaController extends ResourceController
         // $validation = $this->qVal->insert_divisi_terkait();
         // if($validation) return $this->respond($validation, 200);
 
-        $builder = null;
+        $builder = [];
         /*if ($file != NULL) {
             $isFile = $file->isValid();
             if ($isFile) {
@@ -1174,7 +1174,7 @@ class LpaController extends ResourceController
                         "filepath" => $real_path
                     ];
 
-                    $builder = $this->qBuilder->insert_d_foto($foto_payload);
+                    $builder[] = $this->qBuilder->insert_d_foto($foto_payload);
                 }
             }
         }
@@ -1196,32 +1196,55 @@ class LpaController extends ResourceController
         return $this->respond($response, 200);
     }
 
-    public function update_d_foto($id)
+    public function update_d_foto($id = null)
     {
         $lpa_id = $this->request->getVar('lpa_id');
         $group_category = $this->request->getVar('group_category');
         $category = $this->request->getVar('category');
         $file = $this->request->getFile('file');
+        $getFiles = $this->request->getFiles();
 
         // $validation = $this->qVal->update_d_foto();
         // if($validation) return $this->respond($validation, 200);
 
-        $builder = null;
-        if ($file != NULL) {
-            $isFile = $file->isValid();
-            if ($isFile) {
-                $newName = $file->getRandomName();
-                if (!$file->hasMoved()) {
-                    $real_path = 'uploads/' . $file->store();
+        $builder = [];
+        if ($id) {
+            if ($file != NULL) {
+                $isFile = $file->isValid();
+                if ($isFile) {
+                    $newName = $file->getRandomName();
+                    if (!$file->hasMoved()) {
+                        $real_path = 'uploads/' . $file->store();
+                    }
+
+                    $foto_payload = [
+                        "group_category" => $group_category,
+                        "category" => $category,
+                        "filepath" => $real_path
+                    ];
+
+                    $builder = $this->qBuilder->update_d_foto($id, $foto_payload);
                 }
+            }
+        }else{
+            if ($getFiles) {
+                foreach ($getFiles['file'] as $key => $file) {
+                    $isFile = $file->isValid();
+                    if ($isFile) {
+                        $newName = $file->getRandomName();
+                        if (!$file->hasMoved()) {
+                            $real_path = 'uploads/' . $file->store();
+                        }
 
-                $foto_payload = [
-                    "group_category" => $group_category,
-                    "category" => $category,
-                    "filepath" => $real_path
-                ];
+                        $foto_payload = [
+                            "group_category" => $group_category,
+                            "category" => $category,
+                            "filepath" => $real_path
+                        ];
 
-                $builder = $this->qBuilder->update_d_foto($id, $foto_payload);
+                        $builder[] = $this->qBuilder->update_d_foto($key, $foto_payload);
+                    }
+                }
             }
         }
 
