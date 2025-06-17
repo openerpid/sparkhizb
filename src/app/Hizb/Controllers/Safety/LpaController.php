@@ -1121,13 +1121,25 @@ class LpaController extends ResourceController
         $lpa_id = $this->request->getVar('lpa_id');
         $group_category = $this->request->getVar('group_category');
         $category = $this->request->getVar('category');
-        $file = $this->request->getFile('file');
+        $getFiles = $this->request->getFiles();
+
+        /*// Testing
+        $name = [];
+        if ($getFiles) {
+            foreach ($getFiles['file'] as $img) {
+                // if ($img->isValid() && ! $img->hasMoved()) {
+                //     $newName = $img->getRandomName();
+                //     $img->move(WRITEPATH . 'uploads', $newName);
+                // }
+                $name[] = $img->getName();
+            }
+        }*/
 
         // $validation = $this->qVal->insert_divisi_terkait();
         // if($validation) return $this->respond($validation, 200);
 
         $builder = null;
-        if ($file != NULL) {
+        /*if ($file != NULL) {
             $isFile = $file->isValid();
             if ($isFile) {
                 $newName = $file->getRandomName();
@@ -1143,6 +1155,27 @@ class LpaController extends ResourceController
                 ];
 
                 $builder = $this->qBuilder->insert_d_foto($foto_payload);
+            }
+        }*/
+
+        if ($getFiles) {
+            foreach ($getFiles['file'] as $file) {
+                $isFile = $file->isValid();
+                if ($isFile) {
+                    $newName = $file->getRandomName();
+                    if (!$file->hasMoved()) {
+                        $real_path = 'uploads/' . $file->store();
+                    }
+
+                    $foto_payload = [
+                        "lpa_id" => $lpa_id,
+                        "group_category" => $group_category,
+                        "category" => $category,
+                        "filepath" => $real_path
+                    ];
+
+                    $builder = $this->qBuilder->insert_d_foto($foto_payload);
+                }
             }
         }
 
