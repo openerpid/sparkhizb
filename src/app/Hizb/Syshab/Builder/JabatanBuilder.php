@@ -4,7 +4,6 @@ namespace App\Hizb\Syshab\Builder;
 
 use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\UmmuHelper;
-
 use App\Hizb\Syshab\Models\DivisiModel;
 use App\Hizb\Syshab\Models\JabatanModel;
 
