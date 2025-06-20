@@ -1265,8 +1265,12 @@ class LpaController extends ResourceController
         return $this->respond($response, 200);
     }
 
-    public function delete_d_foto($id)
+    public function delete_d_foto($id = null)
     {
+        if ($id == null) {
+            $id = $this->request->getJsonVar('id');
+        }
+
         $builder = $this->qBuilder->delete_d_foto($id);
         if ($builder) {
             $response = [

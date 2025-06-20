@@ -1019,8 +1019,13 @@ class BuilderHelper
             "deleted_by" => $this->identity->account_id()
         ];
 
-        return $builder->where('id', $id)
-        ->set($payload)
+        if (is_array($id)) {
+            $builder = $builder->whereIn('id', $id);
+        }else{
+            $builder = $builder->where('id', $id);
+        }
+
+        return $builder->set($payload)
         ->update();
     }
 }

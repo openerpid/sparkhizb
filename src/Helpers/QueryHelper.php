@@ -12,13 +12,17 @@ namespace Sparkhizb\Helpers;
 */
 
 // use Sparkhizb\Helpers\DateTimeHelper;
+use Sparkhizb\Auth as Openapi2Auth;
 
 class QueryHelper
 {
     public function __construct()
     {
         $this->request = \Config\Services::request();
-        // $this->dtH = new DateTimeHelper();
+        // $this->dtH = new DateTimeHelper(); /
+        // $this->identity = new IdentityHelper(); /
+        // $this->ummuMsdb = new UmmuMsdb; /
+        $this->oa2auth = new Openapi2Auth;
     }
 
     public function limit()
@@ -462,5 +466,128 @@ class QueryHelper
             "updated_at","updated_by",
             "deleted_at","deleted_by"
         ];
+    }
+
+    public function withMsdb($tokenmsdb = null)
+    {
+        $msdb_token = $this->request->header("Msdb-Token");
+
+        if ($msdb_token) {
+            $tokenmsdb = $msdb_token->getValue();
+        }
+
+        if (getenv('msdb') === 'true') {
+            $payload = [
+                "limit" => 0,
+                "offset" => 0,
+                "sort" => "id",
+                "order" => "desc",
+                "search" => "",
+                "token" => $tokenmsdb
+            ];
+
+            $params = [
+                "id" => null,
+                "payload" => $payload,
+                "token" => getenv('company_token')
+            ];
+
+            $builder = $this->oa2auth->show_msdb($params);
+            if ($builder->status == true) {
+                $row = $builder->rows[0];
+
+                if (getenv('dbconn') == 'local') {
+                    $host = $row->localhost;
+                } else {
+                    $host = $row->host;
+                }
+
+                $custom = [
+                    'DSN' => '',
+                    'hostname' => base64_decode($host),
+                    'username' => base64_decode($row->username),
+                    'password' => base64_decode($row->password),
+                    'database' => base64_decode($row->dbname),
+                    'DBDriver' => base64_decode($row->dbdriver),
+                    'DBPrefix' => '',
+                    'pConnect' => false,
+                    'DBDebug' => true,
+                    'charset' => 'utf8',
+                    'DBCollat' => 'utf8_general_ci',
+                    'swapPre' => '',
+                    'encrypt' => false,
+                    'compress' => false,
+                    'strictOn' => false,
+                    'failover' => [],
+                    'port' => base64_decode($row->port),
+                ];
+
+                return $custom;
+            }
+        } else {
+            $custom = [
+                'DSN' => '',
+                'hostname' => getenv('database.msdb.hostname'),
+                'username' => getenv('database.msdb.username'),
+                'password' => getenv('database.msdb.password'),
+                'database' => getenv('database.msdb.database'),
+                'DBDriver' => getenv('database.msdb.DBDriver'),
+                'DBPrefix' => '',
+                'pConnect' => false,
+                'DBDebug' => true,
+                'charset' => 'utf8',
+                'DBCollat' => 'utf8_general_ci',
+                'swapPre' => '',
+                'encrypt' => false,
+                'compress' => false,
+                'strictOn' => false,
+                'failover' => [],
+                'port' => getenv('database.msdb.port'),
+            ];
+
+            return $custom;
+        }
+    }
+
+    public function withoutMsdb($dbdriver = null, $port = null)
+    {
+        $hostname = $this->request->getVar("hostname");
+        $username = $this->request->getVar("username");
+        $password = $this->request->getVar("password");
+        $database = $this->request->getVar("database");
+        $dbdriver = $this->request->getVar("dbdriver");
+        $port = $this->request->getVar("port");
+        $encrypter = $this->request->getVar("encrypter");
+
+        if ($encrypter == "base64") {
+            $h = base64_decode($hostname);
+            $u = base64_decode($username);
+            $p = base64_decode($password);
+            $d = base64_decode($database);
+            $dd = base64_decode($dbdriver);
+            $port = base64_decode($port);
+        }
+
+        $custom = [
+            'DSN' => '',
+            'hostname' => $h,
+            'username' => $u,
+            'password' => $p,
+            'database' => $d,
+            'DBDriver' => ($dbdriver) ? $dbdriver : $dd,
+            'DBPrefix' => '',
+            'pConnect' => false,
+            'DBDebug' => true,
+            'charset' => 'utf8',
+            'DBCollat' => 'utf8_general_ci',
+            'swapPre' => '',
+            'encrypt' => false,
+            'compress' => false,
+            'strictOn' => false,
+            'failover' => [],
+            'port' => 1433,
+        ];
+
+        return $custom;
     }
 }
