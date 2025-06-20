@@ -468,13 +468,10 @@ class QueryHelper
         ];
     }
 
-    public function withMsdb($tokenmsdb = null)
+    public function msdb_fromRequestHeader()
     {
-        $msdb_token = $this->request->header("Msdb-Token");
-
-        if ($msdb_token) {
-            $tokenmsdb = $msdb_token->getValue();
-        }
+        $MsdbToken = $this->request->header("Msdb-Token");
+        $msdb_token = $MsdbToken->getValue();
 
         if (getenv('msdb') === 'true') {
             $payload = [
@@ -483,7 +480,7 @@ class QueryHelper
                 "sort" => "id",
                 "order" => "desc",
                 "search" => "",
-                "token" => $tokenmsdb
+                "token" => $msdb_token
             ];
 
             $params = [
@@ -549,32 +546,33 @@ class QueryHelper
         }
     }
 
-    public function withoutMsdb($dbdriver = null, $port = null)
+    public function msdb_fromRequestParam()
     {
+        $encrypter = $this->request->getVar("encrypter");
+
         $hostname = $this->request->getVar("hostname");
         $username = $this->request->getVar("username");
         $password = $this->request->getVar("password");
         $database = $this->request->getVar("database");
         $dbdriver = $this->request->getVar("dbdriver");
         $port = $this->request->getVar("port");
-        $encrypter = $this->request->getVar("encrypter");
 
         if ($encrypter == "base64") {
-            $h = base64_decode($hostname);
-            $u = base64_decode($username);
-            $p = base64_decode($password);
-            $d = base64_decode($database);
-            $dd = base64_decode($dbdriver);
+            $hostname = base64_decode($hostname);
+            $username = base64_decode($username);
+            $password = base64_decode($password);
+            $database = base64_decode($database);
+            $dbdriver = base64_decode($dbdriver);
             $port = base64_decode($port);
         }
 
         $custom = [
             'DSN' => '',
-            'hostname' => $h,
-            'username' => $u,
-            'password' => $p,
-            'database' => $d,
-            'DBDriver' => ($dbdriver) ? $dbdriver : $dd,
+            'hostname' => $hostname,
+            'username' => $username,
+            'password' => $password,
+            'database' => $database,
+            'DBDriver' => $dbdriver,
             'DBPrefix' => '',
             'pConnect' => false,
             'DBDebug' => true,
@@ -585,7 +583,32 @@ class QueryHelper
             'compress' => false,
             'strictOn' => false,
             'failover' => [],
-            'port' => 1433,
+            'port' => $port,
+        ];
+
+        return $custom;
+    }
+
+    public function msdb_fromEnv()
+    {
+        $custom = [
+            'DSN' => '',
+            'hostname' => getenv('database.default.hostname'),
+            'username' => getenv('database.default.username'),
+            'password' => getenv('database.default.password'),
+            'database' => getenv('database.default.database'),
+            'DBDriver' => getenv('database.default.DBDriver'),
+            'DBPrefix' => '',
+            'pConnect' => false,
+            'DBDebug' => true,
+            'charset' => 'utf8',
+            'DBCollat' => 'utf8_general_ci',
+            'swapPre' => '',
+            'encrypt' => false,
+            'compress' => false,
+            'strictOn' => false,
+            'failover' => [],
+            'port' => getenv('database.default.port'),
         ];
 
         return $custom;

@@ -156,8 +156,14 @@ class PurchaseOrderBuilder
 
     public function show($id = null)
     {
-        $po_number = $this->request->getJsonVar('po_number');
-        $part_number = $this->request->getJsonVar('part_number');
+        $is_json = $this->request->is('json');
+        if ($is_json == true) {
+            $po_number = $this->request->getJsonVar('po_number');
+            $part_number = $this->request->getJsonVar('part_number');
+        }else{
+            $po_number = $this->request->getVar('po_number');
+            $part_number = $this->request->getVar('part_number');
+        }
 
         $builder = $this->qbAlya();
 
