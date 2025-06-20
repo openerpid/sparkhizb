@@ -1139,6 +1139,7 @@ class LpaController extends ResourceController
         // if($validation) return $this->respond($validation, 200);
 
         $builder = [];
+        $responseb = [];
         /*if ($file != NULL) {
             $isFile = $file->isValid();
             if ($isFile) {
@@ -1174,22 +1175,33 @@ class LpaController extends ResourceController
                         "filepath" => $real_path
                     ];
 
-                    $builder[] = $this->qBuilder->insert_d_foto($foto_payload);
+                    $builder = $this->qBuilder->insert_d_foto($foto_payload);
+
+                    $responseb[] = [
+                        "id" => $builder,
+                        // "lpa_id" => $lpa_id,
+                        // "group_category" => $group_category,
+                        // "category" => $category,
+                        "filepath" => $real_path,
+                        "file_url" => base_url($real_path)
+                    ];
+
+                    // $builder[] = $builder;
                 }
             }
         }
 
-        if ($builder) {
+        if ($responseb) {
             $response = [
                 "status" => true,
                 "message" => 'Insert data success.',
-                "response" => $builder
+                "response" => $responseb
             ];
         } else {
             $response = [
                 "status" => false,
                 "message" => 'Insert data failed!',
-                "response" => $builder
+                "response" => $responseb
             ];
         }
 
