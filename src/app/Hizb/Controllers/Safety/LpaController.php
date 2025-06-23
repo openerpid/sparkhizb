@@ -1122,6 +1122,10 @@ class LpaController extends ResourceController
         $group_category = $this->request->getVar('group_category');
         $category = $this->request->getVar('category');
         $getFiles = $this->request->getFiles();
+        // var_dump($getFiles);
+
+        // $a = count($getFiles);
+        // $a = $getFiles;
 
         /*// Testing
         $name = [];
@@ -1160,7 +1164,38 @@ class LpaController extends ResourceController
         }*/
 
         if ($getFiles) {
-            foreach ($getFiles['file'] as $file) {
+            if (is_array($getFiles['file'])) {
+                foreach ($getFiles['file'] as $file) {
+                    $isFile = $file->isValid();
+                    if ($isFile) {
+                        $newName = $file->getRandomName();
+                        if (!$file->hasMoved()) {
+                            $real_path = 'uploads/' . $file->store();
+                        }
+
+                        $foto_payload = [
+                            "lpa_id" => $lpa_id,
+                            "group_category" => $group_category,
+                            "category" => $category,
+                            "filepath" => $real_path
+                        ];
+
+                        $builder = $this->qBuilder->insert_d_foto($foto_payload);
+
+                        $responseb[] = [
+                            "id" => $builder,
+                            // "lpa_id" => $lpa_id,
+                            // "group_category" => $group_category,
+                            // "category" => $category,
+                            "filepath" => $real_path,
+                            "file_url" => base_url($real_path)
+                        ];
+
+                        // $builder[] = $builder;
+                    }
+                }
+            }else{
+                $file = $this->request->getFile('file');
                 $isFile = $file->isValid();
                 if ($isFile) {
                     $newName = $file->getRandomName();
@@ -1185,8 +1220,6 @@ class LpaController extends ResourceController
                         "filepath" => $real_path,
                         "file_url" => base_url($real_path)
                     ];
-
-                    // $builder[] = $builder;
                 }
             }
         }
