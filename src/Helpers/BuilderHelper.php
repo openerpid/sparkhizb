@@ -144,7 +144,17 @@ class BuilderHelper
                                         $builder->where($value->column." ".$value->copr." ",$value->value);
                                     }
                                 }else{
-                                    $builder->where($value->column,$value->value);
+                                    if (isset($value->is_null)) {
+                                        if ($value->is_null == true) {
+                                            $builder->where($value->column . " IS NULL ");
+                                        }
+
+                                        if (isset($value->value)) {
+                                            $builder->orWhere($value->column,$value->value);
+                                        }
+                                    }else{
+                                        $builder->where($value->column,$value->value);
+                                    }
                                 }
                             }
                         }
