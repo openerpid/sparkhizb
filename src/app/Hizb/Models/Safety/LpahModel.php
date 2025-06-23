@@ -64,6 +64,11 @@ class LpahModel extends Model
         "penjelasan_insiden",
         "zona_waktu",
 
+        "rs_klinik_rujukan",
+        "dokter_menangani",
+        "perkiraan_hari_hilang",
+        "perkiraan_biaya_perawatan",
+
         "created_at",
         "updated_at",
         "deleted_at",
