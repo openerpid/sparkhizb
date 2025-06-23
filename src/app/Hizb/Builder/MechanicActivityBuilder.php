@@ -22,7 +22,7 @@ class MechanicActivityBuilder
         $this->model = new MechanicActivityModel();
     }
 
-    private function qbAlya()
+    public function qbAlya()
     {
         $table = $this->model->table;
         // $selects = $this->model->selects;
@@ -57,11 +57,13 @@ class MechanicActivityBuilder
         return $this->iescm->newQuery()->fromSubquery($subquery, 't');
     }
 
-    public function show($id = null)
+    public function show($id = null, $builder = null)
     {
         $allowedFields = $this->model->allowedFields;
 
-        $builder = $this->qbAlya();
+        if ($builder == null) {
+            $builder = $this->qbAlya();
+        }
 
         $params = [
             "builder" => $builder,

@@ -283,4 +283,9 @@ class IdentityHelper
 
         return $token;
     }
+
+    public function user_access()
+    {
+        return $this->jwt->decode()->user_access;
+    }
 }
