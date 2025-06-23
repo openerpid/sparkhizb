@@ -166,32 +166,52 @@ class MechanicActivityController extends ResourceController
         // "actual_duration": null,
         // "remark": "Testing Via postman untuk tikus istana"
 
-
         
         $activity_type = $this->request->getJsonVar('activity_type');
-        $workorder_id = $this->request->getJsonVar('workorder_id');
-        $workorder = $this->request->getJsonVar('workorder');
         $jobtype = $this->request->getJsonVar('jobtype');
-        $operation = $this->request->getJsonVar('operation');
+        $jobtype_text = $this->request->getJsonVar('jobtype_text');
+        $tech_iden_no = $this->request->getJsonVar('tech_iden_no');
+        $unit = $this->request->getJsonVar('unit');
         $workstart = $this->request->getJsonVar('workstart');
         $workend = $this->request->getJsonVar('workend');
         $duration = $this->request->getJsonVar('duration');
+        $actual_duration = $this->request->getJsonVar('actual_duration');
+        $operation = $this->request->getJsonVar('operation');
+        $operation_short_text = $this->request->getJsonVar('operation_short_text');
         $remark = $this->request->getJsonVar('remark');
-        $jobdesc = $this->request->getJsonVar('jobdesc');
+        $jobdesc = $this->request->getJsonVar('jobdesc');        
+        $workorder_id = $this->request->getJsonVar('workorder_id');
+        $workorder = $this->request->getJsonVar('workorder');
+        $component_group = $this->request->getJsonVar('component_group');
+        $component_group_text = $this->request->getJsonVar('component_group_text');
+        $dayofftype_id = $this->request->getJsonVar('dayofftype_id');
+        $dayofftype_text = $this->request->getJsonVar('dayofftype_text');
+        $appr_status_id = $this->request->getJsonVar('appr_status_id');
+
+        $approved_at = $this->request->getJsonVar('approved_at');
+        $approved_by_text = $this->request->getJsonVar('approved_by_text');
 
         $payload = [
             "user" => $this->identity->username(),
             "site" => $this->identity->c04_project_area_kode(),
             "activity_type" => $activity_type,
+            "unit" => $unit,
+            "tech_iden_no" => $tech_iden_no,
+            "jobtype" => $jobtype,
+            "jobtype_text" => $jobtype_text,
             "workorder_id" => $workorder_id,
             "workorder" => $workorder,
-            "jobtype" => $jobtype,
             "operation" => $operation,
             "workstart" => $workstart,
             "workend" => $workend,
             "duration" => $duration,
             "remark" => $remark,
-            "jobdesc" => $jobdesc
+            "jobdesc" => $jobdesc,
+            "operation_short_text" => $operation_short_text,
+            "component_group" => $component_group,
+            "component_group_text" => $component_group_text,
+            "dayofftype_id" => $dayofftype_id,
+            "dayofftype_text" => $dayofftype_text
         ];
 
         $builder = $this->qBuilder->insert($payload);

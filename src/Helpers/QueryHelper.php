@@ -12,7 +12,7 @@ namespace Sparkhizb\Helpers;
 */
 
 // use Sparkhizb\Helpers\DateTimeHelper;
-use Sparkhizb\Auth as Openapi2Auth;
+use Sparkhizb\Auth as OA2Auth;
 
 class QueryHelper
 {
@@ -22,7 +22,7 @@ class QueryHelper
         // $this->dtH = new DateTimeHelper(); /
         // $this->identity = new IdentityHelper(); /
         // $this->ummuMsdb = new UmmuMsdb; /
-        $this->oa2auth = new Openapi2Auth;
+        $this->oa2auth = new OA2Auth;
     }
 
     public function limit()

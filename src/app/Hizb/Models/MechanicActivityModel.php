@@ -23,9 +23,11 @@ class MechanicActivityModel extends Model
 
         "activity_type",
         "workorder_id",
-        "jobtype",
         "job_type_id",
+        "jobtype",
+        "jobtype_text",
         "unit_id",
+        "unit",
         "reason_id",
         "mechanic_id",
 
@@ -58,6 +60,11 @@ class MechanicActivityModel extends Model
         "system_status",
         "is_sap",
         "is_integration",
+
+        "component_group",
+        "component_group_text",
+        "dayofftype_id",
+        "dayofftype_text",
 
         "remark",
         "jobdesc",
