@@ -122,6 +122,7 @@ class MechanicActivityModel extends Model
         tech_iden_no,
         unit,
         site,
+        mechanic_name,
 
         workstart,
         workend,
