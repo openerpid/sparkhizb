@@ -68,7 +68,7 @@ class MechanicActivityBuilder
         $params = [
             "builder" => $builder,
             "id" => $id,
-            "search_params" => ["description"],
+            "search_params" => ["mechanic_name","unit","jobtype_text","tech_iden_no","site","operation","operation_short_text","workorder"],
             "company_id" => null,
             "account_id" => null
         ];
