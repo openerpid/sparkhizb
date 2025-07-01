@@ -147,7 +147,7 @@ class PurchaseOrderBuilder
         ->select("
             a.*,
             a.Prod_code as id,
-            a.Spec as text
+            CONCAT(a.Prod_code,' | ', a.Spec) as text,
         ")
         ->where('a.po_code', $po_code);
 

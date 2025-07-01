@@ -30,7 +30,12 @@ class BuilderHelper
          * Vars*/
         $this->limit      = $this->request->getJsonVar('limit');
         $this->offset     = $this->request->getJsonVar('offset');
+
         $this->sort       = $this->request->getJsonVar('sort');
+        if (!$this->sort) {
+            $this->sort = $this->request->getVar('sort');
+        }
+
         $this->withCreatedBy = $this->request->getJsonVar('created_by');
 
         if (strpos($this->sort, ".")) {
@@ -41,7 +46,15 @@ class BuilderHelper
         }
 
         $this->order      = $this->request->getJsonVar('order');
-        $this->search     = $this->request->getJsonVar('search');
+        if (!$this->order) {
+            $this->order = $this->request->getVar('order');
+        }
+
+        $this->search = $this->request->getJsonVar('search');
+        if (!$this->search) {
+            $this->search = $this->request->getVar('search');
+        }
+
         $this->anywhere     = $this->request->getJsonVar('anywhere');
         $this->anydate      = $this->request->getJsonVar('anydate');
 
@@ -212,7 +225,6 @@ class BuilderHelper
             }
         }
 
-        // $builder->where('deleted_at', null);
         $builder->where('deleted_at IS NULL');
 
         return $builder;
