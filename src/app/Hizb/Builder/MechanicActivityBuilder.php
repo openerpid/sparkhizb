@@ -7,6 +7,7 @@ use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 use App\Hizb\Models\MechanicActivityModel;
+use App\Hizb\Models\MechanicActivityAppvtrxModel;
 
 class MechanicActivityBuilder
 {
@@ -20,6 +21,7 @@ class MechanicActivityBuilder
         $this->qHelp = new QueryHelper();
         $this->umHelp = new UmmuHelper();
         $this->model = new MechanicActivityModel();
+        $this->mAppvtrx = new MechanicActivityAppvtrxModel();
     }
 
     public function qbAlya()
@@ -115,6 +117,14 @@ class MechanicActivityBuilder
                 ->set('deleted_by', $this->identity->account_id())
                 ->update();
         }
+
+        return $builder;
+    }
+
+    public function insert_appvtrx($payload)
+    {
+        // $payload = $this->identity->insert($payload);
+        $builder = $this->mAppvtrx->insert($payload);
 
         return $builder;
     }
