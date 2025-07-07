@@ -108,14 +108,10 @@ class MechanicActivityBuilder
      *  */
     public function delete($id)
     {
-        $builder = $this->model
-            ->delete($id);
-
-        if ($builder) {
-            $this->model
-                ->where('id', $id)
-                ->set('deleted_by', $this->identity->account_id())
-                ->update();
+        if ($this->identity->vendor() == "syshab") {
+            $builder = $this->bHelp->delete2($id, $this->model);
+        }else{
+            $builder = $this->bHelp->delete($id, $this->model);
         }
 
         return $builder;

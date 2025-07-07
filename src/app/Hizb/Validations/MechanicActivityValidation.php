@@ -2,6 +2,9 @@
 
 namespace App\Hizb\Validations;
 
+use CodeIgniter\HTTP\ResponseInterface;
+use Config\Services;
+
 use Sparkhizb\Helpers\IdentityHelper;
 
 use App\Hizb\Models\Safety\LpahModel;
@@ -9,6 +12,7 @@ use App\Hizb\Models\Safety\LpadOrangModel;
 use App\Hizb\Models\Safety\LpadFotoModel;
 use App\Hizb\Models\Safety\LpadKerusakanModel;
 use App\Hizb\Models\MechanicActivityModel;
+use App\Hizb\Builder\UserAccessBuilder;
 
 class MechanicActivityValidation 
 {
@@ -20,6 +24,9 @@ class MechanicActivityValidation
         $this->identity = new IdentityHelper();
 
         $this->model = new MechanicActivityModel();
+
+        $this->qbUserAccess = new UserAccessBuilder();
+        $this->user_access = $this->qbUserAccess->show_by_username_n_module("id,user,module,access", $this->identity->username(), "pm_mechanic_activity");
     }
 
     private function cekID($id)
@@ -130,6 +137,21 @@ class MechanicActivityValidation
         $status_id = $show_statusID->appr_status_id;
 
         if ($status_id == 1) return ["status" => "Dokumen sudah di-approve. Tidak bisa di-update."];
+
+        if ($this->user_access) {
+            $access = explode(",", $this->user_access->access);
+            if (!in_array("mekanik", $access)) {
+                return [
+                    'status' => false,
+                    'message' => 'Access denied.'
+                ];
+            }
+        } else {
+            return [
+                'status' => false,
+                'message' => 'Access denied.'
+            ];
+        }
 
         // if ($is_pic == 1) {
         //     $rules = [

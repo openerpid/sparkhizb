@@ -77,7 +77,8 @@ class MechanicActivityModel extends Model
         "approved_at","approved_by",
 
         "created_at","updated_at","deleted_at",
-        "created_by","updated_by","deleted_by"
+        "created_by","updated_by","deleted_by",
+        "deleted_by_text"
     ];
 
     protected $selects = "

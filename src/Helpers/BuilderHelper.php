@@ -1050,4 +1050,21 @@ class BuilderHelper
         return $builder->set($payload)
         ->update();
     }
+
+    public function delete2($id, $builder)
+    {
+        $payload = [
+            "deleted_at" => date('Y-m-d H:i:s'),
+            "deleted_by_text" => $this->identity->username()
+        ];
+
+        if (is_array($id)) {
+            $builder = $builder->whereIn('id', $id);
+        }else{
+            $builder = $builder->where('id', $id);
+        }
+
+        return $builder->set($payload)
+        ->update();
+    }
 }

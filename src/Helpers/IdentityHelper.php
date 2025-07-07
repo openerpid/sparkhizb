@@ -288,4 +288,15 @@ class IdentityHelper
     {
         return $this->jwt->decode()->user_access;
     }
+
+    public function vendor()
+    {
+        if(isset($this->jwt->decode()->vendor)) {
+            $data = $this->jwt->decode()->vendor;
+        }else{
+            $data = $this->jwt->decode()->vendor;
+        }
+
+        return $data;
+    }
 }
