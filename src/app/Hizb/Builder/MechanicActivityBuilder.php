@@ -124,4 +124,20 @@ class MechanicActivityBuilder
 
         return $builder;
     }
+
+    public function history_deleted()
+    {
+        $table = $this->model->table;
+
+        $subquery = $this->iescm->table($table);
+
+        if ($this->request->getJsonVar('almi') == true) {
+            $subquery->select($this->model->almi);
+        }
+
+        $subquery->where("deleted_at IS NOT NULL")
+        ->where("user", $this->identity->username());
+
+        return $subquery;
+    }
 }
