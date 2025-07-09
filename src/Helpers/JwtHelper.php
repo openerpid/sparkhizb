@@ -17,6 +17,7 @@ class JwtHelper
     {
         $data = array(
             'iat' => strtotime("now"),
+            'core' => 'sparkhizb',
             'dev'   => 'https://openapi2.com/',
             'lib' => 'https://sparkhizb.my.id/',
             'frmwk' => 'https://codeigniter.com/'
