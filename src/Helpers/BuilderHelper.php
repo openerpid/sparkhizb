@@ -92,6 +92,13 @@ class BuilderHelper
             }
         }
 
+        if (isset($params['created_by'])) {
+            $created_by = $params['created_by'];
+            if ($created_by) {
+                $builder->where('created_by', $created_by);
+            }
+        }
+
         if (isset($params['plant_id'])) {
             $plant_id = $params['plant_id'];
             if ($plant_id) {
