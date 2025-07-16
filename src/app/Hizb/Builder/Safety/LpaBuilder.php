@@ -18,6 +18,7 @@ use App\Hizb\Models\Safety\LpadDivisiModel;
 // use App\Models\Safety\HazardReportQueueMailModel;
 // use App\Models\Safety\HazardReportNumberModel;
 use App\Hizb\Models\DocumentNumbersModel;
+use App\Hizb\Models\Safety\LpaIcdMsModel;
 
 class LpaBuilder
 {
@@ -41,6 +42,7 @@ class LpaBuilder
         $this->mUnit = new LpadUnitModel();
         $this->mDoc = new DocumentNumbersModel();
         $this->mDivisi = new LpadDivisiModel();
+        $this->mIcdms = new LpaIcdMsModel();
 
         // $this->db->defaultGroup = 'iescm';
     }
@@ -511,5 +513,14 @@ class LpaBuilder
         ->where('id', $id)
         ->set($payload)
         ->update();
+    }
+
+
+    public function show_icdms($id_arr)
+    {
+        $builder = $this->mIcdms
+        ->whereIn('id', $id_arr);
+
+        return $builder;
     }
 }
