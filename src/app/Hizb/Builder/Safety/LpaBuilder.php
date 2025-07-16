@@ -21,6 +21,7 @@ use App\Hizb\Models\Safety\LpadDivisiModel;
 // use App\Models\Safety\HazardReportNumberModel;
 use App\Hizb\Models\DocumentNumbersModel;
 use App\Hizb\Models\Safety\LpaIcdMsModel;
+use App\Hizb\Models\UsersModel;
 
 
 class LpaBuilder
@@ -48,17 +49,20 @@ class LpaBuilder
         $this->mDivisi = new LpadDivisiModel();
         $this->mIcdms = new LpaIcdMsModel();
 
+        $this->mUser = new UsersModel();
+
         // $this->db->defaultGroup = 'iescm';
     }
 
     private function qbAlya()
     {
         $table = $this->model->table;
-        // $selects = $this->model->selects;
+        $selects = $this->model->selects;
         // $allowedFields = $this->model->allowedFields;
 
         $subquery = $this->iescm->table($table . ' a')
-            // ->select($selects)
+            ->select($selects)
+            ->join($this->mUser->database . '.' . $this->mUser->table . ' b', 'b.account_id = a.created_by', 'left')
 
             // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
             // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')

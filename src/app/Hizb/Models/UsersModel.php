@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Hizb\Models\Safety;
+namespace App\Hizb\Models;
 
 use CodeIgniter\Model;
 
-class LpahModel extends Model
+class UsersModel extends Model
 {
     protected $DBGroup = 'openerpid';
-    protected $table = 'lpa_h';
+    protected $table = 'users';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $insertID = 0;
@@ -17,57 +17,7 @@ class LpahModel extends Model
     protected $allowedFields = [
         "id",
         "company_id",
-
-        "nomor_dokumen",
-        "insident_classification",
-        "site",
-        "divisi",
-        "departemen",
-        "section_kode",
-        "section",
-
-        "hari_kejadian",
-        "tanggal_kejadian","waktu_kejadian",
-        "tanggal_pelaporan","waktu_pelaporan",
-
-        "shift_kerja",
-        "mulai_shift",
-        "selesai_shift",
-        "hari_kerja_ke",
-
-        "lokasi_insiden_id",
-        "lokasi_insiden",
-        "detail_lokasi_insiden",
-
-        "cidera_id",
-        "cidera",
-        "detail_cidera_lainnya",
-        "kronologi",
-
-        "instansi_pemerintah",
-        "nama_pejabat",
-        "pemerintah_disampaikan_oleh",
-        "pemerintah_tanggal",
-
-        "asuransi",
-        "nama_perusahaan",
-        "asuransi_disampaikan_oleh",
-        "asuransi_tanggal",
-
-        "pihak_tiga",
-        "nama_pihak_ketiga",
-        "pihak_tiga_disampaikan_oleh",
-        "pihak_tiga_tanggal",
-
-        "tipe_insiden_id",
-        "tipe_insiden",
-        "penjelasan_insiden",
-        "zona_waktu",
-
-        "rs_klinik_rujukan",
-        "dokter_menangani",
-        "perkiraan_hari_hilang",
-        "perkiraan_biaya_perawatan",
+        "name",
 
         "created_at",
         "updated_at",
@@ -77,11 +27,6 @@ class LpahModel extends Model
         "updated_by",
         "deleted_by"
     ];
-
-    protected $selects = "
-        a.*,
-        b.name as created_by_name
-    ";
 
     // Dates
     protected $useTimestamps = true;
