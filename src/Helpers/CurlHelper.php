@@ -16,11 +16,11 @@ class CurlHelper
     public function __construct()
     {
         if (getenv("CI_DORBITT")=="development") {
-            $this->url = "http://localhost:8080/";
+            $this->url = "http://localhost:8080/v1/";
         }elseif (getenv("CI_DORBITT")=="testing") {
-            $this->url = "http://testing-api.dorbitt.com/";
+            $this->url = "http://testing-api.dorbitt.com/v1/";
         }else{
-            $this->url = "https://api.dorbitt.com/";
+            $this->url = "https://api.dorbitt.com/v1/";
         }
 
         if (getenv("DORBITT_TOKEN")) {

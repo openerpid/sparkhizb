@@ -6,7 +6,9 @@ use Sparkhizb\Helpers\IdentityHelper;
 use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
+use Sparkhizb\Helpers\RequestHelper;
 use Sparkhizb\UmmuHazardReport;
+use Sparkhizb\UmmuInvestigation;
 
 use App\Hizb\Models\Safety\LpahModel;
 use App\Hizb\Models\Safety\LpadUnitModel;
@@ -20,6 +22,7 @@ use App\Hizb\Models\Safety\LpadDivisiModel;
 use App\Hizb\Models\DocumentNumbersModel;
 use App\Hizb\Models\Safety\LpaIcdMsModel;
 
+
 class LpaBuilder
 {
     public function __construct()
@@ -31,7 +34,8 @@ class LpaBuilder
         $this->bHelp = new BuilderHelper();
         $this->qHelp = new QueryHelper();
         $this->umHelp = new UmmuHelper();
-        $this->ummu = new UmmuHazardReport();
+        $this->ummu = new UmmuInvestigation();
+        $this->reqH = new RequestHelper();
 
         // $this->model = new HazardReportQueueMailModel();
         // $this->mNum = new HazardReportNumberModel();
@@ -520,6 +524,28 @@ class LpaBuilder
     {
         $builder = $this->mIcdms
         ->whereIn('id', $id_arr);
+
+        return $builder;
+    }
+
+    public function show_created_by_name($id)
+    {
+        $payload = [
+            // "limit" => 10,
+            // "offset" => 0,
+            // "sort" => "id",
+            // "order" => "desc",
+            // "search" => "",
+            // "selects" => "*"
+        ];
+
+        $params = [
+            "id" => $id,
+            "payload" => $payload,
+            "token" => $this->reqH->myToken()
+        ];
+
+        $builder = $this->ummu->show_created_by_name($params);
 
         return $builder;
     }
