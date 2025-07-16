@@ -22,6 +22,7 @@ use App\Hizb\Models\Safety\LpadDivisiModel;
 use App\Hizb\Models\DocumentNumbersModel;
 use App\Hizb\Models\Safety\LpaIcdMsModel;
 use App\Hizb\Models\UsersModel;
+use App\Hizb\Syshab\Builder\EmployeeBuilder;
 
 
 class LpaBuilder
@@ -50,6 +51,7 @@ class LpaBuilder
         $this->mIcdms = new LpaIcdMsModel();
 
         $this->mUser = new UsersModel();
+        $this->qbEmpl = new EmployeeBuilder();
 
         // $this->db->defaultGroup = 'iescm';
     }

@@ -148,6 +148,17 @@ class EmployeeBuilder
         return $builder;
     }
 
+    public function showSelect_by_nik($nik, $select)
+    {
+        $subquery = $this->qbAlya();
+
+        $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
+        ->select($select)
+        ->where('nik', $nik);
+
+        return $builder;
+    }
+
     public function show_from_sap()
     {
         $curl = curl_init();

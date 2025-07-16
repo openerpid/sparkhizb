@@ -80,6 +80,7 @@ class LpahModel extends Model
 
     protected $selects = "
         a.*,
+        b.nik,
         b.name as created_by_name
     ";
 
