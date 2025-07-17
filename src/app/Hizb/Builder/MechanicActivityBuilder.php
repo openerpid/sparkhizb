@@ -206,8 +206,8 @@ class MechanicActivityBuilder
             $subquery->select($this->model->almi);
         }
 
-        $subquery->where("deleted_at IS NOT NULL")
-        ->where("user", $this->identity->username());
+        $subquery->where("deleted_at IS NOT NULL");
+        // ->where("user", $this->identity->username());
 
         return $subquery;
     }
