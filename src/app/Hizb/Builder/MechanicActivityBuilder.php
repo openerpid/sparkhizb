@@ -8,6 +8,7 @@ use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 use App\Hizb\Models\MechanicActivityModel;
 use App\Hizb\Models\MechanicActivityAppvtrxModel;
+use App\Hizb\Models\UserAccessModel;
 
 class MechanicActivityBuilder
 {
@@ -22,6 +23,7 @@ class MechanicActivityBuilder
         $this->umHelp = new UmmuHelper();
         $this->model = new MechanicActivityModel();
         $this->mAppvtrx = new MechanicActivityAppvtrxModel();
+        $this->mUsracc = new UserAccessModel;
     }
 
     public function qbAlya()
@@ -37,6 +39,7 @@ class MechanicActivityBuilder
         }
         // ->select($selects)
 
+        // ->join($this->mUsracc->database . '.' . $this->mUsracc->table . ' b', 'b.id = a.created_by', 'left')
         // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
         // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
 
@@ -57,6 +60,17 @@ class MechanicActivityBuilder
         $subquery->where('a.deleted_at IS NULL');
 
         return $this->iescm->newQuery()->fromSubquery($subquery, 't');
+    }
+
+    public function cekStatus($id)
+    {
+        $builder = $this->model
+        ->select("appr_status_id")
+        ->where("id", $id)
+        ->get()
+        ->getRow();
+
+        return $builder;
     }
 
     public function show($id = null, $builder = null)
@@ -123,6 +137,63 @@ class MechanicActivityBuilder
         $builder = $this->mAppvtrx->insert($payload);
 
         return $builder;
+    }
+
+    public function show_appvtrx_by_activityID($id)
+    {
+        $builder = $this->mAppvtrx
+        ->where("activity_id", $id);
+
+        $table = $this->mAppvtrx->table;
+        // $selects = $this->model->selects;
+        $selects = "a.*,b.access";
+        // $allowedFields = $this->model->allowedFields;
+
+        $subquery = $this->iescm->table($table . ' a')
+        ->select($selects)
+        ->join($this->mUsracc->database . '.' . $this->mUsracc->table . ' b', 'b.user = a.created_by_text', 'left')
+        // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
+        // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
+
+        // ->join($this->mEmpl->database . '.' . $this->mEmpl->table . ' j', 'j.identity_id = c.id', 'left')
+        // ->join('Sparkhizb_she.lokasi_temuan d', 'd.id = a.lokasi_temuan_id', 'left')
+        // ->join('Sparkhizb_she.jenis_bahaya e', 'e.id = a.jenis_temuan_id', 'left')
+        // ->join('Sparkhizb_she.kode_bahaya f', 'f.id = a.kode_bahaya_id', 'left')
+        // ->join('Sparkhizb.document_kode g', 'g.document_id = 5', 'left')
+        // ->join('Sparkhizb_gallery.photos h', 'h.id = a.foto_temuan_id', 'left')
+        // ->join('Sparkhizb_gallery.photos i', 'i.id = a.foto_perbaikan_id', 'left')
+
+        // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' ll', 'll.id = a.approved_by', 'left')
+        // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' l', 'l.id = ll.identity_id', 'left')
+
+        // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' kk', 'kk.id = a.rejected_by', 'left')
+        // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' k', 'k.id = kk.identity_id', 'left')
+        // // ->whereIn('a.is_release', $release2)
+        // ->where("a.module", "pm_mechanic_activity")
+        ->where('a.activity_id', $id)
+        ->where('a.deleted_at IS NULL');
+
+        return $this->iescm->newQuery()->fromSubquery($subquery, 't');
+    }
+
+    public function show_last_trx_byaccess($activity_id, $access)
+    {
+        $builder = $this->mAppvtrx
+        ->where("activity_id", $activity_id);
+
+        $table = $this->mAppvtrx->table;
+        // $selects = $this->model->selects;
+        $selects = "a.*,b.access";
+        // $allowedFields = $this->model->allowedFields;
+
+        $subquery = $this->iescm->table($table . ' a')
+        ->select($selects)
+        ->join($this->mUsracc->database . '.' . $this->mUsracc->table . ' b', 'b.user = a.created_by_text', 'left')
+        ->where('a.activity_id', $activity_id)
+        ->where('b.access', $access)
+        ->where('a.deleted_at IS NULL');
+
+        return $this->iescm->newQuery()->fromSubquery($subquery, 't');
     }
 
     public function history_deleted()
