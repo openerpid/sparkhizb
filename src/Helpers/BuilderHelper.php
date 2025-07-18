@@ -73,8 +73,9 @@ class BuilderHelper
         $builder        = $params['builder'];
         $id             = $params['id'];
         $search_params  = $params['search_params'];
+        $selects        = $this->request->getJsonVar('selects');
 
-        if ($this->selects and $this->selects != '*') {
+        if ($selects OR $selects != '*') {
             $builder->select($this->selects);
         }
 
@@ -114,7 +115,11 @@ class BuilderHelper
         }
 
         if ($id) {
-            $builder->where('id',$id);
+            if (is_array($id)) {
+                $builder->whereIn('id',$id);
+            }else{
+                $builder->where('id',$id);
+            }
         }else{
             if ($this->where) {
                 foreach ($this->where as $key => $value) {

@@ -16,11 +16,14 @@ use App\Hizb\Models\Safety\LpadOrangModel;
 use App\Hizb\Models\Safety\LpadFotoModel;
 use App\Hizb\Models\Safety\LpadKerusakanModel;
 use App\Hizb\Models\Safety\LpadDivisiModel;
+use App\Hizb\Models\Safety\LpaIcdMsModel;
+use App\Hizb\Models\Safety\LpaAppvModel;
+use App\Hizb\Models\Safety\LpaAppvTrxModel;
+use App\Hizb\Models\Safety\LpaAppvMatrixModel;
 
 // use App\Models\Safety\HazardReportQueueMailModel;
 // use App\Models\Safety\HazardReportNumberModel;
 use App\Hizb\Models\DocumentNumbersModel;
-use App\Hizb\Models\Safety\LpaIcdMsModel;
 use App\Hizb\Models\UsersModel;
 use App\Hizb\Syshab\Builder\EmployeeBuilder;
 
@@ -49,6 +52,10 @@ class LpaBuilder
         $this->mDoc = new DocumentNumbersModel();
         $this->mDivisi = new LpadDivisiModel();
         $this->mIcdms = new LpaIcdMsModel();
+
+        $this->mAppv = new LpaAppvModel();
+        $this->mAppvtrx = new LpaAppvTrxModel();
+        $this->mAppvmatrix = new LpaAppvMatrixModel();
 
         $this->mUser = new UsersModel();
         $this->qbEmpl = new EmployeeBuilder();
@@ -554,5 +561,92 @@ class LpaBuilder
         $builder = $this->ummu->show_created_by_name($params);
 
         return $builder;
+    }
+
+    public function insert_approve_trx($lpa_id, $site)
+    {
+        $show_matrix_appv = $this->mAppvmatrix
+        ->where('site', $site)
+        ->orderBy('sequence', 'ASC')
+        ->get()->getResult();
+
+        if ($show_matrix_appv) {
+            $insert = [];
+            foreach ($show_matrix_appv as $key => $value) {
+                $payload = [
+                    "sequence" => $value->sequence,
+                    "lpa_id" => $lpa_id,
+                    "account_id" => $value->account_id,
+                ];
+                $insert[] = $this->mAppvtrx->insert($payload);
+            }
+        }
+
+
+        return $insert;
+    }
+
+    public function insert_approve($lpa_id, $site)
+    {
+        $show_matrix_appv = $this->mAppvmatrix
+        ->where('site', $site)
+        ->get()
+        ->getResultArray();
+
+        $count = count($show_matrix_appv);
+
+        $payload = [
+            "lpa_id" => $lpa_id,
+            "total_appv" => $count
+        ];
+
+        $insert = $this->mAppv->insert($payload);       
+
+        return $insert;
+    }
+
+    public function approval_queue($doc_id)
+    {
+        $payload = [
+            "limit" => 0,
+            "offset" => 0,
+            "search" => "",
+            "sort" => "sequence",
+            "order" => "asc",
+            "doc_id" => $doc_id,
+            "selects" => "*"
+        ];
+
+        $params = [
+            "id" => null,
+            "payload" => $payload,
+            "token" => $this->reqH->myToken()
+        ];
+
+        $response = $this->ummu->approval_queue($params);
+
+        return $response;
+    }
+
+    public function show_approval()
+    {
+        $payload = [
+            "limit" => 0,
+            "offset" => 0,
+            "search" => "",
+            "sort" => "sequence",
+            "order" => "asc",
+            "selects" => "doc_id,status_id,remark"
+        ];
+
+        $params = [
+            "id" => null,
+            "payload" => $payload,
+            "token" => $this->reqH->myToken()
+        ];
+
+        $response = $this->ummu->show_approval($params);
+
+        return $response;
     }
 }

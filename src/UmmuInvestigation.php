@@ -19,9 +19,10 @@ class UmmuInvestigation
 {
     public function __construct()
     {
-        $this->kode = "she_investigation";
         $this->curli = new CurlHelper();
         $this->gHelp = new GlobalHelper();
+
+        $this->kode = "she_investigation";
         $this->path = 'api/she/investigation/';
     }
 
@@ -36,6 +37,36 @@ class UmmuInvestigation
         ];
             
         $response = $this->curli->request4($params);
+
+        return json_decode($response, false);
+    }
+
+    public function approval_queue($params)
+    {
+        $response = $this->curli->request4(
+            [
+                "path"           => $this->path. "approval_queue",
+                "method"         => "GET",
+                "payload"        => $params['payload'],
+                "module_code"    => $this->kode,
+                "token"          => $params['token']
+            ]
+        );
+
+        return json_decode($response, false);
+    }
+
+    public function show_approval($params)
+    {
+        $response = $this->curli->request4(
+            [
+                "path"           => $this->path. "show_approval",
+                "method"         => "GET",
+                "payload"        => $params['payload'],
+                "module_code"    => $this->kode,
+                "token"          => $params['token']
+            ]
+        );
 
         return json_decode($response, false);
     }
