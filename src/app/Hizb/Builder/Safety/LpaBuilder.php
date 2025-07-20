@@ -21,8 +21,6 @@ use App\Hizb\Models\Safety\LpaAppvModel;
 use App\Hizb\Models\Safety\LpaAppvTrxModel;
 use App\Hizb\Models\Safety\LpaAppvMatrixModel;
 
-// use App\Models\Safety\HazardReportQueueMailModel;
-// use App\Models\Safety\HazardReportNumberModel;
 use App\Hizb\Models\DocumentNumbersModel;
 use App\Hizb\Models\UsersModel;
 use App\Hizb\Syshab\Builder\EmployeeBuilder;
@@ -118,9 +116,12 @@ class LpaBuilder
         return $builder;
     }
 
-    public function show_for_approval($id = null, $builder)
+    public function show_for_approval($id = null, $builder, $sequence)
     {
-        $builder->where('next_appv_sequence <= total_appv');
+        $allowedFields = $this->model->allowedFields;
+
+        $builder->where("next_appv_sequence <= total_appv");
+        $builder->whereIn("next_appv_sequence", array_unique($sequence));
         
         $params = [
             "builder" => $builder,
@@ -131,7 +132,7 @@ class LpaBuilder
         ];
 
         $builder = $this->bHelp->conditions($params);        
-        // $builder = $this->qHelp->orderBy($builder, $allowedFields);
+        $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
         return $builder;
     }
