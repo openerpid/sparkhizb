@@ -78,11 +78,14 @@ class LpahModel extends Model
         "deleted_by"
     ];
 
-    protected $selects = "
-        a.*,
-        b.nik,
-        b.name as created_by_name
-    ";
+    protected $selects = "a.*"
+        .",b.nik"
+        .",b.name as created_by_name"
+        .",c.total_appv"
+        .",c.last_appv_sequence"
+        .",(c.last_appv_sequence + 1) as next_appv_sequence"
+        .",c.last_appv_by"
+    ;
 
     // Dates
     protected $useTimestamps = true;

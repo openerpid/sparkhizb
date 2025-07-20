@@ -42,8 +42,6 @@ class LpaBuilder
         $this->ummu = new UmmuInvestigation();
         $this->reqH = new RequestHelper();
 
-        // $this->model = new HazardReportQueueMailModel();
-        // $this->mNum = new HazardReportNumberModel();
         $this->model = new LpahModel();
         $this->mOrang = new LpadOrangModel();
         $this->mFoto = new LpadFotoModel();
@@ -59,19 +57,22 @@ class LpaBuilder
 
         $this->mUser = new UsersModel();
         $this->qbEmpl = new EmployeeBuilder();
-
-        // $this->db->defaultGroup = 'iescm';
     }
 
-    private function qbAlya()
+    public function sjQuery()
     {
+        $database = (getenv('DBGroup')) ? getenv('DBGroup') : $this->mUser->database;
         $table = $this->model->table;
-        $selects = $this->model->selects;
-        // $allowedFields = $this->model->allowedFields;
+        $tbUser = $this->mUser->table;
+        $tbAppv = $this->mAppv->table;
 
-        $subquery = $this->iescm->table($table . ' a')
+        $selects = $this->model->selects;
+        $allowedFields = $this->model->allowedFields;
+
+        $sjQuery = $this->iescm->table($database. '.'. $table. ' a')
             ->select($selects)
-            ->join($this->mUser->database . '.' . $this->mUser->table . ' b', 'b.account_id = a.created_by', 'left')
+            ->join($database. '.'. $tbUser . ' b', 'b.account_id = a.created_by', 'left')
+            ->join($database. '.'. $tbAppv. ' c', 'c.lpa_id = a.id', 'left')
 
             // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
             // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
@@ -92,7 +93,7 @@ class LpaBuilder
             // // ->whereIn('a.is_release', $release2)
             ->where('a.deleted_at IS NULL');
 
-        return $this->iescm->newQuery()->fromSubquery($subquery, 't');
+        return $this->iescm->newQuery()->fromSubquery($sjQuery, 't');
     }
 
     public function show($id = null)
@@ -101,7 +102,7 @@ class LpaBuilder
         $allowedFields = $this->model->allowedFields;
         $where = $this->request->getJsonVar('where');
 
-        $builder = $this->qbAlya();
+        $builder = $this->sjQuery();
 
         $params = [
             "builder" => $builder,
@@ -117,10 +118,28 @@ class LpaBuilder
         return $builder;
     }
 
+    public function show_for_approval($id = null, $builder)
+    {
+        $builder->where('next_appv_sequence <= total_appv');
+        
+        $params = [
+            "builder" => $builder,
+            "id" => $id,
+            "search_params" => [],
+            "company_id" => null,
+            "account_id" => null
+        ];
+
+        $builder = $this->bHelp->conditions($params);        
+        // $builder = $this->qHelp->orderBy($builder, $allowedFields);
+
+        return $builder;
+    }
+
     public function show_by_number($number)
     {
 
-        $builder = $this->qbAlya();
+        $builder = $this->sjQuery();
         $builder->where('nomor_dokumen', $number);
 
         $params = [
@@ -624,28 +643,6 @@ class LpaBuilder
         ];
 
         $response = $this->ummu->approval_queue($params);
-
-        return $response;
-    }
-
-    public function show_approval()
-    {
-        $payload = [
-            "limit" => 0,
-            "offset" => 0,
-            "search" => "",
-            "sort" => "sequence",
-            "order" => "asc",
-            "selects" => "doc_id,status_id,remark"
-        ];
-
-        $params = [
-            "id" => null,
-            "payload" => $payload,
-            "token" => $this->reqH->myToken()
-        ];
-
-        $response = $this->ummu->show_approval($params);
 
         return $response;
     }
