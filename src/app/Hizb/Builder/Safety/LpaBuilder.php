@@ -657,4 +657,18 @@ class LpaBuilder
 
         return $builder;
     }
+
+    public function last_appv_sequence($lpa_id)
+    {
+        $builder = $this->mAppv
+        ->select("last_appv_sequence")
+        ->where("lpa_id", $lpa_id)
+        ->get()->getRow();
+
+        if ($builder) {
+            return $builder->last_appv_sequence;
+        }else{
+            return null;
+        }
+    }
 }

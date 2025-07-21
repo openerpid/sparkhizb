@@ -89,7 +89,6 @@ class LpahModel extends Model
                 ELSE (c.last_appv_sequence + 1) 
             END as next_appv_sequence
         "
-        // .",(c.last_appv_sequence + 1) as next_appv_sequence"
         .",c.last_appv_by"
     ;
 
