@@ -71,4 +71,35 @@ class UmmuInvestigation
         return json_decode($response, false);
     }
 
+
+    public function approval_show_doc_queue($params)
+    {
+        $response = $this->curli->request4(
+            [
+                "path"           => $this->path. "approval_show_doc_queue",
+                "method"         => "GET",
+                "payload"        => $params['payload'],
+                "module_code"    => $this->kode,
+                "token"          => $params['token']
+            ]
+        );
+
+        return json_decode($response, false);
+    }
+
+    public function approval_approve_doc_queue($params)
+    {
+        $response = $this->curli->request4(
+            [
+                "path"           => $this->path. "approval_approve_doc_queue",
+                "method"         => "POST",
+                "payload"        => $params['payload'],
+                "module_code"    => $this->kode,
+                "token"          => $params['token']
+            ]
+        );
+
+        return json_decode($response, false);
+    }
+
 }

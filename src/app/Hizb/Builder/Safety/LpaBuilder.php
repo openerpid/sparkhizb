@@ -643,8 +643,18 @@ class LpaBuilder
             "token" => $this->reqH->myToken()
         ];
 
-        $response = $this->ummu->approval_queue($params);
+        $response = $this->ummu->approval_show_doc_queue($params);
 
         return $response;
+    }
+
+    public function approve($lpa_id, $payload)
+    {
+        $builder = $this->mAppv
+        ->set($payload)
+        ->where("lpa_id", $lpa_id)
+        ->update();
+
+        return $builder;
     }
 }

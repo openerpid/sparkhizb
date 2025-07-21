@@ -83,7 +83,13 @@ class LpahModel extends Model
         .",b.name as created_by_name"
         .",c.total_appv"
         .",c.last_appv_sequence"
-        .",(c.last_appv_sequence + 1) as next_appv_sequence"
+        .",
+            CASE
+                WHEN c.last_appv_sequence IS NULL THEN 1
+                ELSE (c.last_appv_sequence + 1) 
+            END as next_appv_sequence
+        "
+        // .",(c.last_appv_sequence + 1) as next_appv_sequence"
         .",c.last_appv_by"
     ;
 
