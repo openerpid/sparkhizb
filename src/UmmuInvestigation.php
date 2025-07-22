@@ -102,4 +102,19 @@ class UmmuInvestigation
         return json_decode($response, false);
     }
 
+    public function approval_create_doc_queue($params)
+    {
+        $response = $this->curli->request4(
+            [
+                "path"           => $this->path. "approval_create_doc_queue",
+                "method"         => "POST",
+                "payload"        => $params['payload'],
+                "module_code"    => $this->kode,
+                "token"          => $params['token']
+            ]
+        );
+
+        return json_decode($response, false);
+    }
+
 }

@@ -143,16 +143,16 @@ class LpaBuilder
         $builder = $this->sjQuery();
         $builder->where('nomor_dokumen', $number);
 
-        $params = [
-            "builder" => $builder,
-            "id" => null,
-            "search_params" => [],
-            "company_id" => null,
-            "account_id" => null
-        ];
+        // $params = [
+        //     "builder" => $builder,
+        //     "id" => null,
+        //     "search_params" => [],
+        //     "company_id" => null,
+        //     "account_id" => null
+        // ];
 
-        $builder = $this->bHelp->conditions($params);
-        // $builder = $this->qHelp->orderBy($builder, $allowedFields);
+        // $builder = $this->bHelp->conditions($params);
+        // // $builder = $this->qHelp->orderBy($builder, $allowedFields);
         return $builder;
     }
 
@@ -604,6 +604,39 @@ class LpaBuilder
 
 
         return $insert;
+    }
+
+    public function insert_approval_doc_queue($lpa_id, $site)
+    {
+        $show_matrix_appv = $this->mAppvmatrix
+        ->where('site', $site)
+        ->orderBy('sequence', 'ASC')
+        ->get()->getResult();
+
+        if ($show_matrix_appv) {
+            $insert = [];
+            foreach ($show_matrix_appv as $key => $value) {
+                $payload = [
+                    "sequence" => $value->sequence,
+                    "lpa_id" => $lpa_id,
+                    "account_id" => $value->account_id,
+                ];
+                $insert[] = $this->mAppvtrx->insert($payload);
+            }
+        }
+
+
+        return $insert;
+    }
+
+    public function show_matrix_appv($site)
+    {
+        $builder = $this->mAppvmatrix
+        ->where('site', $site)
+        ->orderBy('sequence', 'ASC')
+        ->get()->getResult();
+
+        return $builder;
     }
 
     public function insert_approve($lpa_id, $site)
