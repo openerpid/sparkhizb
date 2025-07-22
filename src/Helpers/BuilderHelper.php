@@ -73,9 +73,8 @@ class BuilderHelper
         $builder        = $params['builder'];
         $id             = $params['id'];
         $search_params  = $params['search_params'];
-        $selects        = $this->request->getJsonVar('selects');
 
-        if ($selects OR $selects != '*') {
+        if ($this->selects and $this->selects != '*') {
             $builder->select($this->selects);
         }
 
