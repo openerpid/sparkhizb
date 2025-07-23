@@ -141,23 +141,34 @@ class EmployeeBuilder
         // // // $allowedFields = array_merge($allowedFields,["gedung_name"]);
         // // $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
-        $subquery = $this->qbAlya();
-        $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
-            ->where('nik', $nik);
+        $builder = $this->qbAlya();
+        // $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
+        if (is_array($nik)) {
+            $builder->whereIn('nik', $nik);
+        }else{
+            $builder->where('nik', $nik);
+        }
 
         return $builder;
     }
 
     public function showSelect_by_nik($nik, $select)
     {
-        $subquery = $this->qbAlya();
-
-        $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
-        ->select($select)
-        ->where('nik', $nik);
+        $builder = $this->qbAlya();
+        // $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
+        $builder->select($select);
+        if (is_array($nik)) {
+            $builder->whereIn('nik', $nik);
+        }else{
+            $builder->where('nik', $nik);
+        }
 
         return $builder;
     }
+
+
+
+
 
     public function show_from_sap()
     {
