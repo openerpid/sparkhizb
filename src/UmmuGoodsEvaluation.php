@@ -19,9 +19,11 @@ class UmmuGoodsEvaluation
 {
     public function __construct()
     {
-        $this->kode = "goods_evaluation";
         $this->curli = new CurlHelper();
         $this->gHelp = new GlobalHelper();
+
+        $this->kode = "goods_evaluation";
+
         $this->path = 'api/inventory/goods_evaluation/';
     }
 
@@ -45,7 +47,7 @@ class UmmuGoodsEvaluation
             ]
         );
 
-        return json_decode($response, false);
+        // return json_decode($response, false);
     }
 
     public function insert($params)
@@ -78,11 +80,9 @@ class UmmuGoodsEvaluation
 
     public function update($params)
     {
-        $id = $params['id'];
-
         $response = $this->curli->request4(
             [
-                "path"           => $this->path. "update/". $id,
+                "path"           => $this->path. "update/". $params['id'],
                 "method"         => "PUT",
                 "payload"        => $params['payload'],
                 "module_code"    => $this->kode,
@@ -134,6 +134,49 @@ class UmmuGoodsEvaluation
                 "token"          => $params['token']
             ]
         );
+
+        return json_decode($response, false);
+    }
+
+
+
+    
+
+    public function zoneCreate_show($params)
+    {
+        $response = $this->curli->request4([
+            "path"           => $this->path. "zoneCreate_show",
+            "method"         => "GET",
+            "payload"        => $params["payload"],
+            "module_code"    => $this->kode,
+            "token"          => $params["token"]
+        ]);
+
+        return json_decode($response, false);
+    }
+
+    public function zoneCreate_insert($params)
+    {
+        $response = $this->curli->request4([
+            "path"           => $this->path. "zoneCreate_insert",
+            "method"         => "POST",
+            "payload"        => $params["payload"],
+            "module_code"    => $this->kode,
+            "token"          => $params["token"]
+        ]);
+
+        return json_decode($response, false);
+    }
+
+    public function zoneCreate_update($params)
+    {
+        $response = $this->curli->request4([
+            "path"           => $this->path. "zoneCreate_update/". $params['id'],
+            "method"         => "PUT",
+            "payload"        => $params["payload"],
+            "module_code"    => $this->kode,
+            "token"          => $params["token"]
+        ]);
 
         return json_decode($response, false);
     }
