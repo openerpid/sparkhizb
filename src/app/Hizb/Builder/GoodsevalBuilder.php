@@ -186,7 +186,40 @@ class GoodsevalBuilder
         return $builder;
     }
 
+    
 
+    /**
+     * Process Zone*/
+    public function zoneProcess_show($id = null, $payload)
+    {
+        $params = [
+            "id" => $id,
+            "payload" => $payload,
+            "token" => $this->reqH->myToken()
+        ];
+
+        $builder = $this->ummu->zoneProcess_show($params);
+
+        return $builder;
+    }
+
+    public function zoneProcess_update($id, $payload)
+    {
+        $params = [
+            "id" => $id,
+            "payload" => $payload,
+            "token" => $this->umHelp->token()
+        ];
+
+        $builder = $this->ummu->zoneProcess_update($params);
+
+        return $builder;
+    }
+
+
+
+    /**
+     * Monitoring Zone*/
     public function zoneMonitoring_show($id = null, $payload)
     {
         $params = [

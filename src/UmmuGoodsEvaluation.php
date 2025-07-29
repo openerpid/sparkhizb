@@ -141,7 +141,8 @@ class UmmuGoodsEvaluation
 
 
     
-
+    /**
+     * Create Zone*/
     public function zoneCreate_show($params)
     {
         $response = $this->curli->request4([
@@ -182,6 +183,37 @@ class UmmuGoodsEvaluation
     }
 
 
+    /**
+     * Process Zone*/
+    public function zoneProcess_show($params)
+    {
+        $response = $this->curli->request4([
+            "path"           => $this->path. "zoneProcess_show",
+            "method"         => "GET",
+            "payload"        => $params["payload"],
+            "module_code"    => $this->kode,
+            "token"          => $params["token"]
+        ]);
+
+        return json_decode($response, false);
+    }
+
+    public function zoneProcess_update($params)
+    {
+        $response = $this->curli->request4([
+            "path"           => $this->path. "zoneProcess_update/". $params['id'],
+            "method"         => "PUT",
+            "payload"        => $params["payload"],
+            "module_code"    => $this->kode,
+            "token"          => $params["token"]
+        ]);
+
+        return json_decode($response, false);
+    }
+
+
+    /**
+     * Monitoring Zone*/
     public function zoneMonitoring_show($params)
     {
         $response = $this->curli->request4([
