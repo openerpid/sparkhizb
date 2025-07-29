@@ -185,4 +185,18 @@ class GoodsevalBuilder
 
         return $builder;
     }
+
+
+    public function zoneMonitoring_show($id = null, $payload)
+    {
+        $params = [
+            "id" => $id,
+            "payload" => $payload,
+            "token" => $this->reqH->myToken()
+        ];
+
+        $builder = $this->ummu->zoneMonitoring_show($params);
+
+        return $builder;
+    }
 }
