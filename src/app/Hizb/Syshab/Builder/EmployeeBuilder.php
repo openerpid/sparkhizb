@@ -274,4 +274,17 @@ class EmployeeBuilder
         // WHERE H_A101.StEdit <> '2' AND H_A101.KdSite IN (SELECT data FROM dbo.MyArray(@argUser)) AND
         //     (( H_A101.active =@arg_active1 ) OR ( H_A101.active =@arg_active2 ))
     }
+
+    public function get_kode_depar($nik)
+    {
+        $table = $this->model->getTable();
+
+        $subquery = $this->db->table($table)
+            ->select("KdDepar")
+            ->where("Nik", $nik)
+            ->get()
+            ->getRow();
+
+        return $subquery;
+    }
 }

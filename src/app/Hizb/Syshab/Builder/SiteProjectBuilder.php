@@ -25,11 +25,11 @@ class SiteProjectBuilder
         $table = $this->model->table;
         $allowedFields = $this->model->allowedFields;
 
-        $builder = $this->db->table($table)
-            ->select($allowedFields)
+        $subquery = $this->db->table($table)
+            // ->select("*,region_code as id,region_name as text")
             ->where('tActive', 1);
 
-        return $builder;
+        return $this->db->newQuery()->fromSubquery($subquery, 't');
     }
 
     public function show($id = null)
@@ -45,7 +45,7 @@ class SiteProjectBuilder
         $params = [
             "builder" => $builder,
             "id" => $id,
-            "search_params" => ["region_code", "region_name", "cc_email"],
+            "search_params" => ["region_code", "region_name"],
             "company_id" => null
         ];
 
