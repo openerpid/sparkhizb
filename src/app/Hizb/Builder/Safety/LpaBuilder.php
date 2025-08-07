@@ -67,10 +67,10 @@ class LpaBuilder
         $selects = $this->model->selects;
         $allowedFields = $this->model->allowedFields;
 
-        $sjQuery = $this->iescm->table($database. '.'. $table. ' a')
+        $sjQuery = $this->iescm->table($database . '.' . $table . ' a')
             ->select($selects)
-            ->join($database. '.'. $tbUser . ' b', 'b.account_id = a.created_by', 'left')
-            ->join($database. '.'. $tbAppv. ' c', 'c.lpa_id = a.id', 'left')
+            ->join($database . '.' . $tbUser . ' b', 'b.account_id = a.created_by', 'left')
+            ->join($database . '.' . $tbAppv . ' c', 'c.lpa_id = a.id', 'left')
 
             // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
             // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
@@ -105,12 +105,12 @@ class LpaBuilder
         $params = [
             "builder" => $builder,
             "id" => $id,
-            "search_params" => ["nomor_dokumen","site","hari_kejadian"],
+            "search_params" => ["nomor_dokumen", "site", "hari_kejadian"],
             "company_id" => null,
             "account_id" => null
         ];
 
-        $builder = $this->bHelp->conditions($params);        
+        $builder = $this->bHelp->conditions($params);
         $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
         return $builder;
@@ -122,7 +122,7 @@ class LpaBuilder
 
         $builder->where("next_appv_sequence <= total_appv");
         $builder->whereIn("next_appv_sequence", array_unique($sequence));
-        
+
         $params = [
             "builder" => $builder,
             "id" => $id,
@@ -131,7 +131,7 @@ class LpaBuilder
             "account_id" => null
         ];
 
-        $builder = $this->bHelp->conditions($params);        
+        $builder = $this->bHelp->conditions($params);
         $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
         return $builder;
@@ -159,41 +159,41 @@ class LpaBuilder
     public function show_d_orang($h_id)
     {
         return $this->mOrang
-        ->where('lpa_id', $h_id)
-        ->where('deleted_at IS NULL')
-        ->get()->getResult();
+            ->where('lpa_id', $h_id)
+            ->where('deleted_at IS NULL')
+            ->get()->getResult();
     }
 
     public function show_d_foto($h_id)
     {
         return $this->mFoto
-        ->where('lpa_id', $h_id)
-        ->where('deleted_at IS NULL')
-        ->get()->getResult();
+            ->where('lpa_id', $h_id)
+            ->where('deleted_at IS NULL')
+            ->get()->getResult();
     }
 
     public function show_d_kerusakan($h_id)
     {
         return $this->mKerusakan
-        ->where('lpa_id', $h_id)
-        ->where('deleted_at IS NULL')
-        ->get()->getResult();
+            ->where('lpa_id', $h_id)
+            ->where('deleted_at IS NULL')
+            ->get()->getResult();
     }
 
     public function show_d_unit($h_id)
     {
         return $this->mUnit
-        ->where('lpa_id', $h_id)
-        ->where('deleted_at IS NULL')
-        ->get()->getResult();
+            ->where('lpa_id', $h_id)
+            ->where('deleted_at IS NULL')
+            ->get()->getResult();
     }
 
     public function show_d_divisi($h_id)
     {
         return $this->mDivisi
-        ->where('lpa_id', $h_id)
-        ->where('deleted_at IS NULL')
-        ->get()->getResult();
+            ->where('lpa_id', $h_id)
+            ->where('deleted_at IS NULL')
+            ->get()->getResult();
     }
 
     public function show_new($nik, $site)
@@ -541,22 +541,22 @@ class LpaBuilder
 
 
 
-    private function bUpdate_detail($id, $payload ,$builder)
+    private function bUpdate_detail($id, $payload, $builder)
     {
         $lpa_id = $this->request->getVar('lpa_id');
         $payload = $this->identity->update($payload);
 
         return $builder->where('lpa_id', $lpa_id)
-        ->where('id', $id)
-        ->set($payload)
-        ->update();
+            ->where('id', $id)
+            ->set($payload)
+            ->update();
     }
 
 
     public function show_icdms($id_arr)
     {
         $builder = $this->mIcdms
-        ->whereIn('id', $id_arr);
+            ->whereIn('id', $id_arr);
 
         return $builder;
     }
@@ -586,9 +586,9 @@ class LpaBuilder
     public function insert_approve_trx($lpa_id, $site)
     {
         $show_matrix_appv = $this->mAppvmatrix
-        ->where('site', $site)
-        ->orderBy('sequence', 'ASC')
-        ->get()->getResult();
+            ->where('site', $site)
+            ->orderBy('sequence', 'ASC')
+            ->get()->getResult();
 
         if ($show_matrix_appv) {
             $insert = [];
@@ -609,9 +609,9 @@ class LpaBuilder
     public function insert_approval_doc_queue($lpa_id, $site)
     {
         $show_matrix_appv = $this->mAppvmatrix
-        ->where('site', $site)
-        ->orderBy('sequence', 'ASC')
-        ->get()->getResult();
+            ->where('site', $site)
+            ->orderBy('sequence', 'ASC')
+            ->get()->getResult();
 
         if ($show_matrix_appv) {
             $insert = [];
@@ -632,9 +632,9 @@ class LpaBuilder
     public function show_matrix_appv($site)
     {
         $builder = $this->mAppvmatrix
-        ->where('site', $site)
-        ->orderBy('sequence', 'ASC')
-        ->get()->getResult();
+            ->where('site', $site)
+            ->orderBy('sequence', 'ASC')
+            ->get()->getResult();
 
         return $builder;
     }
@@ -642,9 +642,9 @@ class LpaBuilder
     public function insert_approve($lpa_id, $site)
     {
         $show_matrix_appv = $this->mAppvmatrix
-        ->where('site', $site)
-        ->get()
-        ->getResultArray();
+            ->where('site', $site)
+            ->get()
+            ->getResultArray();
 
         $count = count($show_matrix_appv);
 
@@ -653,7 +653,7 @@ class LpaBuilder
             "total_appv" => $count
         ];
 
-        $insert = $this->mAppv->insert($payload);       
+        $insert = $this->mAppv->insert($payload);
 
         return $insert;
     }
@@ -684,9 +684,9 @@ class LpaBuilder
     public function approve($lpa_id, $payload)
     {
         $builder = $this->mAppv
-        ->set($payload)
-        ->where("lpa_id", $lpa_id)
-        ->update();
+            ->set($payload)
+            ->where("lpa_id", $lpa_id)
+            ->update();
 
         return $builder;
     }
@@ -694,14 +694,70 @@ class LpaBuilder
     public function last_appv_sequence($lpa_id)
     {
         $builder = $this->mAppv
-        ->select("last_appv_sequence")
-        ->where("lpa_id", $lpa_id)
-        ->get()->getRow();
+            ->select("last_appv_sequence")
+            ->where("lpa_id", $lpa_id)
+            ->get()->getRow();
 
         if ($builder) {
             return $builder->last_appv_sequence;
-        }else{
+        } else {
             return null;
         }
+    }
+
+    public function show_approval_matrix($id)
+    {
+        $table = $this->mAppvmatrix->table;
+        $subquery = $this->iescm->table($table . ' a')
+            ->select("a.*,b.name")
+            ->join($this->mUser->database . '.' . $this->mUser->table . ' b', 'b.account_id = a.account_id', 'left')
+            ->where('a.deleted_at IS NULL');
+
+        $builder = $this->iescm->newQuery()->fromSubquery($subquery, 't');
+
+        $params = [
+            "builder" => $builder,
+            "id" => $id,
+            "search_params" => ["site"],
+            "company_id" => null,
+            "account_id" => null
+        ];
+
+        $builder = $this->bHelp->conditions($params);
+        $builder->orderBy('site', 'asc')->orderBy('sequence', 'asc');
+        // $builder = $this->qHelp->orderBy($builder, $allowedFields);
+        return $builder;
+    }
+
+    public function approval_matrix_insert($payload)
+    {
+        // $payload = $this->identity->insert($payload);
+        $builder = $this->mAppvmatrix->insert($payload);
+
+        return $builder;
+    }
+
+    public function approval_matrix_delete($id)
+    {
+        $payload = [
+            "deleted_at" => date("Y-m-d H:i:s"),
+            "deleted_by" => $this->identity->account_id()
+        ];
+        $builder = $this->mAppvmatrix
+            ->set($payload)
+            ->whereIn("id", $id)
+            ->update();
+
+        return $builder;
+    }
+
+    public function update_approval_matrix($id, $payload)
+    {
+        $builder = $this->mAppvmatrix
+            ->where('id', $id)
+            ->set($payload)
+            ->update();
+
+        return $builder;
     }
 }

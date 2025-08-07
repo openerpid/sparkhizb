@@ -28,6 +28,8 @@ class UsersModel extends Model
         "deleted_by"
     ];
 
+    protected $selects = "*";
+
     // Dates
     protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
