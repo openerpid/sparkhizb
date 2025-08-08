@@ -461,4 +461,42 @@ class LpaValidation
         ->get()->getRow();
             if ($cek2) return ["id" => "Sequence already exist in ".$site."!"];
     }
+
+    public function update_approval_matrix($id, $params)
+    {
+        $site = $params['site'];
+        $sequence = $params['sequence'];
+        $account_id = $params['account_id'];
+        
+        $rules = [
+            "site_project_kode" => 'required',
+            "sequence" => 'required',
+            "account_id" => 'required',
+        ];
+
+        $this->validation->setRules($rules);
+        $this->validation->withRequest($this->request)->run();
+        $errors = $this->validation->getErrors();
+            if($errors) return $errors;
+
+        $cek = $this->mAppvMtx
+        ->select('id')
+        // ->where('sequence', $sequence)
+        ->where('site', $site)
+        ->where('account_id', $account_id)
+        ->where('id !='. $id)
+        ->where('deleted_at IS NULL')
+        ->get()->getRow();
+            if ($cek) return ["id" => "User already exist in ".$site."!"];
+
+        $cek2 = $this->mAppvMtx
+        ->select('id')
+        ->where('sequence', $sequence)
+        ->where('site', $site)
+        ->where('id !='. $id)
+        // ->where('account_id', $account_id)
+        ->where('deleted_at IS NULL')
+        ->get()->getRow();
+            if ($cek2) return ["id" => "Sequence already exist in ".$site."!"];
+    }
 }
