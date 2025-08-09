@@ -11,14 +11,14 @@ namespace Sparkhizb;
 * =============================================
 */
 
-use Sparkhizb\Helpers\Curl;
+use Sparkhizb\Helpers\CurlHelper;
 use Sparkhizb\Helpers\GlobalHelper;
 
 class UmmuEmployeeAccount
 {
     public function __construct()
     {
-        $this->curli = new Curl();
+        $this->curli = new CurlHelper();
         $this->gHelp = new GlobalHelper();
         $this->urli = 'api/hcm/employee_account/';
     }
