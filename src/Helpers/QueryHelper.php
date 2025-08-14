@@ -358,10 +358,18 @@ class QueryHelper
 
     public function respon($rows,$count,$total)
     {
+        $jssdata = [];
+        
         if ($count > 0) {
             $sts = true;
             $msg = 'Get data success';
             $code = 200;
+
+            // foreach ($rows as $key => $value) {
+            //     $jssdata[] = $value;
+            // }
+
+            // $rows[$key]->jssdata = $jssdata;
         }else{
             $sts = false;
             $msg = 'Data not found';
@@ -379,6 +387,7 @@ class QueryHelper
             "scode"                 => $code,
             "total_count"           => $count,
             "incomplete_results"    => false,
+            // "jssdata"               => $jssdata,
             // "filter"            => [
             //     "search" => $this->request->getJsonVar("search"),
             //     "datetime_detail" => [

@@ -147,12 +147,12 @@ class SuratTugasBuilder
     public function insert($payload)
     {
         $params = [
-            "id" => null,
             "payload" => $payload,
             "token" => $this->umHelp->token()
         ];
 
         $builder = $this->ummu->insert($params);
+        
         return $builder;
     }
 
