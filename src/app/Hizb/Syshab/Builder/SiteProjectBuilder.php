@@ -90,4 +90,16 @@ class SiteProjectBuilder
         $builder = $this->ummu->show($params);
         return $builder;
     }
+
+    public function get_name($kode)
+    {
+        $table = $this->model->table;
+
+        $builder = $this->db->table($table)
+            ->select("region_name as name")
+            ->where("region_code", $kode)
+            ->where("tActive", 1);
+
+        return $builder;
+    }
 }
