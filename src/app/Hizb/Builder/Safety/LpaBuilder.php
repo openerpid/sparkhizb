@@ -100,7 +100,7 @@ class LpaBuilder
         $where = $this->request->getJsonVar('where');
 
         $builder = $this->sjQuery();
-        $builder->where('site', session()->get('kode_site'));
+        // $builder->where('site', session()->get('kode_site'));
 
         $params = [
             "builder" => $builder,
