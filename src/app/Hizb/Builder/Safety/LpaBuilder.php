@@ -96,11 +96,11 @@ class LpaBuilder
 
     public function show($id = null)
     {
-
         $allowedFields = $this->model->allowedFields;
         $where = $this->request->getJsonVar('where');
 
         $builder = $this->sjQuery();
+        $builder->where('site', session()->get('kode_site'));
 
         $params = [
             "builder" => $builder,
