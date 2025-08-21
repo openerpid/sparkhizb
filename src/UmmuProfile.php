@@ -70,4 +70,19 @@ class UmmuProfile
 
         return json_decode($response, false);
     }
+
+    public function update_myKdSite($params)
+    {
+        $response = $this->curli->request4(
+            [
+                "path"           => $this->path."update_myKdSite",
+                "method"         => "PUT",
+                "payload"        => $params['payload'],
+                "module_code"    => $this->kode,
+                "token"          => $params['token']
+            ]
+        );
+
+        return json_decode($response, false);
+    }
 }

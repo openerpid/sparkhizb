@@ -299,4 +299,15 @@ class IdentityHelper
 
         return $data;
     }
+
+    public function KdSite()
+    {
+        if(isset($this->jwt->decode()->employee->KdSite)) {
+            $text = $this->jwt->decode()->employee->KdSite;
+        }else{
+            $text = null;
+        }
+
+        return $text;
+    }
 }

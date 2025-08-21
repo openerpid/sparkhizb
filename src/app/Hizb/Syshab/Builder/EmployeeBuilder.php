@@ -18,7 +18,7 @@ class EmployeeBuilder
         $this->model = new EmployeeModel();
     }
 
-    private function qbAlya()
+    private function sjQuery()
     {
         $table = $this->model->getTable();
         // $allowedFields = $this->model->allowedFields;
@@ -58,7 +58,7 @@ class EmployeeBuilder
 
         // $builder = $this->db->table($table)
         //     ->select($selectFields);
-        $builder = $this->qbAlya();
+        $builder = $this->sjQuery();
         // $builder->select('Nik,Nama');
 
         if ($where_by) {
@@ -141,11 +141,11 @@ class EmployeeBuilder
         // // // $allowedFields = array_merge($allowedFields,["gedung_name"]);
         // // $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
-        $builder = $this->qbAlya();
+        $builder = $this->sjQuery();
         // $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
         if (is_array($nik)) {
             $builder->whereIn('nik', $nik);
-        }else{
+        } else {
             $builder->where('nik', $nik);
         }
 
@@ -154,12 +154,11 @@ class EmployeeBuilder
 
     public function showSelect_by_nik($nik, $select)
     {
-        $builder = $this->qbAlya();
-        // $builder = $this->db->newQuery()->fromSubquery($subquery, 't')
+        $builder = $this->sjQuery();
         $builder->select($select);
         if (is_array($nik)) {
             $builder->whereIn('nik', $nik);
-        }else{
+        } else {
             $builder->where('nik', $nik);
         }
 

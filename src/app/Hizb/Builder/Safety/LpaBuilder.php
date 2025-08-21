@@ -98,9 +98,10 @@ class LpaBuilder
     {
         $allowedFields = $this->model->allowedFields;
         $where = $this->request->getJsonVar('where');
+        // $site = $this->request->getJsonVar('site_kode');
 
         $builder = $this->sjQuery();
-        // $builder->where('site', session()->get('kode_site'));
+        $builder->where('site', $this->identity->KdSite());
 
         $params = [
             "builder" => $builder,
