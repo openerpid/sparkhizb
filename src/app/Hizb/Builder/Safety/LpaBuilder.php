@@ -7,7 +7,6 @@ use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\RequestHelper;
-use Sparkhizb\UmmuHazardReport;
 use Sparkhizb\UmmuInvestigation;
 
 use App\Hizb\Models\Safety\LpahModel;

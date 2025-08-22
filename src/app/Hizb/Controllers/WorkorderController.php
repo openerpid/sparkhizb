@@ -3,21 +3,23 @@
 namespace App\Hizb\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
-use Dorbitt\Helpers\QueryHelper;
-use Dorbitt\Helpers\UmmuHelper;
-use Dorbitt\Helpers\DateTimeHelper;
+use Sparkhizb\Helpers\QueryHelper;
+use Sparkhizb\Helpers\UmmuHelper;
+use Sparkhizb\Helpers\DateTimeHelper;
 
 use App\Hizb\Builder\WorkorderBuilder;
+use App\Hizb\Builder\Syshab\WorkorderBuilder as WorkorderShbBuilder;
 
 class WorkorderController extends ResourceController
 {
     public function __construct()
     {
         $this->request = \Config\Services::request();
-        $this->qHelp = new UmmuHelper();
+        $this->qHelp = new QueryHelper();
         $this->dtH = new DateTimeHelper();
 
         $this->qBuilder = new WorkorderBuilder();
+        $this->shbBuilder = new WorkorderShbBuilder();
     }
 
     /**
@@ -54,6 +56,7 @@ class WorkorderController extends ResourceController
         // }
 
         return $this->respond($builder, 200);
+        // return $this->show_from_syshab();
     }
 
     /**
@@ -626,5 +629,33 @@ class WorkorderController extends ResourceController
         $builder->recordsFiltered = $recordsFiltered;
 
         return $this->respond($builder, 200);
+    }
+
+    public function show_from_syshab()
+    {
+        $builder = $this->shbBuilder->show();
+        $total = $this->qHelp->_total($builder);
+        $rows = $this->qHelp->_rowsBui($builder);
+        $count = count($rows);
+
+        $response = $this->qHelp->respon($rows, $count, $total);
+
+        return $this->respond($response, $response['scode']);
+        // if ($builder->status == true) {
+        //     $rows = $builder->rows;
+        //     if ($rows) {
+        //         foreach ($rows as $key => $value) {
+        //             if (!$value->foto_temuan_url) {
+        //                 $rows[$key]->foto_temuan_url = getenv('api-url') . 'uploads/no_image.jpg';
+        //             }
+
+        //             if (!$value->foto_perbaikan_url) {
+        //                 $rows[$key]->foto_perbaikan_url = getenv('api-url') . 'uploads/no_image.jpg';
+        //             }
+        //         }
+        //     }
+        // }
+
+        // return $this->respond($builder, 200);
     }
 }
