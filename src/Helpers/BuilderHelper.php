@@ -55,11 +55,6 @@ class BuilderHelper
             $this->search = $this->request->getVar('search');
         }
 
-        $this->filter = $this->request->getJsonVar('filter');
-        if (!$this->filter) {
-            $this->filter = json_decode($this->request->getVar('filter'));
-        }
-
         $this->anywhere     = $this->request->getJsonVar('anywhere');
         $this->anydate      = $this->request->getJsonVar('anydate');
 
@@ -75,10 +70,23 @@ class BuilderHelper
 
     public function filter($builder)
     {
-        if ($this->filter) {
-            foreach ($this->filter as $key => $value) {
+        $filter_type = $this->request->getJsonVar('filter_type');
+        $filter = $this->request->getJsonVar('filter');
+        if (!$filter) {
+            $filter = $this->request->getVar('filter');
+            if ($filter) {
+                $filter = json_decode($filter);
+            }
+        }
+
+        if ($filter) {
+            foreach ($filter as $key => $value) {
                 if ($key != "undefined") {
-                    $builder->like($key, $value);
+                    if ($filter_type == "like") {
+                        $builder->like($key, $value);
+                    }else{
+                        $builder->where($key, $value);
+                    }
                 }
             }
         }
