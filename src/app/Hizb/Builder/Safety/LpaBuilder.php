@@ -408,6 +408,8 @@ class LpaBuilder
                     if ($query) {
                         foreach ($rows as $key => $value) {
                             $nik = $value->nik;
+                            $NmSec = null;
+                            $NmDepar = null;
                             foreach ($query as $key2 => $value2) {
                                 if ($value2->Nik == $nik) {
                                     $NmSec = $value2->NmSec;

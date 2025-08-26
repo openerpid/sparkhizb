@@ -32,6 +32,8 @@ class LpadKerusakanModel extends Model
         "kerusakan_keparahan",
         "detail_kerusakan_kerugian",
         "perkiraan_biaya",
+        "nomor_lambung",
+        "is_external",
 
         "created_at",
         "updated_at",
