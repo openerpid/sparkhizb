@@ -68,38 +68,11 @@ class BuilderHelper
         $this->condt      = $this->request->getJsonVar('conditions');
     }
 
-    public function filter($builder)
-    {
-        $filter_type = $this->request->getJsonVar('filter_type');
-        $filter = $this->request->getJsonVar('filter');
-        if (!$filter) {
-            $filter = $this->request->getVar('filter');
-            if ($filter) {
-                $filter = json_decode($filter);
-            }
-        }
-
-        if ($filter) {
-            foreach ($filter as $key => $value) {
-                if ($key != "undefined") {
-                    if ($filter_type == "like") {
-                        $builder->like($key, $value);
-                    }else{
-                        $builder->where($key, $value);
-                    }
-                }
-            }
-        }
-
-        return $builder;
-    }
-
     public function conditions($params)
     {
         $builder        = $params['builder'];
         $id             = $params['id'];
         $search_params  = $params['search_params'];
-
 
         if ($this->selects and $this->selects != '*') {
             $builder->select($this->selects);
@@ -1104,5 +1077,60 @@ class BuilderHelper
 
         return $builder->set($payload)
         ->update();
+    }
+
+
+
+
+
+
+    /**
+     * Filter
+     * */
+    public function filter($builder)
+    {
+        $filter_type = $this->request->getJsonVar('filter_type');
+        $filter = $this->request->getJsonVar('filter');
+        if (!$filter) {
+            $filter = $this->request->getVar('filter');
+            if ($filter) {
+                $filter = json_decode($filter);
+            }
+        }
+
+        if ($filter) {
+            foreach ($filter as $key => $value) {
+                if ($key != "undefined") {
+                    if ($filter_type == "like") {
+                        $builder->like($key, $value);
+                    }else{
+                        $builder->where($key, $value);
+                    }
+                }
+            }
+        }
+
+        return $builder;
+    }
+
+    public function filter2($builder, $filter, $filter_type = null)
+    {
+        if ($filter) {
+            $filter = json_decode($filter);
+        }
+
+        if ($filter) {
+            foreach ($filter as $key => $value) {
+                if ($key != "undefined") {
+                    if ($filter_type == "like") {
+                        $builder->like($key, $value);
+                    }else{
+                        $builder->where($key, $value);
+                    }
+                }
+            }
+        }
+
+        return $builder;
     }
 }

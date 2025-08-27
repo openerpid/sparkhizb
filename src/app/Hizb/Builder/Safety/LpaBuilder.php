@@ -102,6 +102,10 @@ class LpaBuilder
         $builder = $this->sjQuery();
         $builder->where('site', $this->identity->KdSite());
 
+        if (ENVIRONMENT == "production") {
+            $builder->where('is_testing IS NULL');
+        }
+
         $params = [
             "builder" => $builder,
             "id" => $id,
