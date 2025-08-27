@@ -104,6 +104,8 @@ class LpaBuilder
 
         if (ENVIRONMENT == "production") {
             $builder->where('is_testing IS NULL');
+        }else{
+            $builder->where('is_testing', 1);
         }
 
         $params = [
