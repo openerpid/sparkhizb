@@ -69,6 +69,8 @@ class LpahModel extends Model
         "perkiraan_hari_hilang",
         "perkiraan_biaya_perawatan",
 
+        "is_testing",
+
         "created_at",
         "updated_at",
         "deleted_at",
