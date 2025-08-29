@@ -90,14 +90,17 @@ class LpaBuilder
             // // ->whereIn('a.is_release', $release2)
             ->where('a.deleted_at IS NULL');
 
-        return $this->iescm->newQuery()->fromSubquery($sjQuery, 't');
+        $newQuery = $this->iescm->newQuery()->fromSubquery($sjQuery, 't');
+        $filterID = $this->bHelp->filterID($newQuery);
+        $filter = $this->bHelp->filter($filterID);
+
+        return $builder = $filter;
     }
 
     public function show($id = null)
     {
         $allowedFields = $this->model->allowedFields;
         $where = $this->request->getJsonVar('where');
-        // $site = $this->request->getJsonVar('site_kode');
 
         $builder = $this->sjQuery();
         $builder->where('site', $this->identity->KdSite());
@@ -270,7 +273,7 @@ class LpaBuilder
 
     public function insert($payload)
     {
-        $payload = $this->identity->insert($payload);
+        $payload = $this->bHelp->payloadInsert($this->$payload);
         $builder = $this->model->insert($payload);
 
         return $builder;

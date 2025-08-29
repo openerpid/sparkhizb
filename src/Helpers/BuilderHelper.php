@@ -236,7 +236,9 @@ class BuilderHelper
             }
         }
 
-        $builder->where('deleted_at IS NULL');
+        if (isset($params['deleted_at'])) {
+            $builder->where('deleted_at '. $params['deleted_at']);
+        }
 
         return $builder;
     }
@@ -1087,6 +1089,23 @@ class BuilderHelper
     /**
      * Filter
      * */
+    public function filterID($builder)
+    {
+        $ids = $this->request->getJsonVar('ids');
+        if (!$ids) {
+            $ids = $this->request->getVar('ids');
+            if ($ids) {
+                $ids = json_decode($ids);
+            }
+        }
+
+        if ($ids) {
+            $builder->whereIn('id', $ids);
+        }
+
+        return $builder;
+    }
+
     public function filter($builder)
     {
         $filter_type = $this->request->getJsonVar('filter_type');
@@ -1129,6 +1148,211 @@ class BuilderHelper
                     }
                 }
             }
+        }
+
+        return $builder;
+    }
+
+    public function payloadInsert($db_conn, $tb, $payload)
+    {
+        if ($db_conn->fieldExists('company_id', $tb)) {
+            $payload["company_id"] = $this->identity->company_id();
+        }
+
+        if ($db_conn->fieldExists('created_by', $tb)) {
+            $payload["created_by"] = $this->identity->account_id();
+        }
+
+        if ($db_conn->fieldExists('is_testing', $tb)) {
+            if (ENVIRONMENT != "production") {
+                $payload["is_testing"] = 1;
+            }
+        }
+        
+        return $payload;
+    }
+
+    public function payloadUpdate($db_conn, $tb, $payload)
+    {
+        if ($db_conn->fieldExists('updated_by', $tb)) {
+            $payload["updated_by"] = $this->identity->account_id();
+        }
+        
+        return $payload;
+    }
+
+    public function conditions_with_dbconn($params)
+    {
+        $builder        = $params['builder'];
+        $id             = $params['id'];
+        $search_params  = $params['search_params'];
+        $db_conn        = $params['db_conn'];
+        $tb             = $params['tb'];
+
+        if ($this->selects and $this->selects != '*') {
+            $builder->select($this->selects);
+        }
+
+        if (isset($params['company_id'])) {
+            $company_id = $params['company_id'];
+            if ($company_id) {
+                $builder->where('company_id', $company_id);
+            }
+        }
+
+        if (isset($params['account_id'])) {
+            $account_id = $params['account_id'];
+            if ($account_id) {
+                $builder->where('created_by', $account_id);
+            }
+        }
+
+        if (isset($params['created_by'])) {
+            $created_by = $params['created_by'];
+            if ($created_by) {
+                $builder->where('created_by', $created_by);
+            }
+        }
+
+        if (isset($params['plant_id'])) {
+            $plant_id = $params['plant_id'];
+            if ($plant_id) {
+                $builder->where('plant_id', $plant_id);
+            }
+        }
+
+        if (isset($params['site_project_id'])) {
+            $site_project_id = $params['site_project_id'];
+            if ($site_project_id) {
+                $builder->where('site_project_id', $site_project_id);
+            }
+        }
+
+        if ($id) {
+            if (is_array($id)) {
+                $builder->whereIn('id',$id);
+            }else{
+                $builder->where('id',$id);
+            }
+        }else{
+            if ($this->where) {
+                foreach ($this->where as $key => $value) {
+                    if ($value != "") {
+                        $builder->where($key,$value);
+                    }
+                }
+            }
+
+            if ($this->search AND $search_params) {
+                // if ($search_params) {
+                    $builder->groupStart();
+                        $builder->like($search_params[0],$this->search);
+                        if (count($search_params) > 1) {
+                            foreach ($search_params as $key => $value) {
+                                if ($key != 0) {
+                                    $builder->orLike($value,$this->search);
+                                }
+                            }
+                        }
+                    $builder->groupEnd();
+                // }
+            }
+
+            if ($this->anywhere) {
+                if (is_array($this->anywhere)) {
+                    foreach ($this->anywhere as $key => $value) {
+                        if ($value->anywhere == true) {
+                            if (is_array($value->column)) {
+                                $builder->whereIn($value->column,$value->value);                            
+                            }else{
+                                if (isset($value->copr)) {
+                                    // $builder->where('id BETWEEN 1 AND 5');
+                                    // $builder->where("created_at BETWEEN '2024-10-01 00:00:00' AND '2024-11-01 00:00:00'");
+                                    if ($value->copr == "BETWEEN") {
+                                        if (isset($value->type)) {
+                                            if ($value->type == "date") {
+                                                $from = $this->gHelp->dtfFormatter($value->value[0]);
+                                                $to = $this->gHelp->dtfFormatter($value->value[1]);
+                                                $builder->where($value->column." BETWEEN '".$from."' AND '".$to."' ");
+                                            }
+                                        }else{
+                                            // $builder->where($value->column." BETWEEN ".$value->value." ");
+                                            $builder->where($value->column." BETWEEN ".$value->value[0]." AND ".$value->value[1]);
+                                        }
+                                    }else{
+                                        $builder->where($value->column." ".$value->copr." ",$value->value);
+                                    }
+                                }else{
+                                    if (isset($value->is_null)) {
+                                        if ($value->is_null == true) {
+                                            $builder->where($value->column . " IS NULL ");
+                                        }
+
+                                        if (isset($value->value)) {
+                                            $builder->orWhere($value->column,$value->value);
+                                        }
+                                    }else{
+                                        $builder->where($value->column,$value->value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    if ($this->anywhere->anywhere == true) {
+                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                    }
+                }
+            }
+
+            if ($this->from_date) {
+                $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->from_date));
+            }
+
+            if ($this->to_date) {
+                $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->to_date));
+            }
+
+            if ($this->date) {
+                if ($this->date->from) {
+                    $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->date->from));
+                }
+
+                if ($this->date->to) {
+                    $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->date->to));
+                }
+            }
+
+            if ($this->datetime) {
+                if ($this->datetime->from) {
+                    $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->datetime->from));
+                }
+
+                if ($this->datetime->to) {
+                    $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->datetime->to));
+                }
+            }
+
+            if ($this->anydate) {
+                $anydate = $this->anydate->anydate;
+                $from = $this->anydate->from;
+                $to = $this->anydate->to;
+
+                if ($anydate == true) {
+                    if ($from) {
+                        $builder->where('created_at >= ', $this->gHelp->dtfFormatter($from));
+                    }
+
+                    if ($to) {
+                        $builder->where('created_at <= ', $this->gHelp->dtfFormatter($to));
+                    }
+                }
+            }
+        }
+
+        if ($db_conn->fieldExists('deleted_at', $tb)) {
+            $builder->where('deleted_at IS NULL');
         }
 
         return $builder;
