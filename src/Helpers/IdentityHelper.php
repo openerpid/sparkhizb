@@ -310,4 +310,23 @@ class IdentityHelper
 
         return $text;
     }
+
+    public function enmod()
+    {
+        return $this->jwt->decode()->module_enabled;
+    }
+
+    public function modulePrivilege($module_kode)
+    {
+        $enmod = $this->jwt->decode()->module_enabled;
+        $crud_name = [];
+
+        foreach ($enmod as $key => $value) {
+            if ($value->kode == $module_kode) {
+                $crud_name = $value->crud_name;
+            }
+        }
+
+        return $crud_name;
+    }
 }

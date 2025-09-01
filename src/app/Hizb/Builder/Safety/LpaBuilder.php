@@ -7,6 +7,7 @@ use Sparkhizb\Helpers\BuilderHelper;
 use Sparkhizb\Helpers\QueryHelper;
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\RequestHelper;
+use Sparkhizb\Helpers\PrivilegeHelper;
 use Sparkhizb\UmmuInvestigation;
 
 use App\Hizb\Models\Safety\LpahModel;
@@ -38,6 +39,7 @@ class LpaBuilder
         $this->umHelp = new UmmuHelper();
         $this->ummu = new UmmuInvestigation();
         $this->reqH = new RequestHelper();
+        $this->privHelp = new PrivilegeHelper();
 
         $this->model = new LpahModel();
         $this->mOrang = new LpadOrangModel();
@@ -103,7 +105,12 @@ class LpaBuilder
         $where = $this->request->getJsonVar('where');
 
         $builder = $this->sjQuery();
-        $builder->where('site', $this->identity->KdSite());
+
+        $privilege = $this->privHelp->module_priv_oa2("she_investigation");
+
+        if ($privilege->Allsite_priv == 'N') {
+            $builder->where('site', $this->identity->KdSite());
+        }
 
         if (ENVIRONMENT == "production") {
             $builder->where('is_testing IS NULL');
