@@ -107,8 +107,15 @@ class LpaBuilder
         $builder = $this->sjQuery();
 
         $privilege = $this->privHelp->module_priv_oa2("she_investigation");
-
-        if ($privilege->Allsite_priv == 'N') {
+        $select_all_site = false;
+        if ($privilege) {
+            if (isset($privilege->Allsite_priv)) {
+                if ($privilege->Allsite_priv == 'Y') {
+                    $select_all_site = true;
+                }
+            }
+        }
+        if ($select_all_site == false) {
             $builder->where('site', $this->identity->KdSite());
         }
 
