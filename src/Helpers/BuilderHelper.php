@@ -1357,4 +1357,17 @@ class BuilderHelper
 
         return $builder;
     }
+
+    public function is_testing($db_conn, $tb, $builder)
+    {
+        if ($db_conn->fieldExists('is_testing', $tb)) {
+            if (ENVIRONMENT == "production") {
+                $builder->where('is_testing IS NULL');
+            }else{
+                $builder->where('is_testing', 1);
+            }
+        }
+
+        return $builder;
+    }
 }
