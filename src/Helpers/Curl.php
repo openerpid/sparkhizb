@@ -15,9 +15,9 @@ class Curl
 {
     public function __construct()
     {
-        if (getenv("CI_DORBITT")=="development") {
+        if (getenv("CI_OPENAPI2")=="development") {
             $this->url = "http://localhost:8080/v1/";
-        }elseif (getenv("CI_DORBITT")=="testing") {
+        }elseif (getenv("CI_OPENAPI2")=="testing") {
             $this->url = "https://testing.openapi2.com/v1/";
         }else{
             $this->url = "https://openapi2.com/v1/";
