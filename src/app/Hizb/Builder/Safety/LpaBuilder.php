@@ -92,11 +92,17 @@ class LpaBuilder
             // // ->whereIn('a.is_release', $release2)
             ->where('a.deleted_at IS NULL');
 
-        $newQuery = $this->iescm->newQuery()->fromSubquery($sjQuery, 't');
-        $filterID = $this->bHelp->filterID($newQuery);
-        $filter = $this->bHelp->filter($filterID);
+        // $newQuery = $this->iescm->newQuery()->fromSubquery($sjQuery, 't');
+        // $filterID = $this->bHelp->filterID($newQuery);
+        // $filter = $this->bHelp->filter($filterID);
 
-        return $builder = $filter;
+        // return $builder = $filter;
+        $newQuery = $this->iescm->newQuery()->fromSubquery($subquery, 't');
+        $newQuery = $this->bHelp->is_testing($this->iescm, $table, $newQuery);
+        $newQuery = $this->bHelp->filterID($newQuery);
+        $newQuery = $this->bHelp->filter($newQuery);
+
+        return $newQuery;
     }
 
     public function show($id = null)

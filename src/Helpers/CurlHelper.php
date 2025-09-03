@@ -18,9 +18,9 @@ class CurlHelper
         if (getenv("CI_DORBITT")=="development") {
             $this->url = "http://localhost:8080/v1/";
         }elseif (getenv("CI_DORBITT")=="testing") {
-            $this->url = "http://testing-api.dorbitt.com/v1/";
+            $this->url = "https://testing.openapi2.com/v1/";
         }else{
-            $this->url = "https://api.dorbitt.com/v1/";
+            $this->url = "https://openapi2.com/v1/";
         }
 
         if (getenv("DORBITT_TOKEN")) {
