@@ -293,7 +293,7 @@ class LpaBuilder
 
     public function insert($payload)
     {
-        $payload = $this->bHelp->payloadInsert($payload);
+        $payload = $this->bHelp->payloadInsert($this->iescm, $this->model->table, $payload);
         $builder = $this->model->insert($payload);
 
         return $builder;
