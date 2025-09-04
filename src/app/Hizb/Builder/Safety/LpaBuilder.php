@@ -68,7 +68,7 @@ class LpaBuilder
         $selects = $this->model->selects;
         $allowedFields = $this->model->allowedFields;
 
-        $sjQuery = $this->iescm->table($database . '.' . $table . ' a')
+        $subquery = $this->iescm->table($database . '.' . $table . ' a')
             ->select($selects)
             ->join($database . '.' . $tbUser . ' b', 'b.account_id = a.created_by', 'left')
             ->join($database . '.' . $tbAppv . ' c', 'c.lpa_id = a.id', 'left')
