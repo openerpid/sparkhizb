@@ -68,6 +68,122 @@ class BuilderHelper
         $this->condt      = $this->request->getJsonVar('conditions');
     }
 
+    public function is_testing($db_conn, $tb, $builder)
+    {
+        $isTesting_active = $this->request->getJsonVar("isTesting_active");
+
+        if ($isTesting_active != "N") {
+            if ($db_conn->fieldExists('is_testing', $tb)) {
+                if (ENVIRONMENT == "production") {
+                    $builder->where('is_testing IS NULL');
+                }else{
+                    $builder->where('is_testing', 1);
+                }
+            }
+        }
+
+        return $builder;
+    }
+
+    public function isTesting($db_conn, $tb, $builder)
+    {
+        $isTesting_active = $this->request->getJsonVar("isTesting_active");
+
+        if ($isTesting_active != "N") {
+            if ($db_conn->fieldExists('is_testing', $tb)) {
+                if (ENVIRONMENT == "production") {
+                    $builder->where('is_testing IS NULL');
+                }else{
+                    $builder->where('is_testing', 1);
+                }
+            }
+        }
+
+        return $builder;
+    }
+
+    public function anyWhere($builder)
+    {
+        $anywhere = $this->request->getJsonVar('anywhere');
+
+        if ($anywhere) {
+            if (is_array($anywhere)) {
+                foreach ($anywhere as $key => $value) {
+                    if ($value->anywhere == true) {
+                        if (is_array($value->column)) {
+                            $builder->whereIn($value->column,$value->value);                            
+                        }else{
+                            if (isset($value->copr)) {
+                                // $builder->where('id BETWEEN 1 AND 5');
+                                // $builder->where("created_at BETWEEN '2024-10-01 00:00:00' AND '2024-11-01 00:00:00'");
+                                if ($value->copr == "BETWEEN") {
+                                    if (isset($value->type)) {
+                                        if ($value->type == "date") {
+                                            $from = $this->gHelp->dtfFormatter($value->value[0]);
+                                            $to = $this->gHelp->dtfFormatter($value->value[1]);
+                                            $builder->where($value->column." BETWEEN '".$from."' AND '".$to."' ");
+                                        }
+                                    }else{
+                                        // $builder->where($value->column." BETWEEN ".$value->value." ");
+                                        $builder->where($value->column." BETWEEN ".$value->value[0]." AND ".$value->value[1]);
+                                    }
+                                }elseif($value->copr == "IN") {
+                                    $builder->where($value->column." IN (".implode(",",$value->value).")");
+                                } else{
+                                    $builder->where($value->column." ".$value->copr." ",$value->value);
+                                }
+                            }else{
+                                if (isset($value->is_null)) {
+                                    if ($value->is_null == true) {
+                                        $builder->where($value->column . " IS NULL ");
+                                    }
+
+                                    if (isset($value->value)) {
+                                        $builder->orWhere($value->column,$value->value);
+                                    }
+                                }else{
+                                    $builder->where($value->column,$value->value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else{
+                if ($anywhere->anywhere == true) {
+                    $builder->whereIn($anywhere->column, $anywhere->value);
+                }
+            }
+        }
+
+        return $builder;
+    }
+
+    public function doSearch($search_params, $builder)
+    {
+        $search = $this->request->getJsonVar('search');
+        if (!$search) {
+            $search = $this->request->getVar('search');
+        }
+
+        if ($search AND $search_params) {
+            // if ($search_params) {
+            $builder->groupStart();
+                $builder->like($search_params[0], $search);
+                if (count($search_params) > 1) {
+                    foreach ($search_params as $key => $value) {
+                        if ($key != 0) {
+                            $builder->orLike($value, $search);
+                        }
+                    }
+                }
+            $builder->groupEnd();
+            // }
+        }
+
+        return $builder;
+    }
+
     public function conditions($params)
     {
         $builder        = $params['builder'];
@@ -128,68 +244,8 @@ class BuilderHelper
                 }
             }
 
-            if ($this->search AND $search_params) {
-                // if ($search_params) {
-                    $builder->groupStart();
-                        $builder->like($search_params[0],$this->search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$this->search);
-                                }
-                            }
-                        }
-                    $builder->groupEnd();
-                // }
-            }
-
-            if ($this->anywhere) {
-                if (is_array($this->anywhere)) {
-                    foreach ($this->anywhere as $key => $value) {
-                        if ($value->anywhere == true) {
-                            if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
-                                if (isset($value->copr)) {
-                                    // $builder->where('id BETWEEN 1 AND 5');
-                                    // $builder->where("created_at BETWEEN '2024-10-01 00:00:00' AND '2024-11-01 00:00:00'");
-                                    if ($value->copr == "BETWEEN") {
-                                        if (isset($value->type)) {
-                                            if ($value->type == "date") {
-                                                $from = $this->gHelp->dtfFormatter($value->value[0]);
-                                                $to = $this->gHelp->dtfFormatter($value->value[1]);
-                                                $builder->where($value->column." BETWEEN '".$from."' AND '".$to."' ");
-                                            }
-                                        }else{
-                                            // $builder->where($value->column." BETWEEN ".$value->value." ");
-                                            $builder->where($value->column." BETWEEN ".$value->value[0]." AND ".$value->value[1]);
-                                        }
-                                    }else{
-                                        $builder->where($value->column." ".$value->copr." ",$value->value);
-                                    }
-                                }else{
-                                    if (isset($value->is_null)) {
-                                        if ($value->is_null == true) {
-                                            $builder->where($value->column . " IS NULL ");
-                                        }
-
-                                        if (isset($value->value)) {
-                                            $builder->orWhere($value->column,$value->value);
-                                        }
-                                    }else{
-                                        $builder->where($value->column,$value->value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else{
-                    if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
-                    }
-                }
-            }
+            $builder = $this->doSearch($search_params, $builder);
+            $builder = $this->anyWhere($builder);
 
             if ($this->from_date) {
                 $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->from_date));
@@ -1353,19 +1409,6 @@ class BuilderHelper
 
         if ($db_conn->fieldExists('deleted_at', $tb)) {
             $builder->where('deleted_at IS NULL');
-        }
-
-        return $builder;
-    }
-
-    public function is_testing($db_conn, $tb, $builder)
-    {
-        if ($db_conn->fieldExists('is_testing', $tb)) {
-            if (ENVIRONMENT == "production") {
-                $builder->where('is_testing IS NULL');
-            }else{
-                $builder->where('is_testing', 1);
-            }
         }
 
         return $builder;

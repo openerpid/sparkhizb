@@ -108,4 +108,47 @@ class RequestHelper
             return false;
         }
     }
+
+    public function payloadStd()
+    {
+        $ids = $this->request->getJsonVar("ids");
+
+        $limit = $this->request->getJsonVar("limit");
+        if (!$limit) {
+            $limit = 10;
+        }
+
+        $offset = $this->request->getJsonVar("offset");
+        if (!$offset) {
+            $offset = 0;
+        }
+
+        $sort = $this->request->getJsonVar("sort");
+        if (!$sort) {
+            $sort = "id";
+        }
+
+        $order = $this->request->getJsonVar("order");
+        if (!$order) {
+            $order = "desc";
+        }
+
+        $search = $this->request->getJsonVar("search");
+        $selects = $this->request->getJsonVar("selects");
+        
+        $payload = [
+            "ids" => $ids,
+            "limit" => $limit,
+            "offset" => $offset,
+            "sort" => $sort,
+            "order" => $order,
+            "search" => $search,
+            "filter" => $this->request->getJsonVar("filter"),
+            "filter_type" => $this->request->getJsonVar("filter_type"),
+            "anywhere" => $this->request->getJsonVar("anywhere"),
+            "selects" => $selects
+        ];
+
+        return $payload;
+    }
 }

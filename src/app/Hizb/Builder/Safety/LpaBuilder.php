@@ -72,33 +72,10 @@ class LpaBuilder
             ->select($selects)
             ->join($database . '.' . $tbUser . ' b', 'b.account_id = a.created_by', 'left')
             ->join($database . '.' . $tbAppv . ' c', 'c.lpa_id = a.id', 'left')
-
-            // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' b', 'b.id = a.created_by', 'left')
-            // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' c', 'c.id = b.identity_id', 'left')
-
-            // ->join($this->mEmpl->database . '.' . $this->mEmpl->table . ' j', 'j.identity_id = c.id', 'left')
-            // ->join('Sparkhizb_she.lokasi_temuan d', 'd.id = a.lokasi_temuan_id', 'left')
-            // ->join('Sparkhizb_she.jenis_bahaya e', 'e.id = a.jenis_temuan_id', 'left')
-            // ->join('Sparkhizb_she.kode_bahaya f', 'f.id = a.kode_bahaya_id', 'left')
-            // ->join('Sparkhizb.document_kode g', 'g.document_id = 5', 'left')
-            // ->join('Sparkhizb_gallery.photos h', 'h.id = a.foto_temuan_id', 'left')
-            // ->join('Sparkhizb_gallery.photos i', 'i.id = a.foto_perbaikan_id', 'left')
-
-            // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' ll', 'll.id = a.approved_by', 'left')
-            // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' l', 'l.id = ll.identity_id', 'left')
-
-            // ->join($this->mAcnt->database . '.' . $this->mAcnt->table . ' kk', 'kk.id = a.rejected_by', 'left')
-            // ->join($this->mIdnt->database . '.' . $this->mIdnt->table . ' k', 'k.id = kk.identity_id', 'left')
-            // // ->whereIn('a.is_release', $release2)
             ->where('a.deleted_at IS NULL');
 
-        // $newQuery = $this->iescm->newQuery()->fromSubquery($sjQuery, 't');
-        // $filterID = $this->bHelp->filterID($newQuery);
-        // $filter = $this->bHelp->filter($filterID);
-
-        // return $builder = $filter;
         $newQuery = $this->iescm->newQuery()->fromSubquery($subquery, 't');
-        $newQuery = $this->bHelp->is_testing($this->iescm, $table, $newQuery);
+        $newQuery = $this->bHelp->isTesting($this->iescm, $table, $newQuery);
         $newQuery = $this->bHelp->filterID($newQuery);
         $newQuery = $this->bHelp->filter($newQuery);
 
@@ -123,12 +100,6 @@ class LpaBuilder
         }
         if ($select_all_site == false) {
             $builder->where('site', $this->identity->KdSite());
-        }
-
-        if (ENVIRONMENT == "production") {
-            $builder->where('is_testing IS NULL');
-        }else{
-            $builder->where('is_testing', 1);
         }
 
         $params = [
