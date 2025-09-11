@@ -50,7 +50,7 @@ class RequestHelper
 
         if ($getJsonVar == null) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
@@ -60,7 +60,7 @@ class RequestHelper
         $ssl_option = $this->request->header("Ssl-Option");
         if ($ssl_option) {
             $ssl_option = $ssl_option->getValue();
-        }else{
+        } else {
             $ssl_option = null;
         }
 
@@ -72,7 +72,7 @@ class RequestHelper
         $header = $this->request->getServer('HTTP_AUTHORIZATION');
         if (!$header) {
             $token = null;
-        }else{
+        } else {
             $token = explode(' ', $header)[1];
         }
 
@@ -86,9 +86,9 @@ class RequestHelper
 
         if ($a == 'XMLHttpRequest') {
             return true;
-        }else{
+        } else {
             return false;
-        }        
+        }
     }
 
     public function isAjax_datatables()
@@ -98,13 +98,13 @@ class RequestHelper
             if ($a) {
                 $a = $a->getValue();
             }
-            
+
             if ($a == 'datatables') {
                 return true;
-            }else{
+            } else {
                 return false;
-            }        
-        }else{
+            }
+        } else {
             return false;
         }
     }
@@ -133,9 +133,16 @@ class RequestHelper
             $order = "desc";
         }
 
+        $release = $this->request->getJsonVar("release");
+        $nomor_dokumen = $this->request->getJsonVar("nomor_dokumen");
+
         $search = $this->request->getJsonVar("search");
+        $filter = $this->request->getJsonVar("filter");
+        $filter_type = $this->request->getJsonVar("filter_type");
+        $anywhere = $this->request->getJsonVar("anywhere");
+        $isTesting_active = $this->request->getJsonVar("isTesting_active");
         $selects = $this->request->getJsonVar("selects");
-        
+
         $payload = [
             "ids" => $ids,
             "limit" => $limit,
@@ -143,9 +150,10 @@ class RequestHelper
             "sort" => $sort,
             "order" => $order,
             "search" => $search,
-            "filter" => $this->request->getJsonVar("filter"),
-            "filter_type" => $this->request->getJsonVar("filter_type"),
-            "anywhere" => $this->request->getJsonVar("anywhere"),
+            "filter" => $filter,
+            "filter_type" => $filter_type,
+            "anywhere" => $anywhere,
+            "isTesting_active" => $isTesting_active,
             "selects" => $selects
         ];
 

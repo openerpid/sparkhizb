@@ -35,15 +35,14 @@ class UmmuHazardReport
             $show = "show";
         }
 
-        $response = $this->curli->request4(
-            [
-                "path"           => $this->path . $show,
-                "method"         => "GET",
-                "payload"        => $params['payload'],
-                "module_code"    => $this->kode,
-                "token"          => $params['token']
-            ]
-        );
+        $payload = [
+            "path"           => $this->path . $show,
+            "method"         => "GET",
+            "payload"        => $params['payload'],
+            "module_code"    => $this->kode,
+            "token"          => $params['token']
+        ];
+        $response = $this->curli->request4($payload);
 
         return json_decode($response, false);
     }

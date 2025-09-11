@@ -3,13 +3,13 @@
 namespace Sparkhizb\Helpers;
 
 /**
-* =============================================
-* Author: Ummu
-* Website: https://ummukhairiyahyusna.com/
-* App: Sparkhizb LIB
-* Description: 
-* =============================================
-*/
+ * =============================================
+ * Author: Ummu
+ * Website: https://ummukhairiyahyusna.com/
+ * App: Sparkhizb LIB
+ * Description: 
+ * =============================================
+ */
 
 use Sparkhizb\Helpers\GlobalHelper;
 use Sparkhizb\Helpers\IdentityHelper;
@@ -28,10 +28,10 @@ class BuilderHelper
 
         /**
          * Vars*/
-        $this->limit      = $this->request->getJsonVar('limit');
-        $this->offset     = $this->request->getJsonVar('offset');
+        $this->limit = $this->request->getJsonVar('limit');
+        $this->offset = $this->request->getJsonVar('offset');
 
-        $this->sort       = $this->request->getJsonVar('sort');
+        $this->sort = $this->request->getJsonVar('sort');
         if (!$this->sort) {
             $this->sort = $this->request->getVar('sort');
         }
@@ -45,7 +45,7 @@ class BuilderHelper
             $this->sort = null;
         }
 
-        $this->order      = $this->request->getJsonVar('order');
+        $this->order = $this->request->getJsonVar('order');
         if (!$this->order) {
             $this->order = $this->request->getVar('order');
         }
@@ -55,17 +55,17 @@ class BuilderHelper
             $this->search = $this->request->getVar('search');
         }
 
-        $this->anywhere     = $this->request->getJsonVar('anywhere');
-        $this->anydate      = $this->request->getJsonVar('anydate');
+        $this->anywhere = $this->request->getJsonVar('anywhere');
+        $this->anydate = $this->request->getJsonVar('anydate');
 
-        $this->from_date  = $this->request->getJsonVar('from_date');
-        $this->to_date    = $this->request->getJsonVar('to_date');
-        $this->date       = $this->request->getJsonVar('date');
-        $this->datetime   = $this->request->getJsonVar('datetime');
+        $this->from_date = $this->request->getJsonVar('from_date');
+        $this->to_date = $this->request->getJsonVar('to_date');
+        $this->date = $this->request->getJsonVar('date');
+        $this->datetime = $this->request->getJsonVar('datetime');
 
-        $this->selects    = $this->request->getJsonVar('selects');
-        $this->where      = $this->request->getJsonVar('where');
-        $this->condt      = $this->request->getJsonVar('conditions');
+        $this->selects = $this->request->getJsonVar('selects');
+        $this->where = $this->request->getJsonVar('where');
+        $this->condt = $this->request->getJsonVar('conditions');
     }
 
     public function is_testing($db_conn, $tb, $builder)
@@ -76,7 +76,7 @@ class BuilderHelper
             if ($db_conn->fieldExists('is_testing', $tb)) {
                 if (ENVIRONMENT == "production") {
                     $builder->where('is_testing IS NULL');
-                }else{
+                } else {
                     $builder->where('is_testing', 1);
                 }
             }
@@ -93,7 +93,7 @@ class BuilderHelper
             if ($db_conn->fieldExists('is_testing', $tb)) {
                 if (ENVIRONMENT == "production") {
                     $builder->where('is_testing IS NULL');
-                }else{
+                } else {
                     $builder->where('is_testing', 1);
                 }
             }
@@ -108,48 +108,47 @@ class BuilderHelper
 
         if ($anywhere) {
             if (is_array($anywhere)) {
-                foreach ($anywhere as $key => $value) {
-                    if ($value->anywhere == true) {
-                        if (is_array($value->column)) {
-                            $builder->whereIn($value->column,$value->value);                            
-                        }else{
-                            if (isset($value->copr)) {
+                foreach ($anywhere as $key => $v) {
+                    if ($v->anywhere == true) {
+                        if (is_array($v->column)) {
+                            $builder->whereIn($v->column, $v->value);
+                        } else {
+                            if (isset($v->copr)) {
                                 // $builder->where('id BETWEEN 1 AND 5');
                                 // $builder->where("created_at BETWEEN '2024-10-01 00:00:00' AND '2024-11-01 00:00:00'");
-                                if ($value->copr == "BETWEEN") {
+                                if ($v->copr == "BETWEEN") {
                                     if (isset($value->type)) {
-                                        if ($value->type == "date") {
-                                            $from = $this->gHelp->dtfFormatter($value->value[0]);
-                                            $to = $this->gHelp->dtfFormatter($value->value[1]);
-                                            $builder->where($value->column." BETWEEN '".$from."' AND '".$to."' ");
+                                        if ($v->type == "date") {
+                                            $from = $this->gHelp->dtfFormatter($v->value[0]);
+                                            $to = $this->gHelp->dtfFormatter($v->value[1]);
+                                            $builder->where($v->column . " BETWEEN '" . $from . "' AND '" . $to . "' ");
                                         }
-                                    }else{
+                                    } else {
                                         // $builder->where($value->column." BETWEEN ".$value->value." ");
-                                        $builder->where($value->column." BETWEEN ".$value->value[0]." AND ".$value->value[1]);
+                                        $builder->where($v->column . " BETWEEN " . $v->value[0] . " AND " . $v->value[1]);
                                     }
-                                }elseif($value->copr == "IN") {
-                                    $builder->where($value->column." IN (".implode(",",$value->value).")");
-                                } else{
-                                    $builder->where($value->column." ".$value->copr." ",$value->value);
+                                } elseif ($v->copr == "IN") {
+                                    $builder->whereIn($v->column, $v->value);
+                                } else {
+                                    $builder->where($v->column . " " . $v->copr . " ", $v->value);
                                 }
-                            }else{
-                                if (isset($value->is_null)) {
-                                    if ($value->is_null == true) {
-                                        $builder->where($value->column . " IS NULL ");
+                            } else {
+                                if (isset($v->is_null)) {
+                                    if ($v->is_null == true) {
+                                        $builder->where($v->column . " IS NULL ");
                                     }
 
-                                    if (isset($value->value)) {
-                                        $builder->orWhere($value->column,$value->value);
+                                    if (isset($v->value)) {
+                                        $builder->orWhere($v->column, $v->value);
                                     }
-                                }else{
-                                    $builder->where($value->column,$value->value);
+                                } else {
+                                    $builder->where($value->column, $v->value);
                                 }
                             }
                         }
                     }
                 }
-            }
-            else{
+            } else {
                 if ($anywhere->anywhere == true) {
                     $builder->whereIn($anywhere->column, $anywhere->value);
                 }
@@ -166,17 +165,17 @@ class BuilderHelper
             $search = $this->request->getVar('search');
         }
 
-        if ($search AND $search_params) {
+        if ($search and $search_params) {
             // if ($search_params) {
             $builder->groupStart();
-                $builder->like($search_params[0], $search);
-                if (count($search_params) > 1) {
-                    foreach ($search_params as $key => $value) {
-                        if ($key != 0) {
-                            $builder->orLike($value, $search);
-                        }
+            $builder->like($search_params[0], $search);
+            if (count($search_params) > 1) {
+                foreach ($search_params as $key => $value) {
+                    if ($key != 0) {
+                        $builder->orLike($value, $search);
                     }
                 }
+            }
             $builder->groupEnd();
             // }
         }
@@ -186,9 +185,9 @@ class BuilderHelper
 
     public function conditions($params)
     {
-        $builder        = $params['builder'];
-        $id             = $params['id'];
-        $search_params  = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if ($this->selects and $this->selects != '*') {
             $builder->select($this->selects);
@@ -231,15 +230,15 @@ class BuilderHelper
 
         if ($id) {
             if (is_array($id)) {
-                $builder->whereIn('id',$id);
-            }else{
-                $builder->where('id',$id);
+                $builder->whereIn('id', $id);
+            } else {
+                $builder->where('id', $id);
             }
-        }else{
+        } else {
             if ($this->where) {
                 foreach ($this->where as $key => $value) {
                     if ($value != "") {
-                        $builder->where($key,$value);
+                        $builder->where($key, $value);
                     }
                 }
             }
@@ -293,7 +292,7 @@ class BuilderHelper
         }
 
         if (isset($params['deleted_at'])) {
-            $builder->where('deleted_at '. $params['deleted_at']);
+            $builder->where('deleted_at ' . $params['deleted_at']);
         }
 
         return $builder;
@@ -301,9 +300,9 @@ class BuilderHelper
 
     public function conditions2($params)
     {
-        $builder        = $params['builder'];
-        $id             = $params['id'];
-        $search_params  = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if ($this->selects and $this->selects != '*') {
             $builder->select($selects);
@@ -336,7 +335,7 @@ class BuilderHelper
         }
 
         if ($id) {
-            $builder->where('id',$id);
+            $builder->where('id', $id);
         }
 
         // elseif ($this->anywhere) {
@@ -353,28 +352,27 @@ class BuilderHelper
         //         }
         //     }
         // }
-
-        else{
+        else {
             if ($this->where) {
                 foreach ($this->where as $key => $value) {
                     if ($value != "") {
-                        $builder->where($key,$value);
+                        $builder->where($key, $value);
                     }
                 }
             }
 
-            if ($this->search AND $search_params) {
+            if ($this->search and $search_params) {
                 // if ($search_params) {
-                    $builder->groupStart();
-                        $builder->like($search_params[0],$this->search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$this->search);
-                                }
-                            }
+                $builder->groupStart();
+                $builder->like($search_params[0], $this->search);
+                if (count($search_params) > 1) {
+                    foreach ($search_params as $key => $value) {
+                        if ($key != 0) {
+                            $builder->orLike($value, $this->search);
                         }
-                    $builder->groupEnd();
+                    }
+                }
+                $builder->groupEnd();
                 // }
             }
 
@@ -383,20 +381,19 @@ class BuilderHelper
                     foreach ($this->anywhere as $key => $value) {
                         if ($value->anywhere == true) {
                             if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
+                                $builder->whereIn($value->column, $value->value);
+                            } else {
                                 if (isset($value->copr)) {
-                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
-                                }else{
-                                    $builder->where($value->column,$value->value);
+                                    $builder->where($value->column . ' ' . $value->copr . ' ', $value->value);
+                                } else {
+                                    $builder->where($value->column, $value->value);
                                 }
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                        $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
             }
@@ -428,9 +425,9 @@ class BuilderHelper
 
     public function withJoin($params)
     {
-        $limit      = $this->request->getJsonVar('limit');
-        $offset     = $this->request->getJsonVar('offset');
-        $sort       = $this->request->getJsonVar('sort');
+        $limit = $this->request->getJsonVar('limit');
+        $offset = $this->request->getJsonVar('offset');
+        $sort = $this->request->getJsonVar('sort');
         $withCreatedBy = $this->request->getJsonVar('created_by');
 
         if (strpos($sort, ".")) {
@@ -440,16 +437,16 @@ class BuilderHelper
             $sort = null;
         }
 
-        $order      = $this->request->getJsonVar('order');
-        $search     = $this->request->getJsonVar('search');
+        $order = $this->request->getJsonVar('order');
+        $search = $this->request->getJsonVar('search');
 
-        $from_date  = $this->request->getJsonVar('from_date');
-        $to_date    = $this->request->getJsonVar('to_date');
-        $date       = $this->request->getJsonVar('date');
+        $from_date = $this->request->getJsonVar('from_date');
+        $to_date = $this->request->getJsonVar('to_date');
+        $date = $this->request->getJsonVar('date');
 
-        $builder            = $params['builder'];
-        $id                 = $params['id'];
-        $search_params      = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if (isset($params['company_id'])) {
             $company_id = $params['company_id'];
@@ -458,12 +455,12 @@ class BuilderHelper
             }
         }
 
-        if (isset($withCreatedBy) AND $withCreatedBy == true AND isset($params['account_id'])) {
+        if (isset($withCreatedBy) and $withCreatedBy == true and isset($params['account_id'])) {
             $builder->where('a.created_by', $params['account_id']);
         }
 
         if ($id) {
-            $builder->where('a.id',$id);
+            $builder->where('a.id', $id);
         }
 
         // elseif ($this->anywhere) {
@@ -480,19 +477,18 @@ class BuilderHelper
         //         }
         //     }
         // }
-
-        else{
+        else {
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
-                        $builder->like($search_params[0],$search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$search);
-                                }
+                    $builder->like($search_params[0], $search);
+                    if (count($search_params) > 1) {
+                        foreach ($search_params as $key => $value) {
+                            if ($key != 0) {
+                                $builder->orLike($value, $search);
                             }
                         }
+                    }
                     $builder->groupEnd();
                 }
             }
@@ -502,20 +498,19 @@ class BuilderHelper
                     foreach ($this->anywhere as $key => $value) {
                         if ($value->anywhere == true) {
                             if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
+                                $builder->whereIn($value->column, $value->value);
+                            } else {
                                 if (isset($value->copr)) {
-                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
-                                }else{
-                                    $builder->where($value->column,$value->value);
+                                    $builder->where($value->column . ' ' . $value->copr . ' ', $value->value);
+                                } else {
+                                    $builder->where($value->column, $value->value);
                                 }
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                        $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
             }
@@ -538,7 +533,7 @@ class BuilderHelper
                 }
             }
         }
-        
+
         $builder->where('a.deleted_at', null);
 
         return $builder;
@@ -547,35 +542,35 @@ class BuilderHelper
     public function conditions0($params)
     {
         if ($this->UmHelp->is_jsonVar() == true) {
-            $limit      = $this->request->getJsonVar('limit');
-            $offset     = $this->request->getJsonVar('offset');
-            $sort       = $this->request->getJsonVar('sort');
+            $limit = $this->request->getJsonVar('limit');
+            $offset = $this->request->getJsonVar('offset');
+            $sort = $this->request->getJsonVar('sort');
 
-            $order      = $this->request->getJsonVar('order');
-            $search     = $this->request->getJsonVar('search');
+            $order = $this->request->getJsonVar('order');
+            $search = $this->request->getJsonVar('search');
 
-            $date       = $this->request->getJsonVar('date');
+            $date = $this->request->getJsonVar('date');
 
-            $where      = $this->request->getJsonVar('where');
-            $selects    = $this->request->getJsonVar('selects');
-        }else{
-            $limit      = $this->request->getVar('limit');
-            $offset     = $this->request->getVar('offset');
-            $sort       = $this->request->getVar('sort');
+            $where = $this->request->getJsonVar('where');
+            $selects = $this->request->getJsonVar('selects');
+        } else {
+            $limit = $this->request->getVar('limit');
+            $offset = $this->request->getVar('offset');
+            $sort = $this->request->getVar('sort');
 
-            $order      = $this->request->getVar('order');
-            $search     = $this->request->getVar('search');
+            $order = $this->request->getVar('order');
+            $search = $this->request->getVar('search');
 
-            $date       = $this->request->getVar('date');
+            $date = $this->request->getVar('date');
 
-            $where      = $this->request->getVar('where');
-            $selects    = $this->request->getVar('selects');
+            $where = $this->request->getVar('where');
+            $selects = $this->request->getVar('selects');
         }
 
 
-        $builder        = $params['builder'];
-        $id             = $params['id'];
-        $search_params  = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if ($selects) {
             $builder->select($selects);
@@ -589,7 +584,7 @@ class BuilderHelper
         }
 
         if ($id) {
-            $builder->where('id',$id);
+            $builder->where('id', $id);
         }
 
         // elseif ($this->anywhere) {
@@ -606,12 +601,11 @@ class BuilderHelper
         //         }
         //     }
         // }
-
-        else{
+        else {
             if ($where) {
                 foreach ($where as $key => $value) {
                     if ($value != "") {
-                        $builder->where($key,$value);
+                        $builder->where($key, $value);
                     }
                 }
             }
@@ -619,14 +613,14 @@ class BuilderHelper
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
-                        $builder->like($search_params[0],$search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$search);
-                                }
+                    $builder->like($search_params[0], $search);
+                    if (count($search_params) > 1) {
+                        foreach ($search_params as $key => $value) {
+                            if ($key != 0) {
+                                $builder->orLike($value, $search);
                             }
                         }
+                    }
                     $builder->groupEnd();
                 }
             }
@@ -636,20 +630,19 @@ class BuilderHelper
                     foreach ($this->anywhere as $key => $value) {
                         if ($value->anywhere == true) {
                             if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
+                                $builder->whereIn($value->column, $value->value);
+                            } else {
                                 if (isset($value->copr)) {
-                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
-                                }else{
-                                    $builder->where($value->column,$value->value);
+                                    $builder->where($value->column . ' ' . $value->copr . ' ', $value->value);
+                                } else {
+                                    $builder->where($value->column, $value->value);
                                 }
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                        $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
             }
@@ -671,19 +664,19 @@ class BuilderHelper
     public function withJoin0($params)
     {
         if ($this->UmHelp->is_jsonVar() == true) {
-            $limit      = $this->request->getJsonVar('limit');
-            $offset     = $this->request->getJsonVar('offset');
-            $sort       = $this->request->getJsonVar('sort');
-            $order      = $this->request->getJsonVar('order');
-            $search     = $this->request->getJsonVar('search');
-            $date       = $this->request->getJsonVar('date');
-        }else{
-            $limit      = $this->request->getVar('limit');
-            $offset     = $this->request->getVar('offset');
-            $sort       = $this->request->getVar('sort');
-            $order      = $this->request->getVar('order');
-            $search     = $this->request->getVar('search');
-            $date       = $this->request->getVar('date');
+            $limit = $this->request->getJsonVar('limit');
+            $offset = $this->request->getJsonVar('offset');
+            $sort = $this->request->getJsonVar('sort');
+            $order = $this->request->getJsonVar('order');
+            $search = $this->request->getJsonVar('search');
+            $date = $this->request->getJsonVar('date');
+        } else {
+            $limit = $this->request->getVar('limit');
+            $offset = $this->request->getVar('offset');
+            $sort = $this->request->getVar('sort');
+            $order = $this->request->getVar('order');
+            $search = $this->request->getVar('search');
+            $date = $this->request->getVar('date');
         }
 
         if (strpos($sort, ".")) {
@@ -691,9 +684,9 @@ class BuilderHelper
         }
 
 
-        $builder            = $params['builder'];
-        $id                 = $params['id'];
-        $search_params      = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if (isset($params['company_id'])) {
             $company_id = $params['company_id'];
@@ -703,7 +696,7 @@ class BuilderHelper
         }
 
         if ($id) {
-            $builder->where('a.id',$id);
+            $builder->where('a.id', $id);
         }
 
         // elseif ($this->anywhere) {
@@ -720,19 +713,18 @@ class BuilderHelper
         //         }
         //     }
         // }
-
-        else{
+        else {
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
-                        $builder->like($search_params[0],$search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$search);
-                                }
+                    $builder->like($search_params[0], $search);
+                    if (count($search_params) > 1) {
+                        foreach ($search_params as $key => $value) {
+                            if ($key != 0) {
+                                $builder->orLike($value, $search);
                             }
                         }
+                    }
                     $builder->groupEnd();
                 }
             }
@@ -742,20 +734,19 @@ class BuilderHelper
                     foreach ($this->anywhere as $key => $value) {
                         if ($value->anywhere == true) {
                             if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
+                                $builder->whereIn($value->column, $value->value);
+                            } else {
                                 if (isset($value->copr)) {
-                                    $builder->where($value->column.' '.$value->copr.' ',$value->value);
-                                }else{
-                                    $builder->where($value->column,$value->value);
+                                    $builder->where($value->column . ' ' . $value->copr . ' ', $value->value);
+                                } else {
+                                    $builder->where($value->column, $value->value);
                                 }
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                        $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
             }
@@ -778,7 +769,7 @@ class BuilderHelper
                 }
             }
         }
-        
+
         return $builder;
     }
 
@@ -793,30 +784,30 @@ class BuilderHelper
     public function conditions_hill($params)
     {
         if ($this->UmHelp->is_jsonVar() == true) {
-            $limit      = $this->request->getJsonVar('limit');
-            $offset     = $this->request->getJsonVar('offset');
-            $sort       = $this->request->getJsonVar('sort');
+            $limit = $this->request->getJsonVar('limit');
+            $offset = $this->request->getJsonVar('offset');
+            $sort = $this->request->getJsonVar('sort');
 
-            $order      = $this->request->getJsonVar('order');
-            $search     = $this->request->getJsonVar('search');
+            $order = $this->request->getJsonVar('order');
+            $search = $this->request->getJsonVar('search');
 
-            $date       = $this->request->getJsonVar('date');
-            $where      = $this->request->getJsonVar('where');
-        }else{
-            $limit      = $this->request->getVar('limit');
-            $offset     = $this->request->getVar('offset');
-            $sort       = $this->request->getVar('sort');
+            $date = $this->request->getJsonVar('date');
+            $where = $this->request->getJsonVar('where');
+        } else {
+            $limit = $this->request->getVar('limit');
+            $offset = $this->request->getVar('offset');
+            $sort = $this->request->getVar('sort');
 
-            $order      = $this->request->getVar('order');
-            $search     = $this->request->getVar('search');
+            $order = $this->request->getVar('order');
+            $search = $this->request->getVar('search');
 
-            $date       = $this->request->getVar('date');
-            $where      = $this->request->getVar('where');
+            $date = $this->request->getVar('date');
+            $where = $this->request->getVar('where');
         }
 
-        $builder        = $params['builder'];
-        $id             = $params['id'];
-        $search_params  = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if (isset($params['company_id'])) {
             $company_id = $params['company_id'];
@@ -827,21 +818,21 @@ class BuilderHelper
 
         if ($id) {
 
-            $builder->where('id',$id);
+            $builder->where('id', $id);
 
-        }else{
+        } else {
 
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
-                        $builder->like($search_params[0],$search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$search);
-                                }
+                    $builder->like($search_params[0], $search);
+                    if (count($search_params) > 1) {
+                        foreach ($search_params as $key => $value) {
+                            if ($key != 0) {
+                                $builder->orLike($value, $search);
                             }
                         }
+                    }
                     $builder->groupEnd();
                 }
             }
@@ -862,21 +853,21 @@ class BuilderHelper
 
     public function withJoin_hill($params)
     {
-        $limit      = $this->request->getJsonVar('limit');
-        $offset     = $this->request->getJsonVar('offset');
-        $sort       = $this->request->getJsonVar('sort');
+        $limit = $this->request->getJsonVar('limit');
+        $offset = $this->request->getJsonVar('offset');
+        $sort = $this->request->getJsonVar('sort');
 
         if (strpos($sort, ".")) {
             $sort = null;
         }
 
-        $order      = $this->request->getJsonVar('order');
-        $search     = $this->request->getJsonVar('search');
-        $date       = $this->request->getJsonVar('date');
+        $order = $this->request->getJsonVar('order');
+        $search = $this->request->getJsonVar('search');
+        $date = $this->request->getJsonVar('date');
 
-        $builder            = $params['builder'];
-        $id                 = $params['id'];
-        $search_params      = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if (isset($params['company_id'])) {
             $company_id = $params['company_id'];
@@ -887,21 +878,21 @@ class BuilderHelper
 
         if ($id) {
 
-            $builder->where('a.id',$id);
+            $builder->where('a.id', $id);
 
-        }else{
+        } else {
 
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
-                        $builder->like($search_params[0],$search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$search);
-                                }
+                    $builder->like($search_params[0], $search);
+                    if (count($search_params) > 1) {
+                        foreach ($search_params as $key => $value) {
+                            if ($key != 0) {
+                                $builder->orLike($value, $search);
                             }
                         }
+                    }
                     $builder->groupEnd();
                 }
             }
@@ -924,7 +915,7 @@ class BuilderHelper
                 }
             }
         }
-        
+
         return $builder;
     }
     /**
@@ -936,24 +927,24 @@ class BuilderHelper
 
     public function dt_conditions($params)
     {
-        $length      = $this->request->getJsonVar('length');
-        $limit      = $this->request->getJsonVar('limit');
-        $offset     = $this->request->getJsonVar('offset');
-        $sort       = $this->request->getJsonVar('sort');
-        $order      = $this->request->getJsonVar('order');
-        $search     = $this->request->getJsonVar('search');
+        $length = $this->request->getJsonVar('length');
+        $limit = $this->request->getJsonVar('limit');
+        $offset = $this->request->getJsonVar('offset');
+        $sort = $this->request->getJsonVar('sort');
+        $order = $this->request->getJsonVar('order');
+        $search = $this->request->getJsonVar('search');
 
         if (isset($search['value'])) {
             $search = $search['value'];
-        }else{
+        } else {
             $search = "";
         }
 
-        $date       = $this->request->getJsonVar('date');
+        $date = $this->request->getJsonVar('date');
 
-        $builder        = $params['builder'];
-        $id             = $params['id'];
-        $search_params  = $params['search_params'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
 
         if (isset($params['company_id'])) {
             $company_id = $params['company_id'];
@@ -963,7 +954,7 @@ class BuilderHelper
         }
 
         if ($id) {
-            $builder->where('id',$id);
+            $builder->where('id', $id);
         }
 
         // elseif ($this->anywhere) {
@@ -980,27 +971,26 @@ class BuilderHelper
         //         }
         //     }
         // }
-
-        else{
+        else {
             if ($this->where) {
                 foreach ($this->where as $key => $value) {
                     if ($value != "") {
-                        $builder->where($key,$value);
+                        $builder->where($key, $value);
                     }
                 }
             }
-            
+
             if ($search) {
                 if ($search_params) {
                     $builder->groupStart();
-                        $builder->like($search_params[0],$search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$search);
-                                }
+                    $builder->like($search_params[0], $search);
+                    if (count($search_params) > 1) {
+                        foreach ($search_params as $key => $value) {
+                            if ($key != 0) {
+                                $builder->orLike($value, $search);
                             }
                         }
+                    }
                     $builder->groupEnd();
                 }
             }
@@ -1010,20 +1000,19 @@ class BuilderHelper
                     foreach ($this->anywhere as $key => $value) {
                         if ($value->anywhere == true) {
                             if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
+                                $builder->whereIn($value->column, $value->value);
+                            } else {
                                 if (isset($value->copr)) {
-                                    $builder->where($value->column." ".$value->copr." ",$value->value);
-                                }else{
-                                    $builder->where($value->column,$value->value);
+                                    $builder->where($value->column . " " . $value->copr . " ", $value->value);
+                                } else {
+                                    $builder->where($value->column, $value->value);
                                 }
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                        $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
             }
@@ -1051,18 +1040,18 @@ class BuilderHelper
     {
         $where = $this->request->getJsonVar('where');
 
-        $builder        = $params['builder'];
+        $builder = $params['builder'];
 
-        $company_id     = $params['company_id'];
-        $created_by     = $params['created_by'];
-        $deleted_by      = $params['deleted_by'];
+        $company_id = $params['company_id'];
+        $created_by = $params['created_by'];
+        $deleted_by = $params['deleted_by'];
 
         if ($deleted_by == true) {
             $payload = [
                 "deleted_at" => date('Y-m-d H:i:s'),
                 "deleted_by" => $this->identity->account_id()
             ];
-        }else{
+        } else {
             $payload = [
                 "deleted_at" => date('Y-m-d H:i:s')
             ];
@@ -1074,7 +1063,7 @@ class BuilderHelper
             if ($value) {
                 if (is_array($value)) {
                     $builder->whereIn($key, $value);
-                }else{
+                } else {
                     $builder->where($key, $value);
                 }
             }
@@ -1089,7 +1078,7 @@ class BuilderHelper
         }
 
         $builder->update();
-        
+
         return $builder;
     }
 
@@ -1112,12 +1101,12 @@ class BuilderHelper
 
         if (is_array($id)) {
             $builder = $builder->whereIn('id', $id);
-        }else{
+        } else {
             $builder = $builder->where('id', $id);
         }
 
         return $builder->set($payload)
-        ->update();
+            ->update();
     }
 
     public function delete2($id, $builder)
@@ -1129,12 +1118,12 @@ class BuilderHelper
 
         if (is_array($id)) {
             $builder = $builder->whereIn('id', $id);
-        }else{
+        } else {
             $builder = $builder->where('id', $id);
         }
 
         return $builder->set($payload)
-        ->update();
+            ->update();
     }
 
 
@@ -1178,7 +1167,7 @@ class BuilderHelper
                 if ($key != "undefined") {
                     if ($filter_type == "like") {
                         $builder->like($key, $value);
-                    }else{
+                    } else {
                         $builder->where($key, $value);
                     }
                 }
@@ -1199,7 +1188,7 @@ class BuilderHelper
                 if ($key != "undefined") {
                     if ($filter_type == "like") {
                         $builder->like($key, $value);
-                    }else{
+                    } else {
                         $builder->where($key, $value);
                     }
                 }
@@ -1224,7 +1213,7 @@ class BuilderHelper
                 $payload["is_testing"] = 1;
             }
         }
-        
+
         return $payload;
     }
 
@@ -1233,17 +1222,17 @@ class BuilderHelper
         if ($db_conn->fieldExists('updated_by', $tb)) {
             $payload["updated_by"] = $this->identity->account_id();
         }
-        
+
         return $payload;
     }
 
     public function conditions_with_dbconn($params)
     {
-        $builder        = $params['builder'];
-        $id             = $params['id'];
-        $search_params  = $params['search_params'];
-        $db_conn        = $params['db_conn'];
-        $tb             = $params['tb'];
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
+        $db_conn = $params['db_conn'];
+        $tb = $params['tb'];
 
         if ($this->selects and $this->selects != '*') {
             $builder->select($this->selects);
@@ -1286,31 +1275,31 @@ class BuilderHelper
 
         if ($id) {
             if (is_array($id)) {
-                $builder->whereIn('id',$id);
-            }else{
-                $builder->where('id',$id);
+                $builder->whereIn('id', $id);
+            } else {
+                $builder->where('id', $id);
             }
-        }else{
+        } else {
             if ($this->where) {
                 foreach ($this->where as $key => $value) {
                     if ($value != "") {
-                        $builder->where($key,$value);
+                        $builder->where($key, $value);
                     }
                 }
             }
 
-            if ($this->search AND $search_params) {
+            if ($this->search and $search_params) {
                 // if ($search_params) {
-                    $builder->groupStart();
-                        $builder->like($search_params[0],$this->search);
-                        if (count($search_params) > 1) {
-                            foreach ($search_params as $key => $value) {
-                                if ($key != 0) {
-                                    $builder->orLike($value,$this->search);
-                                }
-                            }
+                $builder->groupStart();
+                $builder->like($search_params[0], $this->search);
+                if (count($search_params) > 1) {
+                    foreach ($search_params as $key => $value) {
+                        if ($key != 0) {
+                            $builder->orLike($value, $this->search);
                         }
-                    $builder->groupEnd();
+                    }
+                }
+                $builder->groupEnd();
                 // }
             }
 
@@ -1319,8 +1308,8 @@ class BuilderHelper
                     foreach ($this->anywhere as $key => $value) {
                         if ($value->anywhere == true) {
                             if (is_array($value->column)) {
-                                $builder->whereIn($value->column,$value->value);                            
-                            }else{
+                                $builder->whereIn($value->column, $value->value);
+                            } else {
                                 if (isset($value->copr)) {
                                     // $builder->where('id BETWEEN 1 AND 5');
                                     // $builder->where("created_at BETWEEN '2024-10-01 00:00:00' AND '2024-11-01 00:00:00'");
@@ -1329,35 +1318,34 @@ class BuilderHelper
                                             if ($value->type == "date") {
                                                 $from = $this->gHelp->dtfFormatter($value->value[0]);
                                                 $to = $this->gHelp->dtfFormatter($value->value[1]);
-                                                $builder->where($value->column." BETWEEN '".$from."' AND '".$to."' ");
+                                                $builder->where($value->column . " BETWEEN '" . $from . "' AND '" . $to . "' ");
                                             }
-                                        }else{
+                                        } else {
                                             // $builder->where($value->column." BETWEEN ".$value->value." ");
-                                            $builder->where($value->column." BETWEEN ".$value->value[0]." AND ".$value->value[1]);
+                                            $builder->where($value->column . " BETWEEN " . $value->value[0] . " AND " . $value->value[1]);
                                         }
-                                    }else{
-                                        $builder->where($value->column." ".$value->copr." ",$value->value);
+                                    } else {
+                                        $builder->where($value->column . " " . $value->copr . " ", $value->value);
                                     }
-                                }else{
+                                } else {
                                     if (isset($value->is_null)) {
                                         if ($value->is_null == true) {
                                             $builder->where($value->column . " IS NULL ");
                                         }
 
                                         if (isset($value->value)) {
-                                            $builder->orWhere($value->column,$value->value);
+                                            $builder->orWhere($value->column, $value->value);
                                         }
-                                    }else{
-                                        $builder->where($value->column,$value->value);
+                                    } else {
+                                        $builder->where($value->column, $value->value);
                                     }
                                 }
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     if ($this->anywhere->anywhere == true) {
-                        $builder->whereIn($this->anywhere->column,$this->anywhere->value);
+                        $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
             }

@@ -34,7 +34,28 @@ class HazardReportSparkBuilder
 
     public function showFrom_openapi2($id = null)
     {
+        $release = $this->request->getJsonVar("release");
+        $nomor_dokumen = $this->request->getJsonVar("nomor_dokumen");
+        $nik = $this->request->getJsonVar("nik");
+
         $payload = $this->reqH->payloadStd();
+        $payload["release"] = $release;
+        $payload["nomor_dokumen"] = $nomor_dokumen;
+
+        if ($nik) {
+            $payload["nika_in"] = $nik;
+        }
+
+        // if ($nik) {
+        //     $payload["anywhere"] = [
+        //         [
+        //             "anywhere" => true,
+        //             "column" => "nikaryawan",
+        //             "copr" => "IN",
+        //             "value" => $nik
+        //         ]
+        //     ];
+        // }
 
         $params = [
             "id" => $id,
