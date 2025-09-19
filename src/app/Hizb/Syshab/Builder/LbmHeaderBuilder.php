@@ -79,6 +79,16 @@ class LbmHeaderBuilder
         return $builder;
     }
 
+    public function showBy_grNumber_and_prodcode($gr_number, $prod_code)
+    {
+        $builder = $this->qbAlya();
+
+        $builder->where('lbm_code', $gr_number)
+            ->where('prod_code', $prod_code);
+
+        return $builder;
+    }
+
     public function show2($id = null)
     {
         $po_number = $this->request->getJsonVar('po_number');

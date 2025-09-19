@@ -144,12 +144,12 @@ class PurchaseOrderBuilder
     public function show_detail($po_code)
     {
         $subquery = $this->db->table('tr_purchaseD a')
-        ->select("
+            ->select("
             a.*,
             a.Prod_code as id,
             CONCAT(a.Prod_code,' | ', a.Spec) as text,
         ")
-        ->where('a.po_code', $po_code);
+            ->where('a.po_code', $po_code);
 
         return $subquery;
     }
@@ -160,7 +160,7 @@ class PurchaseOrderBuilder
         if ($is_json == true) {
             $po_number = $this->request->getJsonVar('po_number');
             $part_number = $this->request->getJsonVar('part_number');
-        }else{
+        } else {
             $po_number = $this->request->getVar('po_number');
             $part_number = $this->request->getVar('part_number');
         }
@@ -187,6 +187,36 @@ class PurchaseOrderBuilder
         // $builder = $this->qHelp->orderBy($builder, $allowedFields);
 
         return $builder;
+    }
+
+    public function showBy_poNumber($po_number, $selects = null)
+    {
+        $builder = $this->qbAlya();
+        if ($selects) {
+            $builder->select($selects);
+        }
+        $builder->where('po_code', $po_number);
+
+        $params = [
+            "builder" => $builder,
+            "id" => null,
+            "search_params" => ["po_code"],
+            "company_id" => null
+        ];
+
+        $builder = $this->bHelp->conditions0($params);
+
+        return $builder;
+    }
+
+    public function selectDetail_by_poNumber_prodCode($po_code, $prod_code, $selects)
+    {
+        $subquery = $this->db->table('tr_purchaseD a')
+            ->select($selects)
+            ->where('a.po_code', $po_code)
+            ->where("Prod_code", $prod_code);
+
+        return $subquery;
     }
 
     public function show2($id = null)

@@ -226,4 +226,17 @@ class UmmuGoodsEvaluation
 
         return json_decode($response, false);
     }
+
+    public function exportToExcel($params)
+    {
+        $response = $this->curli->request4([
+            "path"           => $this->path. "exportToExcel",
+            "method"         => "GET",
+            "payload"        => $params["payload"],
+            "module_code"    => $this->kode,
+            "token"          => $params["token"]
+        ]);
+
+        return json_decode($response, false);
+    }
 }
