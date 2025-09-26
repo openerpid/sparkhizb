@@ -635,6 +635,7 @@ class LpaBuilder
     {
         $builder = $this->mAppvmatrix
             ->where('site', $site)
+            ->where('deleted_at IS NULL')
             ->orderBy('sequence', 'ASC')
             ->get()->getResult();
 
