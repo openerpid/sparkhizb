@@ -399,6 +399,49 @@ class QueryHelper
         return $response;
     }
 
+    public function respon2($rows,$count,$total)
+    {
+        $jssdata = [];
+        
+        if ($count > 0) {
+            $sts = true;
+            $msg = 'Get data success';
+            $code = 200;
+
+            // foreach ($rows as $key => $value) {
+            //     $jssdata[] = $value;
+            // }
+
+            // $rows[$key]->jssdata = $jssdata;
+        }else{
+            $sts = true;
+            $msg = 'Data not found';
+            $code = 200;
+        }
+
+        $response = [
+            "status"                => $sts,
+            "message"               => $msg,
+            "rows"                  => $rows,
+            "count"                 => $count,
+            "total"                 => $total,
+            "recordsTotal"          => $total,
+            "recordsFiltered"       => $total,
+            "scode"                 => $code,
+            "total_count"           => $count,
+            "incomplete_results"    => false,
+            // "jssdata"               => $jssdata,
+            // "filter"            => [
+            //     "search" => $this->request->getJsonVar("search"),
+            //     "datetime_detail" => [
+            //         "from" => $this->dtH->dt
+            //     ]
+            // ]
+        ];
+
+        return $response;
+    }
+
     public function rescr($builder)
     {
         if($builder) {
