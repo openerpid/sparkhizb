@@ -11,13 +11,13 @@ namespace Sparkhizb\Helpers;
 * =============================================
 */
 
-use Dorbitt\Helpers\CurlHelper;
+use Dorbitt\Helpers\CurlHelper as DorbittCurlHelper;
 
 class CurlHelper
 {
     public function __construct()
     {
-        $ch = new CurlHelper();
+        $ch = new DorbittCurlHelper();
         $this->url = $ch->endpoint();
 
         if (getenv("DORBITT_TOKEN")) {
