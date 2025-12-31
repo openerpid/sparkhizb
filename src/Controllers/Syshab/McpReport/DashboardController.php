@@ -226,6 +226,18 @@ class DashboardController extends ResourceController
         foreach ($rows as $key => $value) {
             $targetDay_arr[] = $value['targetDay'];
             $actual_arr[] = $value['actual'];
+
+            if ($value['targetDay'] == '.000') {
+                $rows[$key]['targetDay'] = 0;
+            }
+
+            if ($value['actual'] == '.000') {
+                $rows[$key]['actual'] = 0;
+            }
+
+            $persentase = ($value['actual'] / $value['targetDay']) * 100;
+            $rows[$key]['persentase'] = round($persentase, 2);
+            $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
         }
 
         $response = [
