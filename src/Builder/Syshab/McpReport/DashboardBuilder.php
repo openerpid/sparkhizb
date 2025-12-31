@@ -7,6 +7,7 @@ use Sparkhizb\Helpers\RequestHelper;
 use Sparkhizb\UmmuHazardReport;
 use App\Hizb\Models\Safety\HazardReportQueueMailModel;
 use App\Hizb\Models\Safety\HazardReportNumberModel;
+use Sparkhizb\Models\DashboardSiteProjectListModel;
 
 class HazardReportSparkBuilder
 {
@@ -21,6 +22,12 @@ class HazardReportSparkBuilder
         $this->ummu = new UmmuHazardReport();
         $this->model = new HazardReportQueueMailModel();
         $this->mNum = new HazardReportNumberModel();
+        $this->mSiteDash = new DashboardSiteProjectListModel();
+    }
+
+    public function show_dashSite()
+    {
+        // 
     }
 
     public function show_plan_ob()
