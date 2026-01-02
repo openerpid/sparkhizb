@@ -121,6 +121,7 @@ class ProductionResultController extends ResourceController
             $site = 'HO';
         }
 
+        // exec dbo.uSP_0405_SHB_0030B N'SSA',N'20250901',N'20250930'
         // exec dbo.uSP_0405_SHB_0031B N'SSA',N'20240901',N'20250930'
         // exec dbo.uSP_0405_SHB_0032B N'SSA',N'20240901',N'20250930'
 
@@ -182,6 +183,9 @@ class ProductionResultController extends ResourceController
         $date2 = $this->request->getVar('tgl2');
         $site = $this->request->getVar('site');
 
+        // exec dbo.uSP_0405_SHB_0030B N'SSA',N'20250901',N'20250930'
+        // exec dbo.uSP_0405_SHB_0031B N'SSA',N'20240901',N'20250930'
+        // exec dbo.uSP_0405_SHB_0032B N'SSA',N'20240901',N'20250930'
         // exec dbo.uSP_0405_SHB_0033B N'SSA',N'20250901',N'20250930'
         // fr= fuel /  (day  +  night )
         // wh=24 - ( stb  +  bd )

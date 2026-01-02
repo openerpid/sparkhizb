@@ -1,28 +1,54 @@
 <?php
 
-namespace Sparkhizb\Builder;
+namespace Sparkhizb\Builder\Syshab\McpReport;
 
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\RequestHelper;
 use Sparkhizb\UmmuHazardReport;
-use App\Hizb\Models\Safety\HazardReportQueueMailModel;
-use App\Hizb\Models\Safety\HazardReportNumberModel;
+// use App\Hizb\Models\Safety\HazardReportQueueMailModel;
+// use App\Hizb\Models\Safety\HazardReportNumberModel;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
 
-class HazardReportSparkBuilder
+class DashboardBuilder
 {
     public function __construct()
     {
         $this->db = \Config\Database::connect();
-        $this->iescm = \Config\Database::connect('iescm');
+        // $this->iescm = \Config\Database::connect('iescm');
         $this->mcp = \Config\Database::connect('mcp');
         $this->request = \Config\Services::request();
         $this->reqH = new RequestHelper();
         $this->umHelp = new UmmuHelper();
-        $this->ummu = new UmmuHazardReport();
-        $this->model = new HazardReportQueueMailModel();
-        $this->mNum = new HazardReportNumberModel();
+        // $this->ummu = new UmmuHazardReport();
+        // $this->model = new HazardReportQueueMailModel();
+        // $this->mNum = new HazardReportNumberModel();
         $this->mSiteDash = new DashboardSiteProjectListModel();
+    }
+
+    public function show_TR_PRODUCTIONB($select, $site, $tgl, $kode)
+    {
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select($select)
+        ->where('ProdDate', $tgl)
+        ->where('kode', $kode);
+
+        if (is_array($site)) {
+            $builder->whereIn('region_code', $site);
+        }else{
+            $builder->where('region_code', $site);
+        }
+        
+        // $query = "SELECT *
+        //     FROM MCPHILL.dbo.MCC_TR_HPRODUCTIONB
+        //     WHERE region_code = '{$site}'
+        //     AND kode = '{$kode}'
+        //     AND CONVERT(CHAR(8), ProdDate, 112) = '{$tgl}'
+        // ";
+
+        // $builder = $this->mcp->query($query);
+        // $builder->getResultArray();
+
+        return $builder;
     }
 
     public function show_dashSite()

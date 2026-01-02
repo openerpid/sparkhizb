@@ -13,6 +13,7 @@ use App\Helpers\GlobalHelper;
 // use Dorbitt\Models\Herp\SiteProjectModel;
 use Dorbitt\Builder\Iescm\SiteProjectHerpBuilder;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
+use Sparkhizb\Builder\Syshab\McpReport\DashboardBuilder;
 
 class DashboardController extends ResourceController
 {
@@ -31,6 +32,7 @@ class DashboardController extends ResourceController
         $this->mSiteDash = new DashboardSiteProjectListModel();
         // $this->sitepMod = new SiteProjectModel();
         // $this->qbSite = new SiteProjectHerpBuilder();
+        $this->qBuilder = new DashboardBuilder();
     }
 
     public function index()
@@ -143,10 +145,10 @@ class DashboardController extends ResourceController
         // $site = "SSA";
         $site_project = $this->show_region_code();
 
-        /*exec dbo.uSP_0405_SHB_0046B N'20251201',N'SSA' --FUEL
-        exec dbo.uSP_0405_SHB_0046C N'20251201',N'20251201',N'SSA' --daily
-        exec dbo.uSP_0405_SHB_0046D 2025,12,N'20251201',N'20251201',N'20250101',N'SSA' --monthly dan yearly
-        exec dbo.uSP_0405_SHB_0046A N'20251201',N'SSA'*/
+        /*exec dbo.uSP_0405_SHB_0046B N''{$tgl}'',N'SSA' --FUEL
+        exec dbo.uSP_0405_SHB_0046C N''{$tgl}'',N''{$tgl}'',N'SSA' --daily
+        exec dbo.uSP_0405_SHB_0046D 2025,12,N''{$tgl}'',N''{$tgl}'',N'20250101',N'SSA' --monthly dan yearly
+        exec dbo.uSP_0405_SHB_0046A N''{$tgl}'',N'SSA'*/
 
         // $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$site}'";
 
@@ -197,6 +199,7 @@ class DashboardController extends ResourceController
         $actual_arr = [];
 
         if ($site) {
+            $sitex = $site;
             $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$site}'";
             $builder = $this->mcp->query($sp);
             $builder->getResultArray();
@@ -209,6 +212,7 @@ class DashboardController extends ResourceController
                 $rows[] = $value;
             }
         }else{
+            $sitex = $site_project;
             foreach ($site_project as $key => $value) {
                 $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$value}'";
                 $builder = $this->mcp->query($sp);
@@ -240,14 +244,279 @@ class DashboardController extends ResourceController
             $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
         }
 
+        $select = "SUM(QtyRit * Capacity) AS total_ton_day";
+        $builder_coal = $this->qBuilder->show_TR_PRODUCTIONB($select, $sitex, $tgl, 'CL');
+        $total_actual_coal = $builder_coal->get()->getRow();
+
         $response = [
             "rows" => $rows,
             // "targetDay_arr" => $targetDay_arr,
             // "actual_arr" => $actual,
             "total_target" => array_sum($targetDay_arr),
-            "total_actual" => array_sum($actual_arr)
+            "total_actual" => array_sum($actual_arr),
+            "total_target_coal" => 0,
+            "total_actual_coal" => round($total_actual_coal->total_ton_day, 2)
         ];
 
         return $this->respond($response, 200);
+    }
+
+    public function zshow_summary_coalore_daily()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $site = $this->request->getVar('site');
+        $site_project = $this->show_region_code();
+
+        $q = "SELECT  '1.UNIT POPULATION' AS status_unit,
+            mcc_ms_unit.model_no,
+            mcc_ms_unit.unit_code,
+            /*
+                (SELECT TOP 1 time_start FROM MCC_TR_WORKHOUR WHERE MCC_TR_WORKHOUR.equipment_code = mcc_ms_unit.unit_code AND CAST(CONVERT(CHAR(8), MCC_TR_WORKHOUR.prodDate, 112) AS NUMERIC) = '{$tgl}' AND MCC_TR_WORKHOUR.activity_code = '01' AND MCC_TR_WORKHOUR.time_start = (SELECT MIN(time_start) FROM    MCC_TR_WORKHOUR a WHERE   a.equipment_code = mcc_ms_unit.unit_code AND a.time_start >= 7 AND a.time_start <= 18.59 AND a.activity_code = '01' AND CAST(CONVERT(CHAR(8), a.prodDate, 112) AS NUMERIC) = '{$tgl}')) AS time_start_day,
+                (SELECT TOP 1 time_finish FROM    MCC_TR_WORKHOUR WHERE   MCC_TR_WORKHOUR.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_WORKHOUR.prodDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_WORKHOUR.activity_code = '01' AND
+                    MCC_TR_WORKHOUR.time_finish = (SELECT   MAX(time_finish)
+                    FROM    MCC_TR_WORKHOUR a
+                    WHERE   a.equipment_code = mcc_ms_unit.unit_code AND
+                    a.time_finish >= 7 AND
+                    a.time_finish <= 18.59 AND
+                    a.activity_code = '01' AND
+                    CAST(CONVERT(CHAR(8), a.prodDate, 112) AS NUMERIC) = '{$tgl}')) AS time_end_day,
+                (SELECT SUM(time_use)
+                    FROM    MCC_TR_WORKHOUR
+                    WHERE   MCC_TR_WORKHOUR.equipment_code = mcc_ms_unit.unit_code AND
+                    MCC_TR_WORKHOUR.activity_code = '01' AND
+                    MCC_TR_WORKHOUR.time_start >= 7 AND
+                    MCC_TR_WORKHOUR.time_finish <= 18.59 AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_WORKHOUR.prodDate, 112) AS NUMERIC) = '{$tgl}') AS time_use_day,
+                (SELECT hm_start
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'D') AS hm_start_day,
+                (SELECT hm_end
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'D') AS hm_end_day,
+                ISNULL((SELECT  hm_end
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'D'), 0) - ISNULL((SELECT    hm_start
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'D'), 0) AS working_hours_day,
+                (SELECT MIN(unit_time)
+                    FROM    tr_doh
+                    WHERE   tr_doh.unit_code = mcc_ms_unit.unit_code AND
+                    tr_doh.shift_code = 'D' AND
+                    tr_doh.status_do <> '4' AND
+                    CAST(CONVERT(CHAR(8), tr_doh.tgl, 112) AS NUMERIC) = '{$tgl}') AS jam_isi_solar_day,
+                    (SELECT SUM(tr_dod.qty_out)
+                    FROM    tr_dod, tr_doh
+                    WHERE   tr_dod.do_code = tr_doh.do_code AND
+                    tr_doh.unit_code = mcc_ms_unit.unit_code AND
+                    tr_doh.shift_code = 'D' AND
+                    tr_doh.status_do <> '4' AND
+                        CAST(CONVERT(CHAR(8), tr_doh.tgl, 112) AS NUMERIC) = '{$tgl}') AS qty_out_day,
+                (SELECT SUM(QtyRit)
+                    FROM    MCC_TR_HPRODUCTIONB
+                    WHERE   MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                    MCC_TR_HPRODUCTIONB.tShift = 'D' AND
+                    MCC_TR_HPRODUCTIONB.kode = 'OB' AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS qtyrit_ob_day,
+                (SELECT SUM(QtyRit * Capacity)
+                    FROM    MCC_TR_HPRODUCTIONB
+                    WHERE   MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                    MCC_TR_HPRODUCTIONB.tShift = 'D' AND
+                    MCC_TR_HPRODUCTIONB.kode = 'OB' AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS bcm_ob_day,
+            */
+            (SELECT SUM(QtyRit)
+                FROM MCC_TR_HPRODUCTIONB
+                WHERE MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                MCC_TR_HPRODUCTIONB.tShift = 'D' AND
+                MCC_TR_HPRODUCTIONB.kode = 'CL' AND
+                CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS qtyrit_co_day,
+            (SELECT SUM(QtyRit * Capacity)
+                FROM MCC_TR_HPRODUCTIONB
+                WHERE MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                MCC_TR_HPRODUCTIONB.tShift = 'D' AND
+                MCC_TR_HPRODUCTIONB.kode = 'CL' AND
+                CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS ton_co_day
+            /*
+                (SELECT TOP 1 time_start
+                    FROM    MCC_TR_WORKHOUR
+                    WHERE   MCC_TR_WORKHOUR.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_WORKHOUR.prodDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_WORKHOUR.activity_code = '01' AND
+                        MCC_TR_WORKHOUR.time_start = (SELECT    MIN(time_start)
+                    FROM    MCC_TR_WORKHOUR a
+                    WHERE   a.equipment_code = mcc_ms_unit.unit_code AND
+                    a.time_start >= 17 AND
+                    a.time_start <= 6.59 AND
+                    a.activity_code = '01' AND
+                    CAST(CONVERT(CHAR(8), a.prodDate, 112) AS NUMERIC) = '{$tgl}')) AS time_start_night,
+                (SELECT TOP 1 time_finish
+                    FROM    MCC_TR_WORKHOUR
+                    WHERE   MCC_TR_WORKHOUR.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_WORKHOUR.prodDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_WORKHOUR.activity_code = '01' AND
+                    MCC_TR_WORKHOUR.time_finish = (SELECT   MAX(time_finish)
+                    FROM    MCC_TR_WORKHOUR a
+                    WHERE   a.equipment_code = mcc_ms_unit.unit_code AND
+                    a.time_finish >= 17 AND
+                    a.time_finish <= 6.59 AND
+                    a.activity_code = '01' AND
+                    CAST(CONVERT(CHAR(8), a.prodDate, 112) AS NUMERIC) = '{$tgl}')) AS time_end_night,
+                (SELECT SUM(time_use)
+                    FROM    MCC_TR_WORKHOUR
+                    WHERE   MCC_TR_WORKHOUR.equipment_code = mcc_ms_unit.unit_code AND
+                    MCC_TR_WORKHOUR.activity_code = '01' AND
+                    MCC_TR_WORKHOUR.time_start >= 17 AND
+                    MCC_TR_WORKHOUR.time_finish <= 6.59 AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_WORKHOUR.prodDate, 112) AS NUMERIC) = '{$tgl}') AS time_use_night,
+                    (SELECT hm_start
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'N') AS hm_start_night,
+                (SELECT hm_end
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'N') AS hm_end_night,
+                    ISNULL((SELECT  hm_end
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'N'), 0) - ISNULL((SELECT    hm_start
+                    FROM    MCC_TR_HOURMETERB
+                    WHERE   MCC_TR_HOURMETERB.equipment_code = mcc_ms_unit.unit_code AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HOURMETERB.ProdDate, 112) AS NUMERIC) = '{$tgl}' AND
+                    MCC_TR_HOURMETERB.shift_code = 'N'), 0) AS working_hours_night,
+                (SELECT MIN(unit_time)
+                    FROM    tr_doh
+                    WHERE   tr_doh.unit_code = mcc_ms_unit.unit_code AND
+                    tr_doh.shift_code = 'N' AND
+                    tr_doh.status_do <> '4' AND
+                    CAST(CONVERT(CHAR(8), tr_doh.tgl, 112) AS NUMERIC) = '{$tgl}') AS jam_isi_solar_night,
+                (SELECT SUM(tr_dod.qty_out)
+                    FROM    tr_dod, tr_doh
+                    WHERE   tr_dod.do_code = tr_doh.do_code AND
+                    tr_doh.unit_code = mcc_ms_unit.unit_code AND
+                    tr_doh.shift_code = 'N' AND
+                    tr_doh.status_do <> '4' AND
+                    CAST(CONVERT(CHAR(8), tr_doh.tgl, 112) AS NUMERIC) = '{$tgl}') AS qty_out_night,
+                (SELECT SUM(QtyRit)
+                    FROM    MCC_TR_HPRODUCTIONB
+                    WHERE   MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                    MCC_TR_HPRODUCTIONB.tShift = 'N' AND
+                    MCC_TR_HPRODUCTIONB.kode = 'OB' AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS qtyrit_ob_night,
+                (SELECT SUM(QtyRit * Capacity)
+                    FROM    MCC_TR_HPRODUCTIONB
+                    WHERE   MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                    MCC_TR_HPRODUCTIONB.tShift = 'N' AND
+                    MCC_TR_HPRODUCTIONB.kode = 'OB' AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS bcm_ob_night,
+                (SELECT SUM(QtyRit)
+                    FROM    MCC_TR_HPRODUCTIONB
+                    WHERE   MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                    MCC_TR_HPRODUCTIONB.tShift = 'N' AND
+                    MCC_TR_HPRODUCTIONB.kode = 'CL' AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS qtyrit_co_night,
+                (SELECT SUM(QtyRit * Capacity)
+                    FROM    MCC_TR_HPRODUCTIONB
+                    WHERE   MCC_TR_HPRODUCTIONB.unit_houler = mcc_ms_unit.unit_code AND
+                    MCC_TR_HPRODUCTIONB.tShift = 'N' AND
+                    MCC_TR_HPRODUCTIONB.kode = 'CL' AND
+                    CAST(CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) AS NUMERIC) = '{$tgl}') AS ton_co_night
+            */
+        FROM mcc_ms_unit
+        WHERE mcc_ms_unit.stEdit <> '4';
+
+        -- UNION ALL
+
+        -- SELECT  '2.OTHER UNIT' AS status_unit,
+        --     '' AS model_no,
+        --     tr_doh.unit_code,
+        --     -- 0 AS time_start_day,
+        --     -- 0 AS time_end_day,
+        --     -- 0 AS time_use_day,
+        --     -- 0 AS hm_start_day,
+        --     -- 0 AS hm_end_day,
+        --     -- 0 AS working_hours_day,
+        --     -- 0 AS jam_isi_solar_day,
+        --     -- (CASE tr_doh.shift_code
+        --     -- WHEN 'D' THEN
+        --     -- tr_dod.qty_out
+        --     -- ELSE
+        --     -- 0
+        --     -- END) AS qty_out_day,
+        --     -- 0 AS qtyrit_ob_day,
+        --     -- 0 AS bcm_ob_day,
+        --     0 AS qtyrit_co_day,
+        --     0 AS ton_co_day,
+        --     -- 0 AS time_start_night,
+        --     -- 0 AS time_end_night,
+        --     -- 0 AS time_use_night,
+        --     -- 0 AS hm_start_night,
+        --     -- 0 AS hm_end_night,
+        --     -- 0 AS working_hours_night,
+        --     -- 0 AS jam_isi_solar_night,
+        --     -- (CASE tr_doh.shift_code
+        --     -- WHEN 'N' THEN
+        --     -- tr_dod.qty_out
+        --     -- ELSE
+        --     -- 0
+        --     -- END) AS qty_out_night,
+        --     -- 0 AS qtyrit_ob_night,
+        --     -- 0 AS bcm_ob_night,
+        --     -- 0 AS qtyrit_co_night,
+        --     -- 0 AS ton_co_night
+        -- FROM tr_dod, tr_doh 
+        -- WHERE tr_dod.do_code = tr_doh.do_code AND
+        --     tr_doh.status_do <> '4' AND
+        --     tr_doh.type_do = '1' AND
+            -- CAST(CONVERT(CHAR(8), tr_doh.tgl, 112) AS NUMERIC) = '{$tgl}'";
+
+        $builder = $this->mcp->query($q);
+        $builder->getResultArray();
+        $result = $builder->resultArray;
+
+        $ton_co_day_arr = [];
+
+        foreach ($result as $key => $value) {
+            $ton_co_day_arr[] = $value['ton_co_day'];
+        }
+
+        $total_ton_co_day = array_sum($ton_co_day_arr);
+
+        $response = [
+            "status" => true,
+            "rows" => $result,
+            "total_ton_co_day" => $total_ton_co_day
+        ];
+
+        return $this->respond($response, 200);
+    }
+
+    public function show_summary_coalore_daily()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $site = $this->request->getVar('site');
+        $site_project = $this->show_region_code();
+
+        if (!$site) {
+            $site = $site_project;
+        }
+        $select = "SUM(QtyRit * Capacity) AS total_ton_day";
+        $builder = $this->qBuilder->show_TR_PRODUCTIONB($select, $site, $tgl, 'CL');
+        $result = $builder->get()->getRow();
+
+        return $this->respond($result, 200);
     }
 }
