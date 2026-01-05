@@ -353,7 +353,11 @@ class DashboardController extends ResourceController
             }
         }
 
+        $keys = [];
         foreach ($rows as $key => $value) {
+            // $keys[$value['region_code']] = $value['actual'];
+            $keys[] = $value['region_code'];
+
             $targetDay_arr[] = $value['targetDay'];
             $actual_arr[] = $value['actual'];
 
@@ -367,8 +371,31 @@ class DashboardController extends ResourceController
 
             $persentase = ($value['actual'] / $value['targetDay']) * 100;
             $rows[$key]['persentase'] = round($persentase, 2);
+            $rows[$key]['balance'] = $value['actual'] - $value['targetDay'];
             $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
         }
+
+        $keys2 = $keys;
+        foreach ($site_project as $key => $value) {
+            if (!in_array($value, $keys)) {
+                array_push($keys2, $value);
+            }
+        }
+
+        // $a = array_merge($keys, $notKey);
+
+        // $rows_by_site = [];
+        // foreach ($a as $key => $value) {
+        //     $a = [
+        //         "region_code" => $key,
+        //         "total_target" => 0,
+        //         "total_actual" => $value,
+        //         "persentase" => 0,
+        //         "balance" => 0
+        //     ];
+
+        //     $rows_by_site[] = $a;
+        // }
 
         $select = "SUM(QtyRit * Capacity) AS total_ton_day";
         $builder_coal = $this->qBuilder->show_TR_PRODUCTIONB($select, $sitex, $tgl, 'CL');
@@ -378,6 +405,9 @@ class DashboardController extends ResourceController
 
         $response = [
             "status" => true,
+            "keys" => $keys,
+            "keys2" => $keys2,
+            // "a" => $a,
             "rows" => $rows,
             // "targetDay_arr" => $targetDay_arr,
             // "actual_arr" => $actual,
