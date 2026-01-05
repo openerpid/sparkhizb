@@ -14,6 +14,7 @@ use App\Helpers\GlobalHelper;
 use Dorbitt\Builder\Iescm\SiteProjectHerpBuilder;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
 use Sparkhizb\Builder\Syshab\McpReport\DashboardBuilder;
+use Sparkhizb\Models\Syshab\McpReport\VmcctrhproductionbclModel;
 
 class DashboardController extends ResourceController
 {
@@ -249,6 +250,7 @@ class DashboardController extends ResourceController
         $total_actual_coal = $builder_coal->get()->getRow();
 
         $response = [
+            "status" => true,
             "rows" => $rows,
             // "targetDay_arr" => $targetDay_arr,
             // "actual_arr" => $actual,
@@ -516,6 +518,33 @@ class DashboardController extends ResourceController
         $select = "SUM(QtyRit * Capacity) AS total_ton_day";
         $builder = $this->qBuilder->show_TR_PRODUCTIONB($select, $site, $tgl, 'CL');
         $result = $builder->get()->getRow();
+
+        return $this->respond($result, 200);
+    }
+
+    public function show_hauling_daily()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $tgl2 = $this->request->getVar('tgl');
+        $site = $this->request->getVar('site');
+
+        $sp = "exec dbo.uSP_0405_SHB_0034B N'SSA',N'20250901',N'20250930'";
+
+        $builder = $this->qBuilder->show_hauling_daily($tgl, $tgl2, $site);
+        // $builder = $this->qBuilder->TEMP1($tgl, $tgl2, $site);
+        $result = $builder->resultArray;
+
+        return $this->respond($result, 200);
+    }
+
+    public function show_V_MCC_TR_HPRODUCTIONB_CL()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $tgl2 = $this->request->getVar('tgl');
+        $site = $this->request->getVar('site');
+
+        $builder = $this->qBuilder->show_V_MCC_TR_HPRODUCTIONB_CL($tgl, $site);
+        $result = $builder->resultArray;
 
         return $this->respond($result, 200);
     }

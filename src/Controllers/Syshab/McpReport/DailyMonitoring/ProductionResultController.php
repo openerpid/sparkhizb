@@ -145,7 +145,12 @@ class ProductionResultController extends ResourceController
             $dateOnly = date("Y-m-d", $timestamp); // Format the timestamp to the desired date format
 
             $query2[$key]['proddateonly'] = $dateOnly;
-            $query2[$key]['persen'] = round(($total / $planD) * 100, 2);
+
+            if ($planD > 0) {
+                $query2[$key]['persen'] = round(($total / $planD) * 100, 2);
+            }else{
+                $query2[$key]['persen'] = '0.00';
+            }
         }
 
         $rows = [

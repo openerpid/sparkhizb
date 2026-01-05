@@ -33,6 +33,8 @@ $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static functio
                 $routes->get('show_plan_ob_daily', 'McpReport\DashboardController::show_plan_ob_daily');
                 $routes->get('show_summary_ob_daily', 'McpReport\DashboardController::show_summary_ob_daily');
                 $routes->get('show_summary_coalore_daily', 'McpReport\DashboardController::show_summary_coalore_daily');
+                $routes->get('show_hauling_daily', 'McpReport\DashboardController::show_hauling_daily');
+                $routes->get('show_V_MCC_TR_HPRODUCTIONB_CL', 'McpReport\DashboardController::show_V_MCC_TR_HPRODUCTIONB_CL');
             });
 
             $routes->group('ob', function ($routes) {

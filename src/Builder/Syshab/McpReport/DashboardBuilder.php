@@ -25,6 +25,113 @@ class DashboardBuilder
         $this->mSiteDash = new DashboardSiteProjectListModel();
     }
 
+    public function show_hauling_daily($tgl, $tgl2, $site)
+    {
+        // SELECT * FROM ( 
+        //     SELECT 'LOADER' AS tipe, TEMP1.unit_code,TEMP1.ProdDate,TEMP1.day_rit,TEMP1.night_rit,TEMP1.day,TEMP1.night,
+        //         ISNULL (( SELECT SUM(qty_out)
+        //             FROM      V_FUEL_CONSUMPTION_FOR_MCC_CL
+        //             WHERE  region_code = '{$site}' AND unit_code = TEMP1.unit_code AND CONVERT(CHAR(8),tgl,112)  = CONVERT(CHAR(8),TEMP1.ProdDate,112) ),0) AS fuel,
+        //         (ISNULL((SELECT SUM(MCC_TR_WORKHOUR.time_dec)
+        //             FROM    MCC_TR_WORKHOUR   
+        //             WHERE   MCC_TR_WORKHOUR.region_code = '{$site}' AND MCC_TR_WORKHOUR.proddate = TEMP1.ProdDate AND
+        //                     MCC_TR_WORKHOUR.activity_code = '02'  AND MCC_TR_WORKHOUR.equipment_code = TEMP1.unit_code ), 0) ) AS stb ,
+        //         (ISNULL((SELECT SUM(MCC_TR_WORKHOUR.time_dec)
+        //             FROM    MCC_TR_WORKHOUR   
+        //             WHERE   MCC_TR_WORKHOUR.region_code = '{$site}' AND MCC_TR_WORKHOUR.proddate = TEMP1.ProdDate AND
+        //                         MCC_TR_WORKHOUR.activity_code = '03'  AND MCC_TR_WORKHOUR.equipment_code = TEMP1.unit_code ), 0) ) AS bd, 
+        //         (ISNULL((SELECT SUM(MCC_TR_WORKHOUR.time_dec)
+        //             FROM    MCC_TR_WORKHOUR   
+        //             WHERE   MCC_TR_WORKHOUR.region_code = '{$site}' AND MCC_TR_WORKHOUR.proddate = TEMP1.ProdDate AND
+        //                         MCC_TR_WORKHOUR.activity_code = '04'  AND MCC_TR_WORKHOUR.equipment_code = TEMP1.unit_code ), 0) ) AS idle,
+        //             (CONVERT(INT,'{$tgl2}') - CONVERT(INT,'{$tgl}') + 1 ) * 24 AS mohh
+        //     FROM (SELECT V_MCC_TR_HPRODUCTIONB_CL.unit_loader  AS unit_code,V_MCC_TR_HPRODUCTIONB_CL.ProdDate,   
+        //        SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'D' THEN V_MCC_TR_HPRODUCTIONB_CL.QtyRit ELSE 0 END) AS day_rit,
+        //        SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'N' THEN V_MCC_TR_HPRODUCTIONB_CL.QtyRit ELSE 0 END) AS night_rit,
+        //        SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'D' THEN V_MCC_TR_HPRODUCTIONB_CL.Weight ELSE 0 END) AS day,
+        //        SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'N' THEN V_MCC_TR_HPRODUCTIONB_CL.Weight ELSE 0 END) AS night
+        // FROM    V_MCC_TR_HPRODUCTIONB_CL
+        // WHERE   V_MCC_TR_HPRODUCTIONB_CL.region_code ='{$site}' AND 
+        //         CONVERT(CHAR(8) , V_MCC_TR_HPRODUCTIONB_CL.proddate, 112) BETWEEN '{$tgl}' AND '{$tgl2}'   
+        // GROUP BY V_MCC_TR_HPRODUCTIONB_CL.unit_loader,V_MCC_TR_HPRODUCTIONB_CL.ProdDate) AS TEMP1
+
+        // UNION ALL
+
+        $q = "
+            SELECT 'HAULER' AS tipe, TEMP1.unit_code,TEMP1.ProdDate,TEMP1.day_rit,TEMP1.night_rit,TEMP1.day,TEMP1.night,
+                ISNULL (( SELECT SUM(qty_out)
+                    FROM      V_FUEL_CONSUMPTION_FOR_MCC_CL
+                    WHERE  region_code = '{$site}' AND unit_code = TEMP1.unit_code AND CONVERT(CHAR(8),tgl,112)  = CONVERT(CHAR(8),TEMP1.ProdDate,112) ),0) AS fuel,
+                (ISNULL((SELECT SUM(MCC_TR_WORKHOUR.time_dec)
+                    FROM    MCC_TR_WORKHOUR   
+                    WHERE   MCC_TR_WORKHOUR.region_code = '{$site}' AND MCC_TR_WORKHOUR.proddate = TEMP1.ProdDate AND
+                            MCC_TR_WORKHOUR.activity_code = '02'  AND MCC_TR_WORKHOUR.equipment_code = TEMP1.unit_code ), 0) ) AS stb ,
+                (ISNULL((SELECT SUM(MCC_TR_WORKHOUR.time_dec)
+                    FROM    MCC_TR_WORKHOUR   
+                    WHERE   MCC_TR_WORKHOUR.region_code = '{$site}' AND MCC_TR_WORKHOUR.proddate = TEMP1.ProdDate AND
+                                MCC_TR_WORKHOUR.activity_code = '03'  AND MCC_TR_WORKHOUR.equipment_code = TEMP1.unit_code ), 0) ) AS bd, 
+                (ISNULL((SELECT SUM(MCC_TR_WORKHOUR.time_dec)
+                    FROM    MCC_TR_WORKHOUR   
+                    WHERE   MCC_TR_WORKHOUR.region_code = '{$site}' AND MCC_TR_WORKHOUR.proddate = TEMP1.ProdDate AND
+                                MCC_TR_WORKHOUR.activity_code = '04'  AND MCC_TR_WORKHOUR.equipment_code = TEMP1.unit_code ), 0) ) AS idle,
+                    (CONVERT(INT,'{$tgl2}') - CONVERT(INT,'{$tgl}') + 1 ) * 24 AS mohh
+            FROM ( SELECT 
+                V_MCC_TR_HPRODUCTIONB_CL.unit_houler  AS unit_code,
+                V_MCC_TR_HPRODUCTIONB_CL.ProdDate,   
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'D' THEN V_MCC_TR_HPRODUCTIONB_CL.qtyRit ELSE 0 END) AS day_rit,
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'N' THEN V_MCC_TR_HPRODUCTIONB_CL.qtyRit ELSE 0 END) AS night_rit,
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'D' THEN V_MCC_TR_HPRODUCTIONB_CL.Weight ELSE 0 END) AS day,
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'N' THEN V_MCC_TR_HPRODUCTIONB_CL.Weight ELSE 0 END) AS night
+            FROM V_MCC_TR_HPRODUCTIONB_CL WHERE V_MCC_TR_HPRODUCTIONB_CL.region_code ='{$site}' AND CONVERT(CHAR(8) , V_MCC_TR_HPRODUCTIONB_CL.proddate, 112) BETWEEN '{$tgl}' AND '{$tgl2}' 
+            GROUP BY V_MCC_TR_HPRODUCTIONB_CL.unit_houler,V_MCC_TR_HPRODUCTIONB_CL.ProdDate ) AS TEMP1;
+            -- ) AS TEMP2 
+            -- ORDER BY TEMP2.tipe,TEMP2.unit_code,TEMP2.ProdDate ASC
+        ";
+
+        $builder = $this->mcp->query($q);
+        $builder->getResultArray();
+
+        return $builder;
+    }
+
+    public function TEMP1($tgl, $tgl2, $site)
+    {
+        $query = "
+            SELECT 
+                V_MCC_TR_HPRODUCTIONB_CL.unit_houler  AS unit_code,
+                V_MCC_TR_HPRODUCTIONB_CL.ProdDate,   
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'D' THEN V_MCC_TR_HPRODUCTIONB_CL.qtyRit ELSE 0 END) AS day_rit,
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'N' THEN V_MCC_TR_HPRODUCTIONB_CL.qtyRit ELSE 0 END) AS night_rit,
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'D' THEN V_MCC_TR_HPRODUCTIONB_CL.Weight ELSE 0 END) AS day,
+               SUM(CASE V_MCC_TR_HPRODUCTIONB_CL.tshift WHEN 'N' THEN V_MCC_TR_HPRODUCTIONB_CL.Weight ELSE 0 END) AS night
+            FROM V_MCC_TR_HPRODUCTIONB_CL WHERE V_MCC_TR_HPRODUCTIONB_CL.region_code ='{$site}' AND CONVERT(CHAR(8) , V_MCC_TR_HPRODUCTIONB_CL.proddate, 112) BETWEEN '{$tgl}' AND '{$tgl2}' 
+            GROUP BY V_MCC_TR_HPRODUCTIONB_CL.unit_houler,V_MCC_TR_HPRODUCTIONB_CL.ProdDate
+        ";
+
+        $builder = $this->mcp->query($query);
+        $builder->getResultArray();
+
+        return $builder;
+    }
+
+    public function show_V_MCC_TR_HPRODUCTIONB_CL($tgl, $site)
+    {
+        // $builder = $this->mcp->table('V_MCC_TR_HPRODUCTIONB_CL')
+        // // ->select($select)
+        // ->where('ProdDate', $tgl)
+        // ->where('region_code', $site);
+
+        $query = "SELECT * FROM V_MCC_TR_HPRODUCTIONB_CL
+            WHERE ProdDate = '{$tgl}'
+            AND region_code = '{$site}'
+        ";
+
+        $builder = $this->mcp->query($query);
+        $builder->getResultArray();
+
+        return $builder;
+    }
+
     public function show_TR_PRODUCTIONB($select, $site, $tgl, $kode)
     {
         $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
