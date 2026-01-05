@@ -30,6 +30,7 @@ $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static functio
                 // $routes->get('/', 'DashboardController::index');
                 $routes->get('show_siteProject', 'McpReport\DashboardController::show_siteProject');
                 $routes->get('show_summary_ob', 'McpReport\DashboardController::show_summary_ob');
+                $routes->get('show_daily', 'McpReport\DashboardController::show_daily');
                 $routes->get('show_plan_ob_daily', 'McpReport\DashboardController::show_plan_ob_daily');
                 $routes->get('show_summary_ob_daily', 'McpReport\DashboardController::show_summary_ob_daily');
                 $routes->get('show_summary_coalore_daily', 'McpReport\DashboardController::show_summary_coalore_daily');

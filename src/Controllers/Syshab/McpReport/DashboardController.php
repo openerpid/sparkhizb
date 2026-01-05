@@ -263,6 +263,137 @@ class DashboardController extends ResourceController
         return $this->respond($response, 200);
     }
 
+    public function show_daily()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $site = $this->request->getVar('site');
+        // $site = implode("','", $this->show_region_code());
+        // $site = "SSA";
+        $site_project = $this->show_region_code();
+
+        /*exec dbo.uSP_0405_SHB_0046B N''{$tgl}'',N'SSA' --FUEL
+        exec dbo.uSP_0405_SHB_0046C N''{$tgl}'',N''{$tgl}'',N'SSA' --daily
+        exec dbo.uSP_0405_SHB_0046D 2025,12,N''{$tgl}'',N''{$tgl}'',N'20250101',N'SSA' --monthly dan yearly
+        exec dbo.uSP_0405_SHB_0046A N''{$tgl}'',N'SSA'*/
+
+        // $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$site}'";
+
+        /*$a = "SELECT SUM(weight) as actual FROM  MCC_TR_HPRODUCTIONB WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code =  ('{$site}') AND CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112)  = '{$tgl}'";*/
+
+        /*SELECT  RTRIM(LTRIM(CAST(CONVERT(CHAR(10), MCC_MS_TARGETB.tgl, 103) AS CHAR))) AS tanggal,
+            MCC_MS_TARGETB.targetDay,
+            IsNull((SELECT  SUM(weight)
+            FROM  MCC_TR_HPRODUCTIONB
+            WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code =@argproject AND
+            CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112)  = @tgl1),0) AS actual,
+            
+            IsNull((SELECT  SUM(targetday)
+            FROM  MCC_MS_TARGETB a
+            WHERE a.material = 'OB' AND a.region_code =@argproject AND
+            CONVERT(CHAR(8), a.tgl, 112) BETWEEN @tgl2 AND @tgl1 ),0) AS daily_cumm_plan,
+            
+            IsNull((SELECT  SUM(weight)
+            FROM  MCC_TR_HPRODUCTIONB
+            WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code =@argproject AND
+            CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) BETWEEN @tgl2 AND @tgl1 ),0) AS actual_cumm_plan
+            
+        FROM    MCC_MS_TARGETB
+        WHERE   MCC_MS_TARGETB.material = 'OB' AND MCC_MS_TARGETB.region_code =@argproject AND CONVERT(CHAR(8), MCC_MS_TARGETB.tgl, 112)= @tgl1*/
+        
+        // $sp = "
+        //     SELECT RTRIM(LTRIM(CAST(CONVERT(CHAR(10),MCC_MS_TARGETB.tgl, 103) AS CHAR))) AS tanggal,
+        //         MCC_MS_TARGETB.targetDay,
+        //         IsNull((SELECT SUM(weight) FROM  MCC_TR_HPRODUCTIONB WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code IN ('{$site}') AND CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112)  = '{$tgl}'),0) AS actual,
+        //         IsNull((SELECT  SUM(targetday) FROM  MCC_MS_TARGETB a WHERE a.material = 'OB' AND a.region_code IN ('{$site}') AND CONVERT(CHAR(8), a.tgl, 112) BETWEEN '{$tgl}' AND '{$tgl}' ),0) AS daily_cumm_plan,
+        //         IsNull((SELECT  SUM(weight) FROM  MCC_TR_HPRODUCTIONB WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code IN ('{$site}') AND CONVERT(CHAR(8),
+        //         MCC_TR_HPRODUCTIONB.ProdDate, 112) = '{$tgl}' ),0) AS actual_cumm_plan
+
+        //     FROM MCC_MS_TARGETB
+        //     WHERE MCC_MS_TARGETB.material = 'OB' 
+        //         AND MCC_MS_TARGETB.region_code IN  ('{$site}') 
+        //         AND CONVERT(CHAR(8),MCC_MS_TARGETB.tgl, 112) = '{$tgl}'
+        // ";
+
+        // $builder = $this->mcp->query($sp);
+        // $builder->getResultArray();
+        // $builder = $builder->resultArray;
+
+        // // $bcm_tot_arr = [];
+
+        $rows = [];
+        $targetDay_arr = [];
+        $actual_arr = [];
+
+        if ($site) {
+            $sitex = $site;
+            $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$site}'";
+            $builder = $this->mcp->query($sp);
+            $builder->getResultArray();
+            $result = $builder->resultArray;
+            foreach ($result as $key => $value) {
+                foreach ($value as $key2 => $value2) {
+                    $value['region_code'] = $site;
+                }
+
+                $rows[] = $value;
+            }
+        }else{
+            $sitex = $site_project;
+            foreach ($site_project as $key => $value) {
+                $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$value}'";
+                $builder = $this->mcp->query($sp);
+                $builder->getResultArray();
+                $result = $builder->resultArray;
+                foreach ($result as $key2 => $value2) {
+                    foreach ($value2 as $key3 => $value3) {
+                        $value2['region_code'] = $value;
+                    }
+                    $rows[] = $value2;
+                }
+            }
+        }
+
+        foreach ($rows as $key => $value) {
+            $targetDay_arr[] = $value['targetDay'];
+            $actual_arr[] = $value['actual'];
+
+            if ($value['targetDay'] == '.000') {
+                $rows[$key]['targetDay'] = 0;
+            }
+
+            if ($value['actual'] == '.000') {
+                $rows[$key]['actual'] = 0;
+            }
+
+            $persentase = ($value['actual'] / $value['targetDay']) * 100;
+            $rows[$key]['persentase'] = round($persentase, 2);
+            $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
+        }
+
+        $select = "SUM(QtyRit * Capacity) AS total_ton_day";
+        $builder_coal = $this->qBuilder->show_TR_PRODUCTIONB($select, $sitex, $tgl, 'CL');
+        $total_actual_coal = $builder_coal->get()->getRow();
+
+        $show_hauling_daily = $this->hauling_daily();
+
+        $response = [
+            "status" => true,
+            "rows" => $rows,
+            // "targetDay_arr" => $targetDay_arr,
+            // "actual_arr" => $actual,
+            "total_target" => array_sum($targetDay_arr),
+            "total_actual" => array_sum($actual_arr),
+            "total_target_coal" => 0,
+            "total_actual_coal" => round($total_actual_coal->total_ton_day, 2),
+            // "total_target_hauling" => 0,
+            // "total_actual_hauling" => $show_hauling_daily['total'],
+            // "rows_actual_hauling" => $tota
+            "hauling" => $this->hauling_daily()
+        ];
+
+        return $this->respond($response, 200);
+    }
+
     public function zshow_summary_coalore_daily()
     {
         $tgl = $this->request->getVar('tgl');
@@ -522,19 +653,108 @@ class DashboardController extends ResourceController
         return $this->respond($result, 200);
     }
 
-    public function show_hauling_daily()
+    public function hauling_daily()
     {
         $tgl = $this->request->getVar('tgl');
         $tgl2 = $this->request->getVar('tgl');
         $site = $this->request->getVar('site');
+        $site_project = $this->show_region_code();
 
-        $sp = "exec dbo.uSP_0405_SHB_0034B N'SSA',N'20250901',N'20250930'";
+        $rows = [];
+        $total = 0;
+        $total_rit = 0;
 
-        $builder = $this->qBuilder->show_hauling_daily($tgl, $tgl2, $site);
+        if ($site) {
+            // code...
+            $builder = $this->qBuilder->query_show_hauling_daily($tgl, $tgl2, $site);
+            $result = $builder->resultArray;
+            foreach ($result as $key => $value) {
+                foreach ($value as $key2 => $value2) {
+                    $value['region_code'] = $site;
+                }
+
+                $rows[] = $value;
+            }
+        }else{
+            foreach ($site_project as $key => $value) {
+                $builder = $this->qBuilder->query_show_hauling_daily($tgl, $tgl2, $value);
+                $result = $builder->resultArray;
+
+                foreach ($result as $key2 => $value2) {
+                    foreach ($value2 as $key3 => $value3) {
+                        $value2['region_code'] = $value;
+                    }
+                    $rows[] = $value2;
+                }
+            }
+        }
         // $builder = $this->qBuilder->TEMP1($tgl, $tgl2, $site);
-        $result = $builder->resultArray;
+        // $builder = $this->qBuilder->sp_show_hauling_daily($tgl, $tgl2, $site);
 
-        return $this->respond($result, 200);
+
+        foreach ($rows as $key => $value) {
+            $total += $value['day'] + $value['night'];
+            $total_rit += $value['day_rit'] + $value['night_rit'];
+        }
+
+        $rows_actual_by_site = [];
+        foreach ($site_project as $key => $value) {
+            foreach ($rows as $key2 => $value2) {
+                if ($value2['region_code'] == $value) {
+                    $rows_actual_by_site[$value][] = $value2['day'] + $value2['night'];
+                }
+            }
+        }
+
+        foreach ($rows_actual_by_site as $key => $value) {
+            $totalv = array_sum($value);
+            $rows_actual_by_site[$key] = round($totalv,2);
+        }
+
+        $keys = [];
+        foreach ($rows_actual_by_site as $key2 => $value2) {
+            $keys[] = $key2;
+        }
+
+        $notKey = [];
+        foreach ($site_project as $key => $value) {
+            if (!in_array($value, $keys)) {
+                $notKey[$value] = 0;
+            }
+        }
+
+        $a = array_merge($rows_actual_by_site, $notKey);
+
+        $rows_by_site = [];
+        foreach ($a as $key => $value) {
+            $a = [
+                "region_code" => $key,
+                "total_target" => 0,
+                "total_actual" => $value,
+                "persentase" => 0,
+                "balance" => 0
+            ];
+
+            $rows_by_site[] = $a;
+        }
+
+        $response = [
+            "status"             => true,
+            "rows"               => $rows,
+            "total_target"       => 0,
+            "total_actual"       => round($total,2),
+            "total_rit"          => round($total_rit,2),
+            "rows_by_site"       => $rows_by_site,
+        ];
+
+        return $response;
+    }
+
+    public function show_hauling_daily()
+    {
+        $response = $this->hauling_daily();
+
+        return $this->respond($response, 200);
     }
 
     public function show_V_MCC_TR_HPRODUCTIONB_CL()
