@@ -99,7 +99,7 @@ class DashboardBuilder
 
         $query = "SELECT * FROM (" . $loader . " UNION ALL " . $hauler . ") AS TEMP2 ORDER BY TEMP2.tipe,TEMP2.unit_code,TEMP2.ProdDate ASC";
 
-        $builder = $this->mcp->query($query);
+        $builder = $this->mcp->query($hauler);
         $builder->getResultArray();
 
         return $builder;
