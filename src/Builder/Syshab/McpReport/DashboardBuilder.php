@@ -178,6 +178,22 @@ class DashboardBuilder
         return $builder;
     }
 
+    public function show_MCC_TR_HPRODUCTIONB($select, $site, $tgl, $kode)
+    {
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select($select)
+        ->where('ProdDate', $tgl)
+        ->where('kode', $kode);
+
+        if (is_array($site)) {
+            $builder->whereIn('region_code', $site);
+        }else{
+            $builder->where('region_code', $site);
+        }
+
+        return $builder;
+    }
+
     public function show_dashSite()
     {
         // 
@@ -210,5 +226,75 @@ class DashboardBuilder
         $tot_all_bcm = array_sum($bcm_tot_arr);
 
         return $this->respond($tot_all_bcm, 200);
+    }
+
+    public function summary_production($tgl, $tgl2, $site, $kode)
+    {
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select('SUM(Capacity) as total')
+        ->where('ProdDate >=', $tgl)
+        ->where('ProdDate <=', $tgl2)
+        ->whereIn('region_code', $site)
+        ->whereIn('kode', $kode);
+
+        $result = $builder->get()->getRow();
+
+        return $result;
+    }
+
+    public function total_actual_production($tgl, $tgl2, $site, $kode)
+    {
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select('SUM(Capacity) as total_actual')
+        ->where('ProdDate >=', $tgl)
+        ->where('ProdDate <=', $tgl2)
+        ->whereIn('region_code', $site)
+        ->whereIn('kode', $kode);
+
+        $result = $builder->get()->getRow();
+
+        return $result;
+    }
+
+    public function total_target_production($tgl, $tgl2, $site, $kode)
+    {
+        $builder = $this->mcp->table('MCC_MS_TARGETB')
+        ->select('SUM(targetDay) as total_target')
+        ->where('tgl >=', $tgl)
+        ->where('tgl <=', $tgl2)
+        ->whereIn('region_code', $site)
+        ->whereIn('material', $kode);
+
+        $result = $builder->get()->getRow();
+
+        return $result;
+    }
+
+    public function total_ob($tgl, $tgl2, $site)
+    {
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select('SUM(Capacity) as total')
+        ->where('ProdDate >=', $tgl)
+        ->where('ProdDate <=', $tgl2)
+        ->whereIn('region_code', $site)
+        ->whereIn('kode', 'OB');
+
+        $result = $builder->get()->getRow();
+
+        return $result;
+    }
+
+    public function total_hauling($tgl, $tgl2, $site)
+    {
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select('SUM(Capacity) as total')
+        ->where('ProdDate >=', $tgl)
+        ->where('ProdDate <=', $tgl2)
+        ->whereIn('region_code', $site)
+        ->whereIn('kode', 'CL');
+
+        $result = $builder->get()->getRow();
+
+        return $result;
     }
 }

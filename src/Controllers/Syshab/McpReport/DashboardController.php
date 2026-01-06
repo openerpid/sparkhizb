@@ -266,6 +266,10 @@ class DashboardController extends ResourceController
     public function show_daily()
     {
         $tgl = $this->request->getVar('tgl');
+        $tgl2 = $this->request->getVar('tgl2');
+        if (!$tgl2) {
+            $tgl2 = $tgl;
+        }
         $site = $this->request->getVar('site');
         // $site = implode("','", $this->show_region_code());
         // $site = "SSA";
@@ -403,8 +407,98 @@ class DashboardController extends ResourceController
 
         $show_hauling_daily = $this->hauling_daily();
 
+        $ob_daily_by_site = [];
+        $hauling_daily_by_site = [];
+        $coal_daily_by_site = [];
+
+        foreach ($site_project as $key => $value) {
+            $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
+            $hauling_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+            $hauling_total_balance_site = round($hauling_total_actual_site - $hauling_total_target_site,2);
+            if ($hauling_total_target_site != 0) {
+                $hauling_total_actual_persen_site = round(($hauling_total_actual_site / $hauling_total_target_site) * 100, 2);
+            }else{
+                $hauling_total_actual_persen_site = 0;
+            }
+            $hauling_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $hauling_total_target_site,
+                "total_actual" => $hauling_total_actual_site,
+                "total_balance" => $hauling_total_balance_site ,
+                "total_actual_persen" => $hauling_total_actual_persen_site
+            ];
+
+            $ob_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['OB'])->total_target,2);
+            $ob_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['OB'])->total_actual,2);
+            $ob_total_balance_site = round($ob_total_actual_site - $ob_total_target_site,2);
+            if ($ob_total_target_site != 0) {
+                $ob_total_actual_persen_site = round(($ob_total_actual_site / $ob_total_target_site) * 100, 2);
+            }else{
+                $ob_total_actual_persen_site = 0;
+            }
+            $ob_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $ob_total_target_site,
+                "total_actual" => $ob_total_actual_site,
+                "total_balance" => $ob_total_balance_site ,
+                "total_actual_persen" => $ob_total_actual_persen_site
+            ];
+
+            $coal_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CG'])->total_target,2);
+            $coal_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+            $coal_total_balance_site = round($coal_total_actual_site - $coal_total_target_site,2);
+            if ($coal_total_target_site != 0) {
+                $coal_total_actual_persen_site = round(($coal_total_actual_site / $coal_total_target_site) * 100, 2);
+            }else{
+                $coal_total_actual_persen_site = 0;
+            }
+            $coal_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $coal_total_target_site,
+                "total_actual" => $coal_total_actual_site,
+                "total_balance" => $coal_total_balance_site ,
+                "total_actual_persen" => $coal_total_actual_persen_site
+            ];
+        }
+
+        $ob_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['OB'])->total_target,2);
+        $ob_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['OB'])->total_actual,2);
+        $ob_total_balance = round($ob_total_actual - $ob_total_target, 2);
+        $ob_total_actual_persen = round(($ob_total_actual / $ob_total_target) * 100, 2);
+
+        $coal_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['CG'])->total_target,2);
+        $coal_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['CL'])->total_actual,2);
+        $coal_total_balance = round($coal_total_actual - $coal_total_target, 2);
+        $coal_total_actual_persen = round(($coal_total_actual / $coal_total_target) * 100, 2);
+
+        $hauling_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['CL'])->total_target,2);
+        $hauling_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['CL'])->total_actual,2);
+        $hauling_total_balance = round($hauling_total_actual - $hauling_total_target, 2);
+        $hauling_total_actual_persen = round(($hauling_total_actual / $hauling_total_target) * 100, 2);
+
         $response = [
             "status" => true,
+            "ob" => [
+                "total_target" => $ob_total_target,
+                "total_actual" => $ob_total_actual,
+                "total_balance" => $ob_total_balance,
+                "total_actual_persen" => $ob_total_actual_persen,
+                "rows" => $ob_daily_by_site
+            ],
+            "coalore" => [
+                "total_target" => $coal_total_target,
+                "total_actual" => $coal_total_actual,
+                "total_balance" => $coal_total_balance,
+                "total_actual_persen" => $coal_total_actual_persen,
+                "rows" => $coal_daily_by_site
+            ],
+            "hauling" => [
+                "total_target" => $hauling_total_target,
+                "total_actual" => $hauling_total_actual,
+                "total_balance" => $hauling_total_balance,
+                "total_actual_persen" => $hauling_total_actual_persen,
+                "rows" => $hauling_daily_by_site,
+            ],
             "keys" => $keys,
             "keys2" => $keys2,
             // "a" => $a,
@@ -418,7 +512,7 @@ class DashboardController extends ResourceController
             // "total_target_hauling" => 0,
             // "total_actual_hauling" => $show_hauling_daily['total'],
             // "rows_actual_hauling" => $tota
-            "hauling" => $this->hauling_daily()
+            "zhauling" => $this->hauling_daily()
         ];
 
         return $this->respond($response, 200);
@@ -797,5 +891,29 @@ class DashboardController extends ResourceController
         $result = $builder->resultArray;
 
         return $this->respond($result, 200);
+    }
+
+    public function summary_production()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $tgl2 = $this->request->getVar('tgl2');
+        $sites = $this->request->getVar('site');
+        $kode = $this->request->getVar('tgl');
+
+        $builder = $this->qBuilder->total_production($tgl, $tgl2, $sites, $kode);
+
+        return $this->respond($builder, 200);
+    }
+
+    public function total_production()
+    {
+        $tgl = $this->request->getVar('tgl');
+        $tgl2 = $this->request->getVar('tgl2');
+        $sites = explode(',', $this->request->getVar('site'));
+        $kode = explode(',', $this->request->getVar('kode'));
+
+        $builder = $this->qBuilder->total_production($tgl, $tgl2, $sites, $kode);
+
+        return $this->respond($builder, 200);
     }
 }

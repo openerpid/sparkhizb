@@ -36,6 +36,11 @@ $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static functio
                 $routes->get('show_summary_coalore_daily', 'McpReport\DashboardController::show_summary_coalore_daily');
                 $routes->get('show_hauling_daily', 'McpReport\DashboardController::show_hauling_daily');
                 $routes->get('show_V_MCC_TR_HPRODUCTIONB_CL', 'McpReport\DashboardController::show_V_MCC_TR_HPRODUCTIONB_CL');
+                $routes->get('summary_production', 'McpReport\DashboardController::summary_production');
+
+                $routes->get('total_production', 'McpReport\DashboardController::total_production');
+                $routes->get('total_ob', 'McpReport\DashboardController::total_ob');
+                $routes->get('total_hauling', 'McpReport\DashboardController::total_hauling');
             });
 
             $routes->group('ob', function ($routes) {
