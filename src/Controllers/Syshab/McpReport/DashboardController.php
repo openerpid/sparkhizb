@@ -499,20 +499,20 @@ class DashboardController extends ResourceController
                 "total_actual_persen" => $hauling_total_actual_persen,
                 "rows" => $hauling_daily_by_site,
             ],
-            "keys" => $keys,
-            "keys2" => $keys2,
-            // "a" => $a,
-            "rows" => $rows,
-            // "targetDay_arr" => $targetDay_arr,
-            // "actual_arr" => $actual,
-            "total_target" => array_sum($targetDay_arr),
-            "total_actual" => array_sum($actual_arr),
-            "total_target_coal" => 0,
-            "total_actual_coal" => round($total_actual_coal->total_ton_day, 2),
-            // "total_target_hauling" => 0,
-            // "total_actual_hauling" => $show_hauling_daily['total'],
-            // "rows_actual_hauling" => $tota
-            "zhauling" => $this->hauling_daily()
+            // "keys" => $keys,
+            // "keys2" => $keys2,
+            // // "a" => $a,
+            // "rows" => $rows,
+            // // "targetDay_arr" => $targetDay_arr,
+            // // "actual_arr" => $actual,
+            // "total_target" => array_sum($targetDay_arr),
+            // "total_actual" => array_sum($actual_arr),
+            // "total_target_coal" => 0,
+            // "total_actual_coal" => round($total_actual_coal->total_ton_day, 2),
+            // // "total_target_hauling" => 0,
+            // // "total_actual_hauling" => $show_hauling_daily['total'],
+            // // "rows_actual_hauling" => $tota
+            // "zhauling" => $this->hauling_daily()
         ];
 
         return $this->respond($response, 200);
