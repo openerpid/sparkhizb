@@ -15,6 +15,7 @@ use Dorbitt\Builder\Iescm\SiteProjectHerpBuilder;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
 use Sparkhizb\Builder\Syshab\McpReport\DashboardBuilder;
 use Sparkhizb\Models\Syshab\McpReport\VmcctrhproductionbclModel;
+use Sparkhizb\Models\Syshab\MCP\JobsiteModel;
 
 class DashboardController extends ResourceController
 {
@@ -34,6 +35,7 @@ class DashboardController extends ResourceController
         // $this->sitepMod = new SiteProjectModel();
         // $this->qbSite = new SiteProjectHerpBuilder();
         $this->qBuilder = new DashboardBuilder();
+        $this->mSite = new JobsiteModel();
     }
 
     public function index()
@@ -77,26 +79,22 @@ class DashboardController extends ResourceController
 
         /*========
         from herp db*/
-        // $query = "SELECT region_code FROM ms_jobsite  WHERE tActive = 1 ";
-
-        // $builder = $this->mcp->query($query);
-        // $builder->getResultArray();
-        // $builder = $builder->resultArray;
+        $builder = $this->mSite->where('tActive', 1)->findAll();
         
-        // foreach ($builder as $key => $value) {
-        //     $kdSite_arr[] = $value['region_code'];
-        // }
+        foreach ($builder as $key => $value) {
+            $kdSite_arr[] = $value['region_code'];
+        }
 
 
         /*========
         from iescm db*/
-        $siteList = $this->mSiteDash
-        ->select('kode')
-        ->findAll();
+        // $siteList = $this->mSiteDash
+        // ->select('kode')
+        // ->findAll();
 
-        foreach ($siteList as $key => $value) {
-            $kdSite_arr[] = $value['kode'];
-        }
+        // foreach ($siteList as $key => $value) {
+        //     $kdSite_arr[] = $value['kode'];
+        // }
 
         return $kdSite_arr;
     }
@@ -324,9 +322,9 @@ class DashboardController extends ResourceController
 
         // // $bcm_tot_arr = [];
 
-        $rows = [];
-        $targetDay_arr = [];
-        $actual_arr = [];
+        // $rows = [];
+        // $targetDay_arr = [];
+        // $actual_arr = [];
 
         if ($site) {
             $sitex = $site;
@@ -357,34 +355,34 @@ class DashboardController extends ResourceController
             }
         }
 
-        $keys = [];
-        foreach ($rows as $key => $value) {
-            // $keys[$value['region_code']] = $value['actual'];
-            $keys[] = $value['region_code'];
+        // $keys = [];
+        // foreach ($rows as $key => $value) {
+        //     // $keys[$value['region_code']] = $value['actual'];
+        //     $keys[] = $value['region_code'];
 
-            $targetDay_arr[] = $value['targetDay'];
-            $actual_arr[] = $value['actual'];
+        //     $targetDay_arr[] = $value['targetDay'];
+        //     $actual_arr[] = $value['actual'];
 
-            if ($value['targetDay'] == '.000') {
-                $rows[$key]['targetDay'] = 0;
-            }
+        //     if ($value['targetDay'] == '.000') {
+        //         $rows[$key]['targetDay'] = 0;
+        //     }
 
-            if ($value['actual'] == '.000') {
-                $rows[$key]['actual'] = 0;
-            }
+        //     if ($value['actual'] == '.000') {
+        //         $rows[$key]['actual'] = 0;
+        //     }
 
-            $persentase = ($value['actual'] / $value['targetDay']) * 100;
-            $rows[$key]['persentase'] = round($persentase, 2);
-            $rows[$key]['balance'] = $value['actual'] - $value['targetDay'];
-            $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
-        }
+        //     $persentase = ($value['actual'] / $value['targetDay']) * 100;
+        //     $rows[$key]['persentase'] = round($persentase, 2);
+        //     $rows[$key]['balance'] = $value['actual'] - $value['targetDay'];
+        //     $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
+        // }
 
-        $keys2 = $keys;
-        foreach ($site_project as $key => $value) {
-            if (!in_array($value, $keys)) {
-                array_push($keys2, $value);
-            }
-        }
+        // $keys2 = $keys;
+        // foreach ($site_project as $key => $value) {
+        //     if (!in_array($value, $keys)) {
+        //         array_push($keys2, $value);
+        //     }
+        // }
 
         // $a = array_merge($keys, $notKey);
 
@@ -410,6 +408,9 @@ class DashboardController extends ResourceController
         $ob_daily_by_site = [];
         $hauling_daily_by_site = [];
         $coal_daily_by_site = [];
+        $rainslip_daily_by_site = [];
+        $fuelratio_daily_by_site = [];
+        $striping_ratio_daily_by_site = [];
 
         foreach ($site_project as $key => $value) {
             $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
@@ -459,22 +460,141 @@ class DashboardController extends ResourceController
                 "total_balance" => $coal_total_balance_site ,
                 "total_actual_persen" => $coal_total_actual_persen_site
             ];
+
+            $rainslip_total_target_site = 0;
+            $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
+            $rainslip_total_balance_site = 0;
+            if ($rainslip_total_target_site != 0) {
+                $rainslip_total_actual_persen_site = round(($rainslip_total_actual_site / $rainslip_total_target_site) * 100, 2);
+            }else{
+                $rainslip_total_actual_persen_site = 0;
+            }
+            $rainslip_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $rainslip_total_target_site,
+                "total_actual" => $rainslip_total_actual_site,
+                "total_balance" => $rainslip_total_balance_site ,
+                "total_actual_persen" => $rainslip_total_actual_persen_site
+            ];
+
+            /**
+             * FUEL RATION*/
+            $fuelratio_total_target_site = 0;
+            $fuelratio_total_actual_site = round($this->qBuilder->total_fuelratio($tgl, $tgl2, [$value]),2);
+            $fuelratio_total_balance_site = 0;
+            if ($fuelratio_total_target_site != 0) {
+                $fuelratio_total_actual_persen_site = round(($fuelratio_total_actual_site / $fuelratio_total_target_site) * 100, 2);
+            }else{
+                $fuelratio_total_actual_persen_site = 0;
+            }
+            $fuelratio_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $fuelratio_total_target_site,
+                "total_actual" => $fuelratio_total_actual_site,
+                "total_balance" => $fuelratio_total_balance_site ,
+                "total_actual_persen" => $fuelratio_total_actual_persen_site
+            ];
+            /*===================================*/
+
+            /**
+             * STRIPING RATION*/
+            if ($coal_total_target_site != 0) {
+                $striping_total_target_site = round($ob_total_target_site / $coal_total_target_site,2);
+            }else{
+                $striping_total_target_site = 0;
+            }
+
+            if ($coal_total_actual_site != 0) {
+                $striping_total_actual_site = round($ob_total_actual_site / $coal_total_actual_site,2);
+            }else{
+                $striping_total_actual_site = 0;
+            }
+            // $striping_total_balance_site = 0;
+            // if ($striping_total_target_site != 0) {
+            //     $striping_total_actual_persen_site = round(($striping_total_actual_site / $striping_total_target_site) * 100, 2);
+            // }else{
+            //     $striping_total_actual_persen_site = 0;
+            // }
+            $striping_ratio_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $striping_total_target_site,
+                "total_actual" => $striping_total_actual_site,
+                // "total_balance" => $striping_total_balance_site,
+                // "total_actual_persen" => $striping_total_actual_persen_site
+            ];
+            /*===================================*/
         }
 
+        /**
+         * OB
+         * */
         $ob_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['OB'])->total_target,2);
         $ob_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['OB'])->total_actual,2);
         $ob_total_balance = round($ob_total_actual - $ob_total_target, 2);
         $ob_total_actual_persen = round(($ob_total_actual / $ob_total_target) * 100, 2);
+        /*====================*/
 
+        /**
+         * COAL
+         * */
         $coal_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['CG'])->total_target,2);
         $coal_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['CL'])->total_actual,2);
         $coal_total_balance = round($coal_total_actual - $coal_total_target, 2);
         $coal_total_actual_persen = round(($coal_total_actual / $coal_total_target) * 100, 2);
+        /*====================*/
 
+        /**
+         * HAULING
+         * */
         $hauling_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['CL'])->total_target,2);
         $hauling_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['CL'])->total_actual,2);
         $hauling_total_balance = round($hauling_total_actual - $hauling_total_target, 2);
         $hauling_total_actual_persen = round(($hauling_total_actual / $hauling_total_target) * 100, 2);
+        /*====================*/
+
+        /**
+         * RAIN AND SLIPARY
+         * */
+        $rainslip_total_target = 0;
+        $rainslip_total_actual = $this->qBuilder->total_actual_rainslip($tgl, $tgl2, $site_project);
+        $rainslip_total_balance = 0;
+        $rainslip_total_actual_persen = 0;
+        /*====================*/
+
+        /**
+         * FUEL RATIO
+         * */
+        $fuelratio_total_target = 0;
+        $fuelratio_total_actual = $this->qBuilder->total_fuelratio($tgl, $tgl2, $site_project);
+        $fuelratio_total_balance = 0;
+        $fuelratio_total_actual_persen = 0;
+        /*====================*/
+
+
+        usort($ob_daily_by_site, function($a, $b) {
+            // For descending order, compare $b to $a
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($coal_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($hauling_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($rainslip_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($fuelratio_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($striping_ratio_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
 
         $response = [
             "status" => true,
@@ -499,20 +619,27 @@ class DashboardController extends ResourceController
                 "total_actual_persen" => $hauling_total_actual_persen,
                 "rows" => $hauling_daily_by_site,
             ],
-            // "keys" => $keys,
-            // "keys2" => $keys2,
-            // // "a" => $a,
-            // "rows" => $rows,
-            // // "targetDay_arr" => $targetDay_arr,
-            // // "actual_arr" => $actual,
-            // "total_target" => array_sum($targetDay_arr),
-            // "total_actual" => array_sum($actual_arr),
-            // "total_target_coal" => 0,
-            // "total_actual_coal" => round($total_actual_coal->total_ton_day, 2),
-            // // "total_target_hauling" => 0,
-            // // "total_actual_hauling" => $show_hauling_daily['total'],
-            // // "rows_actual_hauling" => $tota
-            // "zhauling" => $this->hauling_daily()
+            "rain_slip" => [
+                "total_target" => $rainslip_total_target,
+                "total_actual" => $rainslip_total_actual,
+                "total_balance" => $rainslip_total_balance,
+                "total_actual_persen" => $rainslip_total_actual_persen,
+                "rows" => $rainslip_daily_by_site,
+            ],
+            "fuelratio" => [
+                "total_target" => 0,
+                "total_actual" => $fuelratio_total_actual,
+                "total_balance" => 0,
+                "total_actual_persen" => 0,
+                "rows" => $fuelratio_daily_by_site
+            ],
+            "striping_ratio" => [
+                "total_target" => 0,
+                "total_actual" => 0,
+                "total_balance" => 0,
+                "total_actual_persen" => 0,
+                "rows" => $striping_ratio_daily_by_site
+            ],
         ];
 
         return $this->respond($response, 200);

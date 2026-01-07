@@ -8,6 +8,7 @@ use Sparkhizb\UmmuHazardReport;
 // use App\Hizb\Models\Safety\HazardReportQueueMailModel;
 // use App\Hizb\Models\Safety\HazardReportNumberModel;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
+use Sparkhizb\Models\Syshab\MCP\TypeLoadModel;
 
 class DashboardBuilder
 {
@@ -15,6 +16,7 @@ class DashboardBuilder
     {
         $this->db = \Config\Database::connect();
         // $this->iescm = \Config\Database::connect('iescm');
+        $this->herp = \Config\Database::connect('herp');
         $this->mcp = \Config\Database::connect('mcp');
         $this->request = \Config\Services::request();
         $this->reqH = new RequestHelper();
@@ -23,6 +25,7 @@ class DashboardBuilder
         // $this->model = new HazardReportQueueMailModel();
         // $this->mNum = new HazardReportNumberModel();
         $this->mSiteDash = new DashboardSiteProjectListModel();
+        $this->mTypeLoad = new TypeLoadModel();
     }
 
     public function query_show_hauling_daily($tgl, $tgl2, $site)
@@ -296,5 +299,113 @@ class DashboardBuilder
         $result = $builder->get()->getRow();
 
         return $result;
+    }
+
+    public function total_actual_rainslip($tgl, $tgl2, $site)
+    {
+        $builder = $this->mcp->table('MCC_TR_RAINFALL')
+        ->select('sum(time_rain_dec) as total_rain, sum(time_slip_dec) as total_slip')
+        ->where('ProdDate >=', $tgl)
+        ->where('ProdDate <=', $tgl2)
+        ->whereIn('region_code', $site);
+
+        $result = $builder->get()->getRow();
+
+        // $query = "
+        //     SELECT (total_rain + total_slip) as total FROM (
+        //         SELECT sum(time_rain_dec) as total_rain, sum(time_slip_dec) as total_slip FROM MCC_TR_RAINFALL
+        //         WHERE region_code = 'SSA'
+        //         AND ProdDate = '20251201'
+        //     ) AS TEMS1
+        // ";
+
+        // $builder = $this->mcp->query($query);
+        // $builder->getResultArray();
+        // $result = $builder->resultArray;
+
+        $total = $result->total_rain + $result->total_slip;
+
+        return $total;
+    }
+
+    public function total_cl($tgl, $tgl2, $site)
+    {
+        $total_cl = "
+            SELECT SUM(ton_dis) AS total_cl
+            FROM MCC_TR_HPRODUCTIONB
+            WHERE kode = 'CL'
+            AND region_code = 'SSA';
+        ";
+
+        $builder = $this->mcp->table('MCC_TR_HPRODUCTIONB')
+        ->select('SUM(ton_dis) AS total')
+        ->where('kode', 'CL')
+        ->where('ProdDate >=', $tgl)
+        ->where('ProdDate <=', $tgl2)
+        ->whereIn('region_code', $site);
+
+        $result = $builder->get()->getRow();
+
+        return $result;
+    }
+
+    public function total_qty_out($tgl, $tgl2, $site)
+    {
+        $total_qty_out = "
+            SELECT SUM(a.qty_out) as total_qty_out
+            FROM tr_dod a
+            INNER JOIN tr_doh b ON b.do_code = a.do_code
+            INNER JOIN MCC_MS_TYPE_LOAD c ON c.load_code = b.load_code
+            WHERE b.Tgl >= '20250101'
+            AND b.region_code = 'STO'
+            AND b.status_do <> '4'
+            AND b.doc_type= '1' 
+            AND b.type_do = '6' 
+            AND b.CntrDoc = '2' 
+            AND c.load_type IN ('B-MCC-CM-001','B-MCC-OB-001');
+        ";
+
+        $builder = $this->herp->table('tr_dod a')
+        ->select('SUM(a.qty_out) as total')
+        ->join('tr_doh b', 'b.do_code = a.do_code', 'left')
+        ->join($this->mTypeLoad->table . ' c', 'c.load_code = b.load_code', 'left')
+        ->where('b.Tgl >=', $tgl)
+        ->where('b.Tgl <=', $tgl2)
+        ->whereIn('b.region_code', $site)
+        ->where('b.status_do !=', 4)
+        ->where('b.doc_type', 1)
+        ->where('b.type_do', 6)
+        ->where('b.CntrDoc', 2)
+        ->whereIn('c.load_type', ['B-MCC-CM-001','B-MCC-OB-001']);
+
+        $result = $builder->get()->getRow();
+
+        return $result;
+    }
+
+    public function total_fuelratio($tgl, $tgl2, $site)
+    {
+        $total_fuel = $this->total_qty_out($tgl, $tgl2, $site)->total;
+        if (!$total_fuel) {
+            $total_fuel = 0;
+        }
+
+        $total_cl = $this->total_cl($tgl, $tgl2, $site)->total;
+        if (!$total_cl) {
+            $total_cl = 0;
+        }
+
+        if ($total_cl != 0) {
+            $fuelratio_total_actual =  round($total_fuel / $total_cl, 2);
+        }else{
+            $fuelratio_total_actual = 0;
+        }
+
+        return $fuelratio_total_actual;
+    }
+
+    public function total_striping_ratio($tgl, $tgl2, $site)
+    {
+        
     }
 }
