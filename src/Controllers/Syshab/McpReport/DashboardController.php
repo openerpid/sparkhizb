@@ -432,10 +432,10 @@ class DashboardController extends ResourceController
             $ob_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['OB'])->total_target,2);
             $ob_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['OB'])->total_actual,2);
             $ob_total_balance_site = round($ob_total_actual_site - $ob_total_target_site,2);
-            if ($ob_total_target_site != 0) {
-                $ob_total_actual_persen_site = round(($ob_total_actual_site / $ob_total_target_site) * 100, 2);
-            }else{
+            if ($ob_total_target_site == 0 OR $ob_total_actual_site == 0) {
                 $ob_total_actual_persen_site = 0;
+            }else{
+                $ob_total_actual_persen_site = round(($ob_total_actual_site / $ob_total_target_site) * 100, 2);
             }
             $ob_daily_by_site[] = [
                 "region_code" => $value,
@@ -448,10 +448,10 @@ class DashboardController extends ResourceController
             $coal_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CG'])->total_target,2);
             $coal_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
             $coal_total_balance_site = round($coal_total_actual_site - $coal_total_target_site,2);
-            if ($coal_total_target_site != 0) {
-                $coal_total_actual_persen_site = round(($coal_total_actual_site / $coal_total_target_site) * 100, 2);
-            }else{
+            if ($coal_total_target_site == 0 OR $coal_total_actual_site == 0) {
                 $coal_total_actual_persen_site = 0;
+            }else{
+                $coal_total_actual_persen_site = round(($coal_total_actual_site / $coal_total_target_site) * 100, 2);
             }
             $coal_daily_by_site[] = [
                 "region_code" => $value,
@@ -464,10 +464,10 @@ class DashboardController extends ResourceController
             $rainslip_total_target_site = 0;
             $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
             $rainslip_total_balance_site = 0;
-            if ($rainslip_total_target_site != 0) {
-                $rainslip_total_actual_persen_site = round(($rainslip_total_actual_site / $rainslip_total_target_site) * 100, 2);
-            }else{
+            if ($rainslip_total_target_site == 0 OR $rainslip_total_actual_site == 0) {
                 $rainslip_total_actual_persen_site = 0;
+            }else{
+                $rainslip_total_actual_persen_site = round(($rainslip_total_actual_site / $rainslip_total_target_site) * 100, 2);
             }
             $rainslip_daily_by_site[] = [
                 "region_code" => $value,
@@ -482,10 +482,10 @@ class DashboardController extends ResourceController
             $fuelratio_total_target_site = 0;
             $fuelratio_total_actual_site = round($this->qBuilder->total_fuelratio($tgl, $tgl2, [$value]),2);
             $fuelratio_total_balance_site = 0;
-            if ($fuelratio_total_target_site != 0) {
-                $fuelratio_total_actual_persen_site = round(($fuelratio_total_actual_site / $fuelratio_total_target_site) * 100, 2);
-            }else{
+            if ($fuelratio_total_target_site == 0 OR $fuelratio_total_actual_site == 0) {
                 $fuelratio_total_actual_persen_site = 0;
+            }else{
+                $fuelratio_total_actual_persen_site = round(($fuelratio_total_actual_site / $fuelratio_total_target_site) * 100, 2);
             }
             $fuelratio_daily_by_site[] = [
                 "region_code" => $value,
@@ -498,16 +498,16 @@ class DashboardController extends ResourceController
 
             /**
              * STRIPING RATION*/
-            if ($coal_total_target_site != 0) {
-                $striping_total_target_site = round($ob_total_target_site / $coal_total_target_site,2);
-            }else{
+            if ($coal_total_target_site == 0 OR $ob_total_target_site == 0) {
                 $striping_total_target_site = 0;
+            }else{
+                $striping_total_target_site = round($ob_total_target_site / $coal_total_target_site,2);
             }
 
-            if ($coal_total_actual_site != 0) {
-                $striping_total_actual_site = round($ob_total_actual_site / $coal_total_actual_site,2);
-            }else{
+            if ($coal_total_actual_site == 0 OR $ob_total_actual_site == 0) {
                 $striping_total_actual_site = 0;
+            }else{
+                $striping_total_actual_site = round($ob_total_actual_site / $coal_total_actual_site,2);
             }
             // $striping_total_balance_site = 0;
             // if ($striping_total_target_site != 0) {
@@ -531,7 +531,12 @@ class DashboardController extends ResourceController
         $ob_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['OB'])->total_target,2);
         $ob_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['OB'])->total_actual,2);
         $ob_total_balance = round($ob_total_actual - $ob_total_target, 2);
-        $ob_total_actual_persen = round(($ob_total_actual / $ob_total_target) * 100, 2);
+        if ($ob_total_actual != 0 OR $ob_total_target != 0) {
+            // code...
+            $ob_total_actual_persen = round(($ob_total_actual / $ob_total_target) * 100, 2);
+        }else{
+            $ob_total_actual_persen = 0;
+        }
         /*====================*/
 
         /**
@@ -540,7 +545,11 @@ class DashboardController extends ResourceController
         $coal_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['CG'])->total_target,2);
         $coal_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['CL'])->total_actual,2);
         $coal_total_balance = round($coal_total_actual - $coal_total_target, 2);
-        $coal_total_actual_persen = round(($coal_total_actual / $coal_total_target) * 100, 2);
+        if ($coal_total_actual == 0 OR $coal_total_target == 0) {
+            $coal_total_actual_persen = 0;
+        }else{
+            $coal_total_actual_persen = round(($coal_total_actual / $coal_total_target) * 100, 2);
+        }
         /*====================*/
 
         /**
@@ -549,7 +558,11 @@ class DashboardController extends ResourceController
         $hauling_total_target = round($this->qBuilder->total_target_production($tgl, $tgl2, $site_project, ['CL'])->total_target,2);
         $hauling_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['CL'])->total_actual,2);
         $hauling_total_balance = round($hauling_total_actual - $hauling_total_target, 2);
-        $hauling_total_actual_persen = round(($hauling_total_actual / $hauling_total_target) * 100, 2);
+        if ($hauling_total_actual == 0 OR $hauling_total_target == 0) {
+            $hauling_total_actual_persen = 0;
+        }else{
+            $hauling_total_actual_persen = round(($hauling_total_actual / $hauling_total_target) * 100, 2);
+        }
         /*====================*/
 
         /**
