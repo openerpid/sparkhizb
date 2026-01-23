@@ -90,6 +90,20 @@ $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static functio
                     $routes->get('show_getting_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting_perunit');
                 });
             });
+
+            $routes->group('summary_daily_production', function($routes) {
+                $routes->get('getBy_locCode', 'McpReport\SummaryDailyProductionController::getBy_locCode');
+                $routes->get('getBy_locCode/(:any)', 'McpReport\SummaryDailyProductionController::getBy_locCode/$1');
+                
+                // $routes->group('production_result', function($routes) {
+                //     // $routes->get('/', 'McpReport\DailyMonitoring\ProductionResultController::index');
+                //     $routes->get('show_all', 'McpReport\DailyMonitoring\ProductionResultController::show_all');
+                //     $routes->get('show_ob', 'McpReport\DailyMonitoring\ProductionResultController::show_ob');
+                //     $routes->get('show_coalhauling_perlocation', 'McpReport\DailyMonitoring\ProductionResultController::show_coalhauling_perlocation');
+                //     $routes->get('show_hauling', 'McpReport\DailyMonitoring\ProductionResultController::show_hauling');
+                //     $routes->get('show_getting', 'McpReport\DailyMonitoring\ProductionResultController::show_getting');
+                // });
+            });
         });
     });
 });

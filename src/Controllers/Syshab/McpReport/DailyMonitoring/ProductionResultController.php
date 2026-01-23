@@ -260,6 +260,14 @@ class ProductionResultController extends ResourceController
             $stb = $value['stb'];
             $fuel = $value['fuel'];
 
+            $a = (24 - $bd - $stb);
+            $b = (24 -  $bd);
+            if ($b == 0) {
+                $ua = 0;
+            }else{
+                $ua = (($a / $b) * 100);
+            }
+
             $timestamp = strtotime($ProdDate); // Convert the string to a Unix timestamp            
             $dateOnly = date("Y-m-d", $timestamp); // Format the timestamp to the desired date format
             $query2[$key]['proddateonly'] = $dateOnly;
@@ -268,7 +276,8 @@ class ProductionResultController extends ResourceController
             $query2[$key]['fr'] = $fuel / ($day + $night);
             $query2[$key]['wh'] = 24 - ($stb  +  $bd);
             $query2[$key]['pa'] = ((24  -  $bd) / 24) * 100;
-            $query2[$key]['ua'] = (((24 - $bd - $stb) / (24 -  $bd)) * 100);
+            // $query2[$key]['ua'] = (((24 - $bd - $stb) / (24 -  $bd)) * 100);
+            $query2[$key]['ua'] = $ua;
         }
 
         // foreach ($query2 as $key => $value) {
@@ -352,16 +361,20 @@ class ProductionResultController extends ResourceController
             // $night_rit = $value['night_rit'];
             // $day = $value['day'];
             // $night = $value['night'];
-            $total = $value['total'];
-            $planD = $value['planD'];
+            $total = (float)$value['total'];
+            $planD = (float)$value['planD'];
 
             $timestamp = strtotime($ProdDate); // Convert the string to a Unix timestamp            
             $dateOnly = date("Y-m-d", $timestamp); // Format the timestamp to the desired date format
             $query2[$key]['proddateonly'] = $dateOnly;
             // $query2[$key]['total'] = number_format($day + $night, 2);
             // $query2[$key]['total_rit'] = number_format($day_rit + $night_rit, 2);
-
-            $query2[$key]['persen'] = round(($total / $planD) * 100, 2);
+            if ($planD == 0) {
+                $persen = 0;
+            }else{
+                $persen = round(($total / $planD) * 100, 2);
+            }
+            $query2[$key]['persen'] = $persen;
         }
 
         // foreach ($query2 as $key => $value) {
