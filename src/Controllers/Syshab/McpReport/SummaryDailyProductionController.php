@@ -64,6 +64,42 @@ class SummaryDailyProductionController extends ResourceController
         // return view($page, $data);
     }
 
+    public function show_ssc()
+    {
+        $tgl = $this->request->getVar("tgl");
+        $site = $this->request->getVar("site");
+
+        $response = [
+            "coal_by_seam" => $this->ssc_coal_by_seam($tgl, $site)
+        ];
+
+        return $this->respond($response, 200);
+    }
+
+    private function ssc_coal_by_seam($tgl, $site)
+    {
+        $selectVar = $this->request->getVar('select');
+        if ($selectVar) {
+            $select = $selectVar;
+        }else{
+            $select = "subloc_code,subloc_name";
+        }
+        
+        // if ($loc_code) {
+        //     $location = explode(",",$loc_code); 
+        // }else{
+        //     $location = explode(",", $this->request->getVar('loc_code'));
+        // }
+
+        $location = ["SSA003"];
+
+        $builder = $this->qbSubLoc->getBy_locCode($location, $select);
+        $rows = $builder->get()->getResult();
+
+        // return $this->respond($rows, 200);
+        return $rows;
+    }
+
     public function show_siteProject()
     {
         $query = "SELECT * FROM ms_jobsite  WHERE tActive = 1 ";
@@ -103,12 +139,19 @@ class SummaryDailyProductionController extends ResourceController
 
     public function getBy_locCode($loc_code)
     {
-        $select = "subloc_code,subloc_name";
+        $selectVar = $this->request->getVar('select');
+        if ($selectVar) {
+            $select = $selectVar;
+        }else{
+            $select = "subloc_code,subloc_name";
+        }
+        
         if ($loc_code) {
             $location = explode(",",$loc_code); 
         }else{
             $location = explode(",", $this->request->getVar('loc_code'));
         }
+
         $builder = $this->qbSubLoc->getBy_locCode($location, $select);
         $rows = $builder->get()->getResult();
 
