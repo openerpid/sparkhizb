@@ -16,6 +16,9 @@ use Sparkhizb\Models\DashboardSiteProjectListModel;
 use Sparkhizb\Builder\Syshab\McpReport\DashboardBuilder;
 use Sparkhizb\Models\Syshab\McpReport\VmcctrhproductionbclModel;
 use Sparkhizb\Models\Syshab\MCP\JobsiteModel;
+use Sparkhizb\Builder\Syshab\MCP\PlanBuilder;
+use Sparkhizb\Builder\Syshab\MCP\PlanPerPitBuilder;
+use Dorbitt\Helpers\DateTimeHelper;
 
 class DashboardController extends ResourceController
 {
@@ -36,6 +39,9 @@ class DashboardController extends ResourceController
         // $this->qbSite = new SiteProjectHerpBuilder();
         $this->qBuilder = new DashboardBuilder();
         $this->mSite = new JobsiteModel();
+        $this->bPlan = new PlanBuilder();
+        $this->planPIT = new PlanPerPitBuilder();
+        $this->dtH = new DateTimeHelper();
     }
 
     public function index()
@@ -461,7 +467,7 @@ class DashboardController extends ResourceController
                 "total_actual_persen" => $coal_total_actual_persen_site
             ];
 
-            $rainslip_total_target_site = 0;
+            $rainslip_total_target_site = round($this->total_plan_rain($tgl, [$value]), 2);
             $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
             $rainslip_total_balance_site = 0;
             if ($rainslip_total_target_site == 0 OR $rainslip_total_actual_site == 0) {
@@ -479,7 +485,7 @@ class DashboardController extends ResourceController
 
             /**
              * FUEL RATION*/
-            $fuelratio_total_target_site = 0;
+            $fuelratio_total_target_site = round($this->plan_fuelRatio($tgl, [$value]), 2);
             $fuelratio_total_actual_site = round($this->qBuilder->total_fuelratio($tgl, $tgl2, [$value]),2);
             $fuelratio_total_balance_site = 0;
             if ($fuelratio_total_target_site == 0 OR $fuelratio_total_actual_site == 0) {
@@ -568,7 +574,7 @@ class DashboardController extends ResourceController
         /**
          * RAIN AND SLIPARY
          * */
-        $rainslip_total_target = 0;
+        $rainslip_total_target = round($this->total_plan_rain($tgl, $site_project), 2);
         $rainslip_total_actual = $this->qBuilder->total_actual_rainslip($tgl, $tgl2, $site_project);
         $rainslip_total_balance = 0;
         $rainslip_total_actual_persen = 0;
@@ -577,7 +583,7 @@ class DashboardController extends ResourceController
         /**
          * FUEL RATIO
          * */
-        $fuelratio_total_target = 0;
+        $fuelratio_total_target = round($this->plan_fuelRatio($tgl, $site_project), 2);
         $fuelratio_total_actual = $this->qBuilder->total_fuelratio($tgl, $tgl2, $site_project);
         $fuelratio_total_balance = 0;
         $fuelratio_total_actual_persen = 0;
@@ -640,7 +646,7 @@ class DashboardController extends ResourceController
                 "rows" => $rainslip_daily_by_site,
             ],
             "fuelratio" => [
-                "total_target" => 0,
+                "total_target" => $fuelratio_total_target,
                 "total_actual" => $fuelratio_total_actual,
                 "total_balance" => 0,
                 "total_actual_persen" => 0,
@@ -1055,5 +1061,46 @@ class DashboardController extends ResourceController
         $builder = $this->qBuilder->total_production($tgl, $tgl2, $sites, $kode);
 
         return $this->respond($builder, 200);
+    }
+
+    /**
+     * total rain and slippery*/
+    private function total_plan_rain($tgl, $site)
+    {
+        $year = $this->dtH->getYear($tgl);
+        $month = $this->dtH->getMonth($tgl);
+        $jHari = $this->dtH->jHari($tgl);
+
+        $select = "(SUM(raintime".(int)$month.") + SUM(slippery".(int)$month.")) as total";
+
+        $builder = $this->planPIT->show_per_day($select, $year, $site, ['CG','CL']);
+        $query = $builder->get()
+        // ->getResultArray();
+        ->getRow();
+
+        $total = $query->total;
+
+        return $total / $jHari;
+    }
+
+    /**
+     * plan fuel*/
+    private function plan_fuelRatio($tgl, $site)
+    {
+        $year = $this->dtH->getYear($tgl);
+        $month = $this->dtH->getMonth($tgl);
+        $jHari = $this->dtH->jHari($tgl);
+
+        // $select = "*";
+        $select = "(SUM(targetDay) / SUM(targetFuel)) as total";
+
+        $builder = $this->bPlan->show_per_day($select, $this->dtH->toYmd($tgl), $site, ['CG','CL','OB']);
+        $query = $builder->get()
+        // ->getResultArray();
+        ->getRow();
+
+        $total = $query->total;
+
+        return $total;
     }
 }
