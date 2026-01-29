@@ -14,12 +14,14 @@ namespace Sparkhizb\Helpers;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Services;
+use Sparkhizb\Helpers\JwtHelper;
 
 class RequestHelper
 {
     public function __construct()
     {
         $this->request = \Config\Services::request();
+        $this->jwt = new JwtHelper();
     }
 
     public function page_header($data_page, $page)
@@ -158,5 +160,29 @@ class RequestHelper
         ];
 
         return $payload;
+    }
+
+    public function companyToken()
+    {
+        $company_token = $this->request->header("Company-Token");
+
+        if ($company_token) {
+            $company_token = $company_token->getValue();
+
+            return $company_token;
+        }
+    }
+
+    public function companyTokenDecode()
+    {
+        $company_token = $this->request->header("Company-Token");
+
+        if ($company_token) {
+            $company_token = $company_token->getValue();
+
+            $decode = $this->jwt->decode($company_token);
+
+            return $decode;
+        }
     }
 }
