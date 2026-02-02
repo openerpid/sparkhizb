@@ -121,94 +121,95 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
         });
     });
 
-    /*===============Spark===============*/
-    /*===============Spark===============*/
-    $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static function($routes) {
-        $routes->group('syshab', ['namespace' => 'Sparkhizb\Controllers\Syshab'], static function($routes) {
-            $routes->group('mcp_report', function($routes) {
-                $routes->group('dashboard', function ($routes) {
-                    // $routes->get('/', 'DashboardController::index');
-                    $routes->get('show_siteProject', 'McpReport\DashboardController::show_siteProject');
-                    $routes->get('show_summary_ob', 'McpReport\DashboardController::show_summary_ob');
-                    $routes->get('show_daily', 'McpReport\DashboardController::show_daily');
-                    $routes->get('show_plan_ob_daily', 'McpReport\DashboardController::show_plan_ob_daily');
-                    $routes->get('show_summary_ob_daily', 'McpReport\DashboardController::show_summary_ob_daily');
-                    $routes->get('show_summary_coalore_daily', 'McpReport\DashboardController::show_summary_coalore_daily');
-                    $routes->get('show_hauling_daily', 'McpReport\DashboardController::show_hauling_daily');
-                    $routes->get('show_V_MCC_TR_HPRODUCTIONB_CL', 'McpReport\DashboardController::show_V_MCC_TR_HPRODUCTIONB_CL');
-                    $routes->get('summary_production', 'McpReport\DashboardController::summary_production');
+    // /*===============Spark===============*/
+    // /*===============Spark===============*/
+    // $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static function($routes) {
+    //     $routes->group('syshab', ['namespace' => 'Sparkhizb\Controllers\Syshab'], static function($routes) {
+    //         $routes->group('mcp_report', function($routes) {
+    //             $routes->group('dashboard', function ($routes) {
+    //                 // $routes->get('/', 'DashboardController::index');
+    //                 $routes->get('show_siteProject', 'McpReport\DashboardController::show_siteProject');
+    //                 $routes->get('show_summary_ob', 'McpReport\DashboardController::show_summary_ob');
+    //                 $routes->get('show_daily', 'McpReport\DashboardController::show_daily');
+    //                 $routes->get('show_monthly', 'McpReport\DashboardController::show_daily');
+    //                 $routes->get('show_plan_ob_daily', 'McpReport\DashboardController::show_plan_ob_daily');
+    //                 $routes->get('show_summary_ob_daily', 'McpReport\DashboardController::show_summary_ob_daily');
+    //                 $routes->get('show_summary_coalore_daily', 'McpReport\DashboardController::show_summary_coalore_daily');
+    //                 $routes->get('show_hauling_daily', 'McpReport\DashboardController::show_hauling_daily');
+    //                 $routes->get('show_V_MCC_TR_HPRODUCTIONB_CL', 'McpReport\DashboardController::show_V_MCC_TR_HPRODUCTIONB_CL');
+    //                 $routes->get('summary_production', 'McpReport\DashboardController::summary_production');
 
-                    $routes->get('total_production', 'McpReport\DashboardController::total_production');
-                    $routes->get('total_ob', 'McpReport\DashboardController::total_ob');
-                    $routes->get('total_hauling', 'McpReport\DashboardController::total_hauling');
-                });
+    //                 $routes->get('total_production', 'McpReport\DashboardController::total_production');
+    //                 $routes->get('total_ob', 'McpReport\DashboardController::total_ob');
+    //                 $routes->get('total_hauling', 'McpReport\DashboardController::total_hauling');
+    //             });
 
-                $routes->group('ob', function ($routes) {
-                    $routes->group('hourly_monitoring', ['namespace' => 'App\Controllers\Admin\McpReport\OB'], static function ($routes) {
-                        $routes->get('/', 'HourlyMonitoringController::index');
-                        $routes->get('show', 'HourlyMonitoringController::show_hourly_ob_monitoring');
-                        $routes->get('show_all', 'HourlyMonitoringController::show_hourly_ob_monitoring_all');
-                        $routes->get('show_modif', 'HourlyMonitoringController::modif_hourly_ob_monitoring');
-                        $routes->get('show_modif/(:any)', 'HourlyMonitoringController::modif_hourly_ob_monitoring/$1');
-                    });
+    //             $routes->group('ob', function ($routes) {
+    //                 $routes->group('hourly_monitoring', ['namespace' => 'App\Controllers\Admin\McpReport\OB'], static function ($routes) {
+    //                     $routes->get('/', 'HourlyMonitoringController::index');
+    //                     $routes->get('show', 'HourlyMonitoringController::show_hourly_ob_monitoring');
+    //                     $routes->get('show_all', 'HourlyMonitoringController::show_hourly_ob_monitoring_all');
+    //                     $routes->get('show_modif', 'HourlyMonitoringController::modif_hourly_ob_monitoring');
+    //                     $routes->get('show_modif/(:any)', 'HourlyMonitoringController::modif_hourly_ob_monitoring/$1');
+    //                 });
 
-                    // $routes->group('daily-monitoring', ['namespace' => 'App\Controllers\Admin\McpReport\OB'], static function ($routes) {
-                    //     $routes->get('/', 'HourlyMonitoringController::report_daily_production');
-                    //     $routes->get('pit/search', 'HourlyMonitoringController::search');
-                    //     $routes->get('equipment/search', 'HourlyMonitoringController::equipment_search');
-                    //     $routes->get('fuel-info', 'HourlyMonitoringController::fuel_info');
-                    //     $routes->get('plan-target', 'HourlyMonitoringController::plan_target');
-                    //     $routes->get('plan-target/month-year-date', 'HourlyMonitoringController::month_year_date');
-                    // });
-                });
+    //                 // $routes->group('daily-monitoring', ['namespace' => 'App\Controllers\Admin\McpReport\OB'], static function ($routes) {
+    //                 //     $routes->get('/', 'HourlyMonitoringController::report_daily_production');
+    //                 //     $routes->get('pit/search', 'HourlyMonitoringController::search');
+    //                 //     $routes->get('equipment/search', 'HourlyMonitoringController::equipment_search');
+    //                 //     $routes->get('fuel-info', 'HourlyMonitoringController::fuel_info');
+    //                 //     $routes->get('plan-target', 'HourlyMonitoringController::plan_target');
+    //                 //     $routes->get('plan-target/month-year-date', 'HourlyMonitoringController::month_year_date');
+    //                 // });
+    //             });
 
-                $routes->group('daily_monitoring', function($routes) {
-                    $routes->group('production_result', function($routes) {
-                        // $routes->get('/', 'McpReport\DailyMonitoring\ProductionResultController::index');
-                        $routes->get('show_all', 'McpReport\DailyMonitoring\ProductionResultController::show_all');
-                        $routes->get('show_ob', 'McpReport\DailyMonitoring\ProductionResultController::show_ob');
-                        $routes->get('show_coalhauling_perlocation', 'McpReport\DailyMonitoring\ProductionResultController::show_coalhauling_perlocation');
-                        $routes->get('show_hauling', 'McpReport\DailyMonitoring\ProductionResultController::show_hauling');
-                        $routes->get('show_getting', 'McpReport\DailyMonitoring\ProductionResultController::show_getting');
-                    });
+    //             $routes->group('daily_monitoring', function($routes) {
+    //                 $routes->group('production_result', function($routes) {
+    //                     // $routes->get('/', 'McpReport\DailyMonitoring\ProductionResultController::index');
+    //                     $routes->get('show_all', 'McpReport\DailyMonitoring\ProductionResultController::show_all');
+    //                     $routes->get('show_ob', 'McpReport\DailyMonitoring\ProductionResultController::show_ob');
+    //                     $routes->get('show_coalhauling_perlocation', 'McpReport\DailyMonitoring\ProductionResultController::show_coalhauling_perlocation');
+    //                     $routes->get('show_hauling', 'McpReport\DailyMonitoring\ProductionResultController::show_hauling');
+    //                     $routes->get('show_getting', 'McpReport\DailyMonitoring\ProductionResultController::show_getting');
+    //                 });
 
-                    $routes->group('equipment_performance', function ($routes) {
-                        // $routes->get('/', 'EquipmentPerformanceController::index');
-                        $routes->get('show_all_daily', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_all_daily');
-                        $routes->get('show_all_summary', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_all_summary');
+    //                 $routes->group('equipment_performance', function ($routes) {
+    //                     // $routes->get('/', 'EquipmentPerformanceController::index');
+    //                     $routes->get('show_all_daily', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_all_daily');
+    //                     $routes->get('show_all_summary', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_all_summary');
 
-                        $routes->get('show_ob_perloc', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_ob');
-                        $routes->get('show_ob_pertgl', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_ob_pertgl');
-                        $routes->get('show_ob_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_ob_perunit');
+    //                     $routes->get('show_ob_perloc', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_ob');
+    //                     $routes->get('show_ob_pertgl', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_ob_pertgl');
+    //                     $routes->get('show_ob_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_ob_perunit');
 
-                        $routes->get('show_hauling_perloc', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_hauling');
-                        $routes->get('show_hauling_pertgl', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_hauling_pertgl');
-                        $routes->get('show_hauling_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_hauling_perunit');
+    //                     $routes->get('show_hauling_perloc', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_hauling');
+    //                     $routes->get('show_hauling_pertgl', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_hauling_pertgl');
+    //                     $routes->get('show_hauling_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_hauling_perunit');
 
-                        $routes->get('show_getting_perloc', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting');
-                        $routes->get('show_getting_pertgl', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting_pertgl');
-                        $routes->get('show_getting_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting_perunit');
-                    });
-                });
+    //                     $routes->get('show_getting_perloc', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting');
+    //                     $routes->get('show_getting_pertgl', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting_pertgl');
+    //                     $routes->get('show_getting_perunit', 'McpReport\DailyMonitoring\EquipmentPerformanceController::show_equipment_performance_getting_perunit');
+    //                 });
+    //             });
 
-                $routes->group('summary_daily_production', function($routes) {
-                    $routes->get('show_ssc_summary', 'McpReport\SummaryDailyProductionController::show_ssc_summary');
+    //             $routes->group('summary_daily_production', function($routes) {
+    //                 $routes->get('show_ssc_summary', 'McpReport\SummaryDailyProductionController::show_ssc_summary');
 
-                    $routes->get('getBy_locCode', 'McpReport\SummaryDailyProductionController::getBy_locCode');
-                    $routes->get('getBy_locCode/(:any)', 'McpReport\SummaryDailyProductionController::getBy_locCode/$1');
+    //                 $routes->get('getBy_locCode', 'McpReport\SummaryDailyProductionController::getBy_locCode');
+    //                 $routes->get('getBy_locCode/(:any)', 'McpReport\SummaryDailyProductionController::getBy_locCode/$1');
                     
-                    // $routes->group('production_result', function($routes) {
-                    //     // $routes->get('/', 'McpReport\DailyMonitoring\ProductionResultController::index');
-                    //     $routes->get('show_all', 'McpReport\DailyMonitoring\ProductionResultController::show_all');
-                    //     $routes->get('show_ob', 'McpReport\DailyMonitoring\ProductionResultController::show_ob');
-                    //     $routes->get('show_coalhauling_perlocation', 'McpReport\DailyMonitoring\ProductionResultController::show_coalhauling_perlocation');
-                    //     $routes->get('show_hauling', 'McpReport\DailyMonitoring\ProductionResultController::show_hauling');
-                    //     $routes->get('show_getting', 'McpReport\DailyMonitoring\ProductionResultController::show_getting');
-                    // });
-                });
-            });
-        });
-    });
+    //                 // $routes->group('production_result', function($routes) {
+    //                 //     // $routes->get('/', 'McpReport\DailyMonitoring\ProductionResultController::index');
+    //                 //     $routes->get('show_all', 'McpReport\DailyMonitoring\ProductionResultController::show_all');
+    //                 //     $routes->get('show_ob', 'McpReport\DailyMonitoring\ProductionResultController::show_ob');
+    //                 //     $routes->get('show_coalhauling_perlocation', 'McpReport\DailyMonitoring\ProductionResultController::show_coalhauling_perlocation');
+    //                 //     $routes->get('show_hauling', 'McpReport\DailyMonitoring\ProductionResultController::show_hauling');
+    //                 //     $routes->get('show_getting', 'McpReport\DailyMonitoring\ProductionResultController::show_getting');
+    //                 // });
+    //             });
+    //         });
+    //     });
+    // });
 });
 
 $routes->group('openapi2', function($routes) {
@@ -233,6 +234,8 @@ $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static functio
                 $routes->get('show_siteProject', 'McpReport\DashboardController::show_siteProject');
                 $routes->get('show_summary_ob', 'McpReport\DashboardController::show_summary_ob');
                 $routes->get('show_daily', 'McpReport\DashboardController::show_daily');
+                $routes->get('show_monthly', 'McpReport\DashboardController::show_monthly');
+                $routes->get('show_summary/(:any)', 'McpReport\DashboardController::show_summary/$1');
                 $routes->get('show_plan_ob_daily', 'McpReport\DashboardController::show_plan_ob_daily');
                 $routes->get('show_summary_ob_daily', 'McpReport\DashboardController::show_summary_ob_daily');
                 $routes->get('show_summary_coalore_daily', 'McpReport\DashboardController::show_summary_coalore_daily');
