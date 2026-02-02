@@ -235,6 +235,7 @@ $routes->group('spark', ['namespace' => 'Sparkhizb\Controllers'], static functio
                 $routes->get('show_summary_ob', 'McpReport\DashboardController::show_summary_ob');
                 $routes->get('show_daily', 'McpReport\DashboardController::show_daily');
                 $routes->get('show_monthly', 'McpReport\DashboardController::show_monthly');
+                $routes->get('show_yearly', 'McpReport\DashboardController::show_yearly');
                 $routes->get('show_summary/(:any)', 'McpReport\DashboardController::show_summary/$1');
                 $routes->get('show_plan_ob_daily', 'McpReport\DashboardController::show_plan_ob_daily');
                 $routes->get('show_summary_ob_daily', 'McpReport\DashboardController::show_summary_ob_daily');
