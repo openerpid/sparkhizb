@@ -446,6 +446,7 @@ class DashboardController extends ResourceController
         $rainslip_daily_by_site = [];
         $fuelratio_daily_by_site = [];
         $striping_ratio_daily_by_site = [];
+        $distanceOB_daily_by_site = [];
 
         foreach ($site_project as $key => $value) {
             $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
@@ -496,6 +497,8 @@ class DashboardController extends ResourceController
                 "total_actual_persen" => $coal_total_actual_persen_site
             ];
 
+            /**
+             * RAIN AND SLIPPERY*/
             $rainslip_total_target_site = round($this->total_plan_rain($tgl, [$value]), 2);
             $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
             $rainslip_total_balance_site = 0;
@@ -556,6 +559,25 @@ class DashboardController extends ResourceController
                 "total_actual" => $striping_total_actual_site,
                 // "total_balance" => $striping_total_balance_site,
                 // "total_actual_persen" => $striping_total_actual_persen_site
+            ];
+            /*===================================*/
+
+            /**
+             * DISTANCE OB*/
+            $distanceOB_total_target_site = round($this->plan_distance_ob($tgl, [$value]), 2);
+            $distanceOB_total_actual_site = 0;
+            $distanceOB_total_balance_site = 0;
+            if ($distanceOB_total_target_site == 0 OR $distanceOB_total_actual_site == 0) {
+                $distanceOB_total_actual_persen_site = 0;
+            }else{
+                $distanceOB_total_actual_persen_site = round(($distanceOB_total_actual_site / $distanceOB_total_target_site) * 100, 2);
+            }
+            $distanceOB_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $distanceOB_total_target_site,
+                "total_actual" => $distanceOB_total_actual_site,
+                "total_balance" => $distanceOB_total_balance_site ,
+                "total_actual_persen" => $distanceOB_total_actual_persen_site
             ];
             /*===================================*/
         }
@@ -687,6 +709,20 @@ class DashboardController extends ResourceController
                 "total_balance" => 0,
                 "total_actual_persen" => 0,
                 "rows" => $striping_ratio_daily_by_site
+            ],
+            "distance_ob" => [
+                "total_target" => 0,
+                "total_actual" => 0,
+                "total_balance" => 0,
+                "total_actual_persen" => 0,
+                "rows" => $distanceOB_daily_by_site
+            ],
+            "distance_ore_coal" => [
+                "total_target" => 0,
+                "total_actual" => 0,
+                "total_balance" => 0,
+                "total_actual_persen" => 0,
+                "rows" => []
             ],
         ];
 
@@ -1644,5 +1680,43 @@ class DashboardController extends ResourceController
         $total = $query->total;
 
         return $total;
+    }
+
+    /**
+     * plan distance ob*/
+    private function plan_distance_ob($tgl, $site)
+    {
+        $year = $this->dtH->getYear($tgl);
+        $month = $this->dtH->getMonth($tgl);
+        $jHari = $this->dtH->jHari($tgl);
+
+        $select = "SUM(avg_distance".(int)$month.") as total";
+
+        $builder = $this->planPIT->show_per_day($select, $year, $site, ['OB']);
+        $query = $builder->get()
+        ->getRow();
+
+        $total = $query->total;
+
+        return $total / $jHari;
+    }
+
+    /**
+     * plan distance ore/coal*/
+    private function plan_distance_ore_coal($tgl, $site)
+    {
+        $year = $this->dtH->getYear($tgl);
+        $month = $this->dtH->getMonth($tgl);
+        $jHari = $this->dtH->jHari($tgl);
+
+        $select = "SUM(avg_distance".(int)$month.") as total";
+
+        $builder = $this->planPIT->show_per_day($select, $year, $site, ['CG','CL']);
+        $query = $builder->get()
+        ->getRow();
+
+        $total = $query->total;
+
+        return $total / $jHari;
     }
 }
