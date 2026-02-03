@@ -19,6 +19,8 @@ use Sparkhizb\Models\Syshab\MCP\JobsiteModel;
 use Sparkhizb\Builder\Syshab\MCP\PlanBuilder;
 use Sparkhizb\Builder\Syshab\MCP\PlanPerPitBuilder;
 use Dorbitt\Helpers\DateTimeHelper;
+use Sparkhizb\Builder\Syshab\MCP\TrProductionBuilder;
+use Sparkhizb\Builder\Syshab\MCP\TrProductionBBuilder;
 
 class DashboardController extends ResourceController
 {
@@ -42,6 +44,8 @@ class DashboardController extends ResourceController
         $this->bPlan = new PlanBuilder();
         $this->planPIT = new PlanPerPitBuilder();
         $this->dtH = new DateTimeHelper();
+        $this->bTrProd = new TrProductionBuilder();
+        $this->bTrProdB = new TrProductionBBuilder();
     }
 
     public function index()
@@ -267,6 +271,10 @@ class DashboardController extends ResourceController
         return $this->respond($response, 200);
     }
 
+
+
+    /**
+     * RUN ==========*/
     public function show_daily()
     {
         $tgl = $this->request->getVar('tgl');
@@ -278,7 +286,6 @@ class DashboardController extends ResourceController
         
         $response =  $this->show_summary_by_date($tgl, $tgl2, $site);
         return $this->respond($response, 200);
-
     }
 
     public function show_monthly()
@@ -307,59 +314,6 @@ class DashboardController extends ResourceController
     private function show_summary_by_date($tgl, $tgl2, $site = null)
     {
         $site_project = $this->show_region_code();
-
-        /*exec dbo.uSP_0405_SHB_0046B N''{$tgl}'',N'SSA' --FUEL
-        exec dbo.uSP_0405_SHB_0046C N''{$tgl}'',N''{$tgl}'',N'SSA' --daily
-        exec dbo.uSP_0405_SHB_0046D 2025,12,N''{$tgl}'',N''{$tgl}'',N'20250101',N'SSA' --monthly dan yearly
-        exec dbo.uSP_0405_SHB_0046A N''{$tgl}'',N'SSA'*/
-
-        // $sp = "uSP_0405_SHB_0046C '{$tgl}', '{$tgl}', '{$site}'";
-
-        /*$a = "SELECT SUM(weight) as actual FROM  MCC_TR_HPRODUCTIONB WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code =  ('{$site}') AND CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112)  = '{$tgl}'";*/
-
-        /*SELECT  RTRIM(LTRIM(CAST(CONVERT(CHAR(10), MCC_MS_TARGETB.tgl, 103) AS CHAR))) AS tanggal,
-            MCC_MS_TARGETB.targetDay,
-            IsNull((SELECT  SUM(weight)
-            FROM  MCC_TR_HPRODUCTIONB
-            WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code =@argproject AND
-            CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112)  = @tgl1),0) AS actual,
-            
-            IsNull((SELECT  SUM(targetday)
-            FROM  MCC_MS_TARGETB a
-            WHERE a.material = 'OB' AND a.region_code =@argproject AND
-            CONVERT(CHAR(8), a.tgl, 112) BETWEEN @tgl2 AND @tgl1 ),0) AS daily_cumm_plan,
-            
-            IsNull((SELECT  SUM(weight)
-            FROM  MCC_TR_HPRODUCTIONB
-            WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code =@argproject AND
-            CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112) BETWEEN @tgl2 AND @tgl1 ),0) AS actual_cumm_plan
-            
-        FROM    MCC_MS_TARGETB
-        WHERE   MCC_MS_TARGETB.material = 'OB' AND MCC_MS_TARGETB.region_code =@argproject AND CONVERT(CHAR(8), MCC_MS_TARGETB.tgl, 112)= @tgl1*/
-        
-        // $sp = "
-        //     SELECT RTRIM(LTRIM(CAST(CONVERT(CHAR(10),MCC_MS_TARGETB.tgl, 103) AS CHAR))) AS tanggal,
-        //         MCC_MS_TARGETB.targetDay,
-        //         IsNull((SELECT SUM(weight) FROM  MCC_TR_HPRODUCTIONB WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code IN ('{$site}') AND CONVERT(CHAR(8), MCC_TR_HPRODUCTIONB.ProdDate, 112)  = '{$tgl}'),0) AS actual,
-        //         IsNull((SELECT  SUM(targetday) FROM  MCC_MS_TARGETB a WHERE a.material = 'OB' AND a.region_code IN ('{$site}') AND CONVERT(CHAR(8), a.tgl, 112) BETWEEN '{$tgl}' AND '{$tgl}' ),0) AS daily_cumm_plan,
-        //         IsNull((SELECT  SUM(weight) FROM  MCC_TR_HPRODUCTIONB WHERE MCC_TR_HPRODUCTIONB.kode = 'OB' AND MCC_TR_HPRODUCTIONB.region_code IN ('{$site}') AND CONVERT(CHAR(8),
-        //         MCC_TR_HPRODUCTIONB.ProdDate, 112) = '{$tgl}' ),0) AS actual_cumm_plan
-
-        //     FROM MCC_MS_TARGETB
-        //     WHERE MCC_MS_TARGETB.material = 'OB' 
-        //         AND MCC_MS_TARGETB.region_code IN  ('{$site}') 
-        //         AND CONVERT(CHAR(8),MCC_MS_TARGETB.tgl, 112) = '{$tgl}'
-        // ";
-
-        // $builder = $this->mcp->query($sp);
-        // $builder->getResultArray();
-        // $builder = $builder->resultArray;
-
-        // // $bcm_tot_arr = [];
-
-        // $rows = [];
-        // $targetDay_arr = [];
-        // $actual_arr = [];
 
         if ($site) {
             $sitex = $site;
@@ -390,50 +344,6 @@ class DashboardController extends ResourceController
             }
         }
 
-        // $keys = [];
-        // foreach ($rows as $key => $value) {
-        //     // $keys[$value['region_code']] = $value['actual'];
-        //     $keys[] = $value['region_code'];
-
-        //     $targetDay_arr[] = $value['targetDay'];
-        //     $actual_arr[] = $value['actual'];
-
-        //     if ($value['targetDay'] == '.000') {
-        //         $rows[$key]['targetDay'] = 0;
-        //     }
-
-        //     if ($value['actual'] == '.000') {
-        //         $rows[$key]['actual'] = 0;
-        //     }
-
-        //     $persentase = ($value['actual'] / $value['targetDay']) * 100;
-        //     $rows[$key]['persentase'] = round($persentase, 2);
-        //     $rows[$key]['balance'] = $value['actual'] - $value['targetDay'];
-        //     $rows[$key]['minus'] = $value['actual'] - $value['targetDay'];
-        // }
-
-        // $keys2 = $keys;
-        // foreach ($site_project as $key => $value) {
-        //     if (!in_array($value, $keys)) {
-        //         array_push($keys2, $value);
-        //     }
-        // }
-
-        // $a = array_merge($keys, $notKey);
-
-        // $rows_by_site = [];
-        // foreach ($a as $key => $value) {
-        //     $a = [
-        //         "region_code" => $key,
-        //         "total_target" => 0,
-        //         "total_actual" => $value,
-        //         "persentase" => 0,
-        //         "balance" => 0
-        //     ];
-
-        //     $rows_by_site[] = $a;
-        // }
-
         $select = "SUM(QtyRit * Capacity) AS total_ton_day";
         $builder_coal = $this->qBuilder->show_TR_PRODUCTIONB($select, $sitex, $tgl, 'CL');
         $total_actual_coal = $builder_coal->get()->getRow();
@@ -447,6 +357,8 @@ class DashboardController extends ResourceController
         $fuelratio_daily_by_site = [];
         $striping_ratio_daily_by_site = [];
         $distanceOB_daily_by_site = [];
+        $distanceOreCoal_daily_by_site = [];
+        $distanceBargingHauling_daily_by_site = [];
 
         foreach ($site_project as $key => $value) {
             $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
@@ -562,10 +474,16 @@ class DashboardController extends ResourceController
             ];
             /*===================================*/
 
+
+
+
+            /*=================================================================================*/
+            /*================= DISTANCE ======================================================*/
+            /*=================================================================================*/
             /**
              * DISTANCE OB*/
-            $distanceOB_total_target_site = round($this->plan_distance_ob($tgl, [$value]), 2);
-            $distanceOB_total_actual_site = 0;
+            $distanceOB_total_target_site = round($this->plan_distance($tgl, [$value], ['OB']), 2);
+            $distanceOB_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['OB']);
             $distanceOB_total_balance_site = 0;
             if ($distanceOB_total_target_site == 0 OR $distanceOB_total_actual_site == 0) {
                 $distanceOB_total_actual_persen_site = 0;
@@ -580,6 +498,44 @@ class DashboardController extends ResourceController
                 "total_actual_persen" => $distanceOB_total_actual_persen_site
             ];
             /*===================================*/
+
+            /**
+             * DISTANCE ORE/COAL*/
+            $distanceOreCoal_total_target_site = round($this->plan_distance($tgl, [$value], ['CL']), 2);
+            $distanceOreCoal_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CL']);;
+            $distanceOreCoal_total_balance_site = 0;
+            if ($distanceOreCoal_total_target_site == 0 OR $distanceOreCoal_total_actual_site == 0) {
+                $distanceOreCoal_total_actual_persen_site = 0;
+            }else{
+                $distanceOreCoal_total_actual_persen_site = round(($distanceOreCoal_total_actual_site / $distanceOreCoal_total_target_site) * 100, 2);
+            }
+            $distanceOreCoal_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $distanceOreCoal_total_target_site,
+                "total_actual" => $distanceOreCoal_total_actual_site,
+                "total_balance" => $distanceOreCoal_total_balance_site ,
+                "total_actual_persen" => $distanceOreCoal_total_actual_persen_site
+            ];
+            /*===================================*/
+
+            /**
+             * DISTANCE BARGING/HAULING*/
+            $distanceBargingHauling_total_target_site = round($this->plan_distance($tgl, [$value], ['CG']), 2);
+            $distanceBargingHauling_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CG']);;
+            $distanceBargingHauling_total_balance_site = 0;
+            if ($distanceBargingHauling_total_target_site == 0 OR $distanceBargingHauling_total_actual_site == 0) {
+                $distanceBargingHauling_total_actual_persen_site = 0;
+            }else{
+                $distanceBargingHauling_total_actual_persen_site = round(($distanceBargingHauling_total_actual_site / $distanceBargingHauling_total_target_site) * 100, 2);
+            }
+            $distanceBargingHauling_daily_by_site[] = [
+                "region_code" => $value,
+                "total_target" => $distanceBargingHauling_total_target_site,
+                "total_actual" => $distanceBargingHauling_total_actual_site,
+                "total_balance" => $distanceBargingHauling_total_balance_site ,
+                "total_actual_persen" => $distanceBargingHauling_total_actual_persen_site
+            ];
+            /*===================================*/
         }
 
         /**
@@ -589,7 +545,6 @@ class DashboardController extends ResourceController
         $ob_total_actual = round($this->qBuilder->total_actual_production($tgl, $tgl2, $site_project, ['OB'])->total_actual,2);
         $ob_total_balance = round($ob_total_actual - $ob_total_target, 2);
         if ($ob_total_actual != 0 OR $ob_total_target != 0) {
-            // code...
             $ob_total_actual_persen = round(($ob_total_actual / $ob_total_target) * 100, 2);
         }else{
             $ob_total_actual_persen = 0;
@@ -666,6 +621,18 @@ class DashboardController extends ResourceController
             return $b['region_code'] <=> $a['region_code'];
         });
 
+        usort($distanceOB_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($distanceOreCoal_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        usort($distanceBargingHauling_daily_by_site, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
         $response = [
             "status" => true,
             "ob" => [
@@ -722,11 +689,17 @@ class DashboardController extends ResourceController
                 "total_actual" => 0,
                 "total_balance" => 0,
                 "total_actual_persen" => 0,
-                "rows" => []
+                "rows" => $distanceOreCoal_daily_by_site
+            ],
+            "distance_barging_hauling" => [
+                "total_target" => 0,
+                "total_actual" => 0,
+                "total_balance" => 0,
+                "total_actual_persen" => 0,
+                "rows" => $distanceBargingHauling_daily_by_site
             ],
         ];
 
-        // return $this->respond($response, 200);
         return $response;
     }
 
@@ -1660,10 +1633,6 @@ class DashboardController extends ResourceController
      * plan fuel*/
     private function plan_fuelRatio($tgl, $site)
     {
-        $year = $this->dtH->getYear($tgl);
-        $month = $this->dtH->getMonth($tgl);
-        $jHari = $this->dtH->jHari($tgl);
-
         // $select = "*";
         $select = "
             CASE
@@ -1683,40 +1652,40 @@ class DashboardController extends ResourceController
     }
 
     /**
-     * plan distance ob*/
-    private function plan_distance_ob($tgl, $site)
+     * plan distance */
+    private function plan_distance($tgl, $site, $prod_code)
     {
         $year = $this->dtH->getYear($tgl);
         $month = $this->dtH->getMonth($tgl);
-        $jHari = $this->dtH->jHari($tgl);
+        // $jHari = $this->dtH->jHari($tgl);
 
         $select = "SUM(avg_distance".(int)$month.") as total";
 
-        $builder = $this->planPIT->show_per_day($select, $year, $site, ['OB']);
+        $builder = $this->planPIT->show_per_day($select, $year, $site, $prod_code);
         $query = $builder->get()
         ->getRow();
 
         $total = $query->total;
 
-        return $total / $jHari;
+        return $total;
     }
 
     /**
-     * plan distance ore/coal*/
-    private function plan_distance_ore_coal($tgl, $site)
+     * Actual Distance */
+    private function actual_distance($fromDate, $toDate, $site, $prod_code)
     {
-        $year = $this->dtH->getYear($tgl);
-        $month = $this->dtH->getMonth($tgl);
-        $jHari = $this->dtH->jHari($tgl);
+        $select = "SUM(Distance * Capacity) AS total_distvol, SUM(Capacity) AS total_vol";
 
-        $select = "SUM(avg_distance".(int)$month.") as total";
-
-        $builder = $this->planPIT->show_per_day($select, $year, $site, ['CG','CL']);
+        $builder = $this->bTrProdB->show_by_date($select, $fromDate, $toDate, $site, $prod_code);
         $query = $builder->get()
         ->getRow();
 
-        $total = $query->total;
+        if ($query->total_vol == 0 OR $query->total_vol == NULL OR $query->total_vol == '') {
+            $total = 0;
+        }else{
+            $total = $query->total_distvol / $query->total_vol;
+        }
 
-        return $total / $jHari;
+        return round($total, 2);
     }
 }
