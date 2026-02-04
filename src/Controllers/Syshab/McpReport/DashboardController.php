@@ -8,17 +8,18 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\Files\File;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use App\Builder\Approval\ApprovalBuilder;
-use Dorbitt\GviewsHelper;
 use App\Helpers\GlobalHelper;
-// use Dorbitt\Models\Herp\SiteProjectModel;
+
+use Dorbitt\GviewsHelper;
+use Dorbitt\Helpers\DateTimeHelper;
 use Dorbitt\Builder\Iescm\SiteProjectHerpBuilder;
+// use Dorbitt\Models\Herp\SiteProjectModel;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
 use Sparkhizb\Builder\Syshab\McpReport\DashboardBuilder;
 use Sparkhizb\Models\Syshab\McpReport\VmcctrhproductionbclModel;
 use Sparkhizb\Models\Syshab\MCP\JobsiteModel;
 use Sparkhizb\Builder\Syshab\MCP\PlanBuilder;
 use Sparkhizb\Builder\Syshab\MCP\PlanPerPitBuilder;
-use Dorbitt\Helpers\DateTimeHelper;
 use Sparkhizb\Builder\Syshab\MCP\TrProductionBuilder;
 use Sparkhizb\Builder\Syshab\MCP\TrProductionBBuilder;
 
@@ -284,7 +285,7 @@ class DashboardController extends ResourceController
         }
         $site = $this->request->getVar('site');
         
-        $response =  $this->show_summary_by_date($tgl, $tgl2, $site);
+        $response =  $this->show_summary_by_date($tgl, $tgl2, $site, "daily");
         return $this->respond($response, 200);
     }
 
@@ -295,7 +296,8 @@ class DashboardController extends ResourceController
         $tgl2 = config('Ummu')->dtHe('getYmt', $tgl);
         $site = $this->request->getVar('site');
 
-        $response =  $this->show_summary_by_date($tgl, $tgl2, $site);
+        $response =  $this->show_summary_by_date($tgl, $tgl2, $site, "monthly");
+
         return $this->respond($response, 200);
     }
 
@@ -307,11 +309,12 @@ class DashboardController extends ResourceController
         $tgl2 = $thn . '1231';
         $site = $this->request->getVar('site');
 
-        $response =  $this->show_summary_by_date($tgl, $tgl2, $site);
+        $response =  $this->show_summary_by_date($tgl, $tgl2, $site, "yearly");
         return $this->respond($response, 200);
     }
+    // =====================================================
 
-    private function show_summary_by_date($tgl, $tgl2, $site = null)
+    private function show_summary_by_date($tgl, $tgl2, $site, $type)
     {
         $site_project = $this->show_region_code();
 
@@ -350,193 +353,17 @@ class DashboardController extends ResourceController
 
         $show_hauling_daily = $this->hauling_daily();
 
-        $ob_daily_by_site = [];
-        $hauling_daily_by_site = [];
-        $coal_daily_by_site = [];
-        $rainslip_daily_by_site = [];
-        $fuelratio_daily_by_site = [];
-        $striping_ratio_daily_by_site = [];
-        $distanceOB_daily_by_site = [];
-        $distanceOreCoal_daily_by_site = [];
-        $distanceBargingHauling_daily_by_site = [];
+        $ob_daily_by_site = $this->show_summary_OB_by_date_perSite($tgl, $tgl2, $site_project, $type);
+        $hauling_daily_by_site = $this->show_summary_BargingHauling_by_date_perSite($tgl, $tgl2, $site_project, $type);
+        $coal_daily_by_site = $this->show_summary_CoalOre_by_date_perSite($tgl, $tgl2, $site_project, $type);
 
-        foreach ($site_project as $key => $value) {
-            $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
-            $hauling_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
-            $hauling_total_balance_site = round($hauling_total_actual_site - $hauling_total_target_site,2);
-            if ($hauling_total_target_site != 0) {
-                $hauling_total_actual_persen_site = round(($hauling_total_actual_site / $hauling_total_target_site) * 100, 2);
-            }else{
-                $hauling_total_actual_persen_site = 0;
-            }
-            $hauling_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $hauling_total_target_site,
-                "total_actual" => $hauling_total_actual_site,
-                "total_balance" => $hauling_total_balance_site ,
-                "total_actual_persen" => $hauling_total_actual_persen_site
-            ];
+        $rainslip_daily_by_site = $this->show_summary_RainSlippery_by_date_perSite($tgl, $tgl2, $site_project, $type);
+        $fuelratio_daily_by_site = $this->show_summary_FuelRatio_by_date_perSite($tgl, $tgl2, $site_project, $type);
+        $striping_ratio_daily_by_site = $this->show_summary_StrippingRatio_by_date_perSite($tgl, $tgl2, $site_project, $type);
 
-            $ob_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['OB'])->total_target,2);
-            $ob_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['OB'])->total_actual,2);
-            $ob_total_balance_site = round($ob_total_actual_site - $ob_total_target_site,2);
-            if ($ob_total_target_site == 0 OR $ob_total_actual_site == 0) {
-                $ob_total_actual_persen_site = 0;
-            }else{
-                $ob_total_actual_persen_site = round(($ob_total_actual_site / $ob_total_target_site) * 100, 2);
-            }
-            $ob_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $ob_total_target_site,
-                "total_actual" => $ob_total_actual_site,
-                "total_balance" => $ob_total_balance_site ,
-                "total_actual_persen" => $ob_total_actual_persen_site
-            ];
-
-            $coal_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CG'])->total_target,2);
-            $coal_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
-            $coal_total_balance_site = round($coal_total_actual_site - $coal_total_target_site,2);
-            if ($coal_total_target_site == 0 OR $coal_total_actual_site == 0) {
-                $coal_total_actual_persen_site = 0;
-            }else{
-                $coal_total_actual_persen_site = round(($coal_total_actual_site / $coal_total_target_site) * 100, 2);
-            }
-            $coal_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $coal_total_target_site,
-                "total_actual" => $coal_total_actual_site,
-                "total_balance" => $coal_total_balance_site ,
-                "total_actual_persen" => $coal_total_actual_persen_site
-            ];
-
-            /**
-             * RAIN AND SLIPPERY*/
-            $rainslip_total_target_site = round($this->total_plan_rain($tgl, [$value]), 2);
-            $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
-            $rainslip_total_balance_site = 0;
-            if ($rainslip_total_target_site == 0 OR $rainslip_total_actual_site == 0) {
-                $rainslip_total_actual_persen_site = 0;
-            }else{
-                $rainslip_total_actual_persen_site = round(($rainslip_total_actual_site / $rainslip_total_target_site) * 100, 2);
-            }
-            $rainslip_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $rainslip_total_target_site,
-                "total_actual" => $rainslip_total_actual_site,
-                "total_balance" => $rainslip_total_balance_site ,
-                "total_actual_persen" => $rainslip_total_actual_persen_site
-            ];
-
-            /**
-             * FUEL RATION*/
-            $fuelratio_total_target_site = round($this->plan_fuelRatio($tgl, [$value]), 2);
-            $fuelratio_total_actual_site = round($this->qBuilder->total_fuelratio($tgl, $tgl2, [$value]),2);
-            $fuelratio_total_balance_site = 0;
-            if ($fuelratio_total_target_site == 0 OR $fuelratio_total_actual_site == 0) {
-                $fuelratio_total_actual_persen_site = 0;
-            }else{
-                $fuelratio_total_actual_persen_site = round(($fuelratio_total_actual_site / $fuelratio_total_target_site) * 100, 2);
-            }
-            $fuelratio_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $fuelratio_total_target_site,
-                "total_actual" => $fuelratio_total_actual_site,
-                "total_balance" => $fuelratio_total_balance_site ,
-                "total_actual_persen" => $fuelratio_total_actual_persen_site
-            ];
-            /*===================================*/
-
-            /**
-             * STRIPING RATION*/
-            if ($coal_total_target_site == 0 OR $ob_total_target_site == 0) {
-                $striping_total_target_site = 0;
-            }else{
-                $striping_total_target_site = round($ob_total_target_site / $coal_total_target_site,2);
-            }
-
-            if ($coal_total_actual_site == 0 OR $ob_total_actual_site == 0) {
-                $striping_total_actual_site = 0;
-            }else{
-                $striping_total_actual_site = round($ob_total_actual_site / $coal_total_actual_site,2);
-            }
-            // $striping_total_balance_site = 0;
-            // if ($striping_total_target_site != 0) {
-            //     $striping_total_actual_persen_site = round(($striping_total_actual_site / $striping_total_target_site) * 100, 2);
-            // }else{
-            //     $striping_total_actual_persen_site = 0;
-            // }
-            $striping_ratio_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $striping_total_target_site,
-                "total_actual" => $striping_total_actual_site,
-                // "total_balance" => $striping_total_balance_site,
-                // "total_actual_persen" => $striping_total_actual_persen_site
-            ];
-            /*===================================*/
-
-
-
-
-            /*=================================================================================*/
-            /*================= DISTANCE ======================================================*/
-            /*=================================================================================*/
-            /**
-             * DISTANCE OB*/
-            $distanceOB_total_target_site = round($this->plan_distance($tgl, [$value], ['OB']), 2);
-            $distanceOB_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['OB']);
-            $distanceOB_total_balance_site = 0;
-            if ($distanceOB_total_target_site == 0 OR $distanceOB_total_actual_site == 0) {
-                $distanceOB_total_actual_persen_site = 0;
-            }else{
-                $distanceOB_total_actual_persen_site = round(($distanceOB_total_actual_site / $distanceOB_total_target_site) * 100, 2);
-            }
-            $distanceOB_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $distanceOB_total_target_site,
-                "total_actual" => $distanceOB_total_actual_site,
-                "total_balance" => $distanceOB_total_balance_site ,
-                "total_actual_persen" => $distanceOB_total_actual_persen_site
-            ];
-            /*===================================*/
-
-            /**
-             * DISTANCE ORE/COAL*/
-            $distanceOreCoal_total_target_site = round($this->plan_distance($tgl, [$value], ['CL']), 2);
-            $distanceOreCoal_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CL']);;
-            $distanceOreCoal_total_balance_site = 0;
-            if ($distanceOreCoal_total_target_site == 0 OR $distanceOreCoal_total_actual_site == 0) {
-                $distanceOreCoal_total_actual_persen_site = 0;
-            }else{
-                $distanceOreCoal_total_actual_persen_site = round(($distanceOreCoal_total_actual_site / $distanceOreCoal_total_target_site) * 100, 2);
-            }
-            $distanceOreCoal_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $distanceOreCoal_total_target_site,
-                "total_actual" => $distanceOreCoal_total_actual_site,
-                "total_balance" => $distanceOreCoal_total_balance_site ,
-                "total_actual_persen" => $distanceOreCoal_total_actual_persen_site
-            ];
-            /*===================================*/
-
-            /**
-             * DISTANCE BARGING/HAULING*/
-            $distanceBargingHauling_total_target_site = round($this->plan_distance($tgl, [$value], ['CG']), 2);
-            $distanceBargingHauling_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CG']);;
-            $distanceBargingHauling_total_balance_site = 0;
-            if ($distanceBargingHauling_total_target_site == 0 OR $distanceBargingHauling_total_actual_site == 0) {
-                $distanceBargingHauling_total_actual_persen_site = 0;
-            }else{
-                $distanceBargingHauling_total_actual_persen_site = round(($distanceBargingHauling_total_actual_site / $distanceBargingHauling_total_target_site) * 100, 2);
-            }
-            $distanceBargingHauling_daily_by_site[] = [
-                "region_code" => $value,
-                "total_target" => $distanceBargingHauling_total_target_site,
-                "total_actual" => $distanceBargingHauling_total_actual_site,
-                "total_balance" => $distanceBargingHauling_total_balance_site ,
-                "total_actual_persen" => $distanceBargingHauling_total_actual_persen_site
-            ];
-            /*===================================*/
-        }
+        $distanceOB_daily_by_site = $this->show_summary_DistanceOB_by_date_perSite($tgl, $tgl2, $site_project, $type);
+        $distanceOreCoal_daily_by_site = $this->show_summary_DistanceOreCoal_by_date_perSite($tgl, $tgl2, $site_project, $type);
+        $distanceBargingHauling_daily_by_site = $this->show_summary_DistanceBargingHauling_by_date_perSite($tgl, $tgl2, $site_project, $type);
 
         /**
          * OB
@@ -580,7 +407,7 @@ class DashboardController extends ResourceController
         /**
          * RAIN AND SLIPARY
          * */
-        $rainslip_total_target = round($this->total_plan_rain($tgl, $site_project), 2);
+        $rainslip_total_target = round($this->plan_rain_slippery($tgl, $site_project, $type), 2);
         $rainslip_total_actual = $this->qBuilder->total_actual_rainslip($tgl, $tgl2, $site_project);
         $rainslip_total_balance = 0;
         $rainslip_total_actual_persen = 0;
@@ -589,49 +416,11 @@ class DashboardController extends ResourceController
         /**
          * FUEL RATIO
          * */
-        $fuelratio_total_target = round($this->plan_fuelRatio($tgl, $site_project), 2);
+        $fuelratio_total_target = round($this->plan_fuelRatio($tgl, $site_project, $type), 2);
         $fuelratio_total_actual = $this->qBuilder->total_fuelratio($tgl, $tgl2, $site_project);
         $fuelratio_total_balance = 0;
         $fuelratio_total_actual_persen = 0;
         /*====================*/
-
-
-        usort($ob_daily_by_site, function($a, $b) {
-            // For descending order, compare $b to $a
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($coal_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($hauling_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($rainslip_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($fuelratio_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($striping_ratio_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($distanceOB_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($distanceOreCoal_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
-
-        usort($distanceBargingHauling_daily_by_site, function($a, $b) {
-            return $b['region_code'] <=> $a['region_code'];
-        });
 
         $response = [
             "status" => true,
@@ -702,6 +491,536 @@ class DashboardController extends ResourceController
 
         return $response;
     }
+
+    // private function show_summary_by_date_perSite($tgl, $tgl2, $site = null)
+    // {
+    //     $site_project = $this->show_region_code();
+
+    //     $ob_daily_by_site = [];
+    //     $coal_daily_by_site = [];
+    //     $hauling_daily_by_site = [];
+    //     $rainslip_daily_by_site = [];
+    //     $fuelratio_daily_by_site = [];
+    //     $striping_ratio_daily_by_site = [];
+    //     $distanceOB_daily_by_site = [];
+    //     $distanceOreCoal_daily_by_site = [];
+    //     $distanceBargingHauling_daily_by_site = [];
+
+    //     foreach ($site_project as $key => $value) {
+    //         $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
+    //         $hauling_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+    //         $hauling_total_balance_site = round($hauling_total_actual_site - $hauling_total_target_site,2);
+    //         if ($hauling_total_target_site != 0) {
+    //             $hauling_total_actual_persen_site = round(($hauling_total_actual_site / $hauling_total_target_site) * 100, 2);
+    //         }else{
+    //             $hauling_total_actual_persen_site = 0;
+    //         }
+    //         $hauling_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $hauling_total_target_site,
+    //             "total_actual" => $hauling_total_actual_site,
+    //             "total_balance" => $hauling_total_balance_site ,
+    //             "total_actual_persen" => $hauling_total_actual_persen_site
+    //         ];
+
+    //         $ob_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['OB'])->total_target,2);
+    //         $ob_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['OB'])->total_actual,2);
+    //         $ob_total_balance_site = round($ob_total_actual_site - $ob_total_target_site,2);
+    //         if ($ob_total_target_site == 0 OR $ob_total_actual_site == 0) {
+    //             $ob_total_actual_persen_site = 0;
+    //         }else{
+    //             $ob_total_actual_persen_site = round(($ob_total_actual_site / $ob_total_target_site) * 100, 2);
+    //         }
+    //         $ob_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $ob_total_target_site,
+    //             "total_actual" => $ob_total_actual_site,
+    //             "total_balance" => $ob_total_balance_site ,
+    //             "total_actual_persen" => $ob_total_actual_persen_site
+    //         ];
+
+    //         $coal_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CG'])->total_target,2);
+    //         $coal_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+    //         $coal_total_balance_site = round($coal_total_actual_site - $coal_total_target_site,2);
+    //         if ($coal_total_target_site == 0 OR $coal_total_actual_site == 0) {
+    //             $coal_total_actual_persen_site = 0;
+    //         }else{
+    //             $coal_total_actual_persen_site = round(($coal_total_actual_site / $coal_total_target_site) * 100, 2);
+    //         }
+    //         $coal_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $coal_total_target_site,
+    //             "total_actual" => $coal_total_actual_site,
+    //             "total_balance" => $coal_total_balance_site ,
+    //             "total_actual_persen" => $coal_total_actual_persen_site
+    //         ];
+
+    //         /**
+    //          * RAIN AND SLIPPERY*/
+    //         $rainslip_total_target_site = round($this->plan_rain_slippery($tgl, [$value]), 2);
+    //         $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
+    //         $rainslip_total_balance_site = 0;
+    //         if ($rainslip_total_target_site == 0 OR $rainslip_total_actual_site == 0) {
+    //             $rainslip_total_actual_persen_site = 0;
+    //         }else{
+    //             $rainslip_total_actual_persen_site = round(($rainslip_total_actual_site / $rainslip_total_target_site) * 100, 2);
+    //         }
+    //         $rainslip_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $rainslip_total_target_site,
+    //             "total_actual" => $rainslip_total_actual_site,
+    //             "total_balance" => $rainslip_total_balance_site ,
+    //             "total_actual_persen" => $rainslip_total_actual_persen_site
+    //         ];
+
+    //         /**
+    //          * FUEL RATION*/
+    //         $fuelratio_total_target_site = round($this->plan_fuelRatio($tgl, [$value]), 2);
+    //         $fuelratio_total_actual_site = round($this->qBuilder->total_fuelratio($tgl, $tgl2, [$value]),2);
+    //         $fuelratio_total_balance_site = 0;
+    //         if ($fuelratio_total_target_site == 0 OR $fuelratio_total_actual_site == 0) {
+    //             $fuelratio_total_actual_persen_site = 0;
+    //         }else{
+    //             $fuelratio_total_actual_persen_site = round(($fuelratio_total_actual_site / $fuelratio_total_target_site) * 100, 2);
+    //         }
+    //         $fuelratio_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $fuelratio_total_target_site,
+    //             "total_actual" => $fuelratio_total_actual_site,
+    //             "total_balance" => $fuelratio_total_balance_site ,
+    //             "total_actual_persen" => $fuelratio_total_actual_persen_site
+    //         ];
+    //         /*===================================*/
+
+    //         /**
+    //          * STRIPING RATION*/
+    //         if ($coal_total_target_site == 0 OR $ob_total_target_site == 0) {
+    //             $striping_total_target_site = 0;
+    //         }else{
+    //             $striping_total_target_site = round($ob_total_target_site / $coal_total_target_site,2);
+    //         }
+
+    //         if ($coal_total_actual_site == 0 OR $ob_total_actual_site == 0) {
+    //             $striping_total_actual_site = 0;
+    //         }else{
+    //             $striping_total_actual_site = round($ob_total_actual_site / $coal_total_actual_site,2);
+    //         }
+    //         // $striping_total_balance_site = 0;
+    //         // if ($striping_total_target_site != 0) {
+    //         //     $striping_total_actual_persen_site = round(($striping_total_actual_site / $striping_total_target_site) * 100, 2);
+    //         // }else{
+    //         //     $striping_total_actual_persen_site = 0;
+    //         // }
+    //         $striping_ratio_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $striping_total_target_site,
+    //             "total_actual" => $striping_total_actual_site,
+    //             // "total_balance" => $striping_total_balance_site,
+    //             // "total_actual_persen" => $striping_total_actual_persen_site
+    //         ];
+    //         /*===================================*/
+
+
+
+
+    //         /*=================================================================================*/
+    //         /*================= DISTANCE ======================================================*/
+    //         /*=================================================================================*/
+    //         /**
+    //          * DISTANCE OB*/
+    //         $distanceOB_total_target_site = round($this->plan_distance($tgl, [$value], ['OB']), 2);
+    //         $distanceOB_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['OB']);
+    //         $distanceOB_total_balance_site = 0;
+    //         if ($distanceOB_total_target_site == 0 OR $distanceOB_total_actual_site == 0) {
+    //             $distanceOB_total_actual_persen_site = 0;
+    //         }else{
+    //             $distanceOB_total_actual_persen_site = round(($distanceOB_total_actual_site / $distanceOB_total_target_site) * 100, 2);
+    //         }
+    //         $distanceOB_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $distanceOB_total_target_site,
+    //             "total_actual" => $distanceOB_total_actual_site,
+    //             "total_balance" => $distanceOB_total_balance_site ,
+    //             "total_actual_persen" => $distanceOB_total_actual_persen_site
+    //         ];
+    //         /*===================================*/
+
+    //         /**
+    //          * DISTANCE ORE/COAL*/
+    //         $distanceOreCoal_total_target_site = round($this->plan_distance($tgl, [$value], ['CL']), 2);
+    //         $distanceOreCoal_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CL']);;
+    //         $distanceOreCoal_total_balance_site = 0;
+    //         if ($distanceOreCoal_total_target_site == 0 OR $distanceOreCoal_total_actual_site == 0) {
+    //             $distanceOreCoal_total_actual_persen_site = 0;
+    //         }else{
+    //             $distanceOreCoal_total_actual_persen_site = round(($distanceOreCoal_total_actual_site / $distanceOreCoal_total_target_site) * 100, 2);
+    //         }
+    //         $distanceOreCoal_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $distanceOreCoal_total_target_site,
+    //             "total_actual" => $distanceOreCoal_total_actual_site,
+    //             "total_balance" => $distanceOreCoal_total_balance_site ,
+    //             "total_actual_persen" => $distanceOreCoal_total_actual_persen_site
+    //         ];
+    //         /*===================================*/
+
+    //         /**
+    //          * DISTANCE BARGING/HAULING*/
+    //         $distanceBargingHauling_total_target_site = round($this->plan_distance($tgl, [$value], ['CG']), 2);
+    //         $distanceBargingHauling_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CG']);;
+    //         $distanceBargingHauling_total_balance_site = 0;
+    //         if ($distanceBargingHauling_total_target_site == 0 OR $distanceBargingHauling_total_actual_site == 0) {
+    //             $distanceBargingHauling_total_actual_persen_site = 0;
+    //         }else{
+    //             $distanceBargingHauling_total_actual_persen_site = round(($distanceBargingHauling_total_actual_site / $distanceBargingHauling_total_target_site) * 100, 2);
+    //         }
+    //         $distanceBargingHauling_daily_by_site[] = [
+    //             "region_code" => $value,
+    //             "total_target" => $distanceBargingHauling_total_target_site,
+    //             "total_actual" => $distanceBargingHauling_total_actual_site,
+    //             "total_balance" => $distanceBargingHauling_total_balance_site ,
+    //             "total_actual_persen" => $distanceBargingHauling_total_actual_persen_site
+    //         ];
+    //         /*===================================*/
+    //     }
+
+    //     usort($ob_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($coal_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($hauling_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($rainslip_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($fuelratio_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($striping_ratio_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($distanceOB_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($distanceOreCoal_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     usort($distanceBargingHauling_daily_by_site, function($a, $b) {
+    //         return $b['region_code'] <=> $a['region_code'];
+    //     });
+
+    //     $response = [
+    //         "ob" => $ob_daily_by_site,
+    //         "coalore" => $coal_daily_by_site,
+    //         "hauling" => $hauling_daily_by_site,
+    //         "rain_slip" => $rainslip_daily_by_site,
+    //         "fuelratio" => $fuelratio_daily_by_site,
+    //         "striping_ratio" => $striping_ratio_daily_by_site,
+    //         "distance_ob" => $distanceOB_daily_by_site,
+    //         "distance_ore_coal" => $distanceOreCoal_daily_by_site,
+    //         "distance_barging_hauling" => $distanceBargingHauling_daily_by_site,
+    //     ];
+
+    //     return $response;
+    // }
+
+
+    // =======================================================================================
+    // =======================================================================================
+    // =======================================================================================
+    private function show_summary_OB_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $ob_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['OB'])->total_target,2);
+            $ob_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['OB'])->total_actual,2);
+            $ob_total_balance_site = round($ob_total_actual_site - $ob_total_target_site,2);
+            if ($ob_total_target_site == 0 OR $ob_total_actual_site == 0) {
+                $ob_total_actual_persen_site = 0;
+            }else{
+                $ob_total_actual_persen_site = round(($ob_total_actual_site / $ob_total_target_site) * 100, 2);
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $ob_total_target_site,
+                "total_actual" => $ob_total_actual_site,
+                "total_balance" => $ob_total_balance_site ,
+                "total_actual_persen" => $ob_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    private function show_summary_CoalOre_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $coal_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CG'])->total_target,2);
+            $coal_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+            $coal_total_balance_site = round($coal_total_actual_site - $coal_total_target_site,2);
+            if ($coal_total_target_site == 0 OR $coal_total_actual_site == 0) {
+                $coal_total_actual_persen_site = 0;
+            }else{
+                $coal_total_actual_persen_site = round(($coal_total_actual_site / $coal_total_target_site) * 100, 2);
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $coal_total_target_site,
+                "total_actual" => $coal_total_actual_site,
+                "total_balance" => $coal_total_balance_site ,
+                "total_actual_persen" => $coal_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    private function show_summary_BargingHauling_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $hauling_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CL'])->total_target,2);
+            $hauling_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+            $hauling_total_balance_site = round($hauling_total_actual_site - $hauling_total_target_site,2);
+            if ($hauling_total_target_site != 0) {
+                $hauling_total_actual_persen_site = round(($hauling_total_actual_site / $hauling_total_target_site) * 100, 2);
+            }else{
+                $hauling_total_actual_persen_site = 0;
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $hauling_total_target_site,
+                "total_actual" => $hauling_total_actual_site,
+                "total_balance" => $hauling_total_balance_site ,
+                "total_actual_persen" => $hauling_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    // ==== Rain and Sluppery ====
+    private function show_summary_RainSlippery_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $rainslip_total_target_site = round($this->plan_rain_slippery($tgl, [$value], $type), 2);
+            $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
+            $rainslip_total_balance_site = 0;
+            if ($rainslip_total_target_site == 0 OR $rainslip_total_actual_site == 0) {
+                $rainslip_total_actual_persen_site = 0;
+            }else{
+                $rainslip_total_actual_persen_site = round(($rainslip_total_actual_site / $rainslip_total_target_site) * 100, 2);
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $rainslip_total_target_site,
+                "total_actual" => $rainslip_total_actual_site,
+                "total_balance" => $rainslip_total_balance_site ,
+                "total_actual_persen" => $rainslip_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    private function show_summary_FuelRatio_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $fuelratio_total_target_site = round($this->plan_fuelRatio($tgl, [$value], $type), 2);
+            $fuelratio_total_actual_site = round($this->qBuilder->total_fuelratio($tgl, $tgl2, [$value]),2);
+            $fuelratio_total_balance_site = 0;
+
+            if ($fuelratio_total_target_site == 0 OR $fuelratio_total_actual_site == 0) {
+                $fuelratio_total_actual_persen_site = 0;
+            }else{
+                $fuelratio_total_actual_persen_site = round(($fuelratio_total_actual_site / $fuelratio_total_target_site) * 100, 2);
+            }
+
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $fuelratio_total_target_site,
+                "total_actual" => $fuelratio_total_actual_site,
+                "total_balance" => $fuelratio_total_balance_site ,
+                "total_actual_persen" => $fuelratio_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    private function show_summary_StrippingRatio_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $ob_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['OB'])->total_target,2);
+            $ob_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['OB'])->total_actual,2);
+            $coal_total_target_site = round($this->qBuilder->total_target_production($tgl, $tgl2, [$value], ['CG'])->total_target,2);
+            $coal_total_actual_site = round($this->qBuilder->total_actual_production($tgl, $tgl2, [$value], ['CL'])->total_actual,2);
+
+            if ($coal_total_target_site == 0 OR $ob_total_target_site == 0) {
+                $striping_total_target_site = 0;
+            }else{
+                $striping_total_target_site = round($ob_total_target_site / $coal_total_target_site,2);
+            }
+
+            if ($coal_total_actual_site == 0 OR $ob_total_actual_site == 0) {
+                $striping_total_actual_site = 0;
+            }else{
+                $striping_total_actual_site = round($ob_total_actual_site / $coal_total_actual_site,2);
+            }
+            // $striping_total_balance_site = 0;
+            // if ($striping_total_target_site != 0) {
+            //     $striping_total_actual_persen_site = round(($striping_total_actual_site / $striping_total_target_site) * 100, 2);
+            // }else{
+            //     $striping_total_actual_persen_site = 0;
+            // }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $striping_total_target_site,
+                "total_actual" => $striping_total_actual_site,
+                // "total_balance" => $striping_total_balance_site,
+                // "total_actual_persen" => $striping_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    // ==== Distance ====
+    private function show_summary_DistanceOB_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $distanceOB_total_target_site = round($this->plan_distance($tgl, [$value], ['OB']), 2);
+            $distanceOB_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['OB']);
+            $distanceOB_total_balance_site = 0;
+            if ($distanceOB_total_target_site == 0 OR $distanceOB_total_actual_site == 0) {
+                $distanceOB_total_actual_persen_site = 0;
+            }else{
+                $distanceOB_total_actual_persen_site = round(($distanceOB_total_actual_site / $distanceOB_total_target_site) * 100, 2);
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $distanceOB_total_target_site,
+                "total_actual" => $distanceOB_total_actual_site,
+                "total_balance" => $distanceOB_total_balance_site ,
+                "total_actual_persen" => $distanceOB_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    private function show_summary_DistanceOreCoal_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $distanceOreCoal_total_target_site = round($this->plan_distance($tgl, [$value], ['CL']), 2);
+            $distanceOreCoal_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CL']);;
+            $distanceOreCoal_total_balance_site = 0;
+            if ($distanceOreCoal_total_target_site == 0 OR $distanceOreCoal_total_actual_site == 0) {
+                $distanceOreCoal_total_actual_persen_site = 0;
+            }else{
+                $distanceOreCoal_total_actual_persen_site = round(($distanceOreCoal_total_actual_site / $distanceOreCoal_total_target_site) * 100, 2);
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $distanceOreCoal_total_target_site,
+                "total_actual" => $distanceOreCoal_total_actual_site,
+                "total_balance" => $distanceOreCoal_total_balance_site ,
+                "total_actual_persen" => $distanceOreCoal_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+
+    private function show_summary_DistanceBargingHauling_by_date_perSite($tgl, $tgl2, $site_project, $type)
+    {
+        $rows = [];
+
+        foreach ($site_project as $key => $value) {
+            $distanceBargingHauling_total_target_site = round($this->plan_distance($tgl, [$value], ['CG']), 2);
+            $distanceBargingHauling_total_actual_site = $this->actual_distance($tgl, $tgl2, [$value], ['CG']);
+            $distanceBargingHauling_total_balance_site = 0;
+            if ($distanceBargingHauling_total_target_site == 0 OR $distanceBargingHauling_total_actual_site == 0) {
+                $distanceBargingHauling_total_actual_persen_site = 0;
+            }else{
+                $distanceBargingHauling_total_actual_persen_site = round(($distanceBargingHauling_total_actual_site / $distanceBargingHauling_total_target_site) * 100, 2);
+            }
+            $rows[] = [
+                "region_code" => $value,
+                "total_target" => $distanceBargingHauling_total_target_site,
+                "total_actual" => $distanceBargingHauling_total_actual_site,
+                "total_balance" => $distanceBargingHauling_total_balance_site ,
+                "total_actual_persen" => $distanceBargingHauling_total_actual_persen_site
+            ];
+        }
+
+        usort($rows, function($a, $b) {
+            return $b['region_code'] <=> $a['region_code'];
+        });
+
+        return $rows;
+    }
+    // =======================================================================================
+    // =======================================================================================
+    // =======================================================================================
+
 
     public function show_summary($tab)
     {
@@ -917,7 +1236,7 @@ class DashboardController extends ResourceController
                 "total_actual_persen" => $coal_total_actual_persen_site
             ];
 
-            $rainslip_total_target_site = round($this->total_plan_rain($tgl, [$value]), 2);
+            $rainslip_total_target_site = round($this->plan_rain_slippery($tgl, [$value]), 2);
             $rainslip_total_actual_site = round($this->qBuilder->total_actual_rainslip($tgl, $tgl2, [$value]),2);
             $rainslip_total_balance_site = 0;
             if ($rainslip_total_target_site == 0 OR $rainslip_total_actual_site == 0) {
@@ -1024,7 +1343,7 @@ class DashboardController extends ResourceController
         /**
          * RAIN AND SLIPARY
          * */
-        $rainslip_total_target = round($this->total_plan_rain($tgl, $site_project), 2);
+        $rainslip_total_target = round($this->plan_rain_slippery($tgl, $site_project), 2);
         $rainslip_total_actual = $this->qBuilder->total_actual_rainslip($tgl, $tgl2, $site_project);
         $rainslip_total_balance = 0;
         $rainslip_total_actual_persen = 0;
@@ -1611,29 +1930,40 @@ class DashboardController extends ResourceController
 
     /**
      * total rain and slippery*/
-    private function total_plan_rain($tgl, $site)
+    private function plan_rain_slippery($tgl, $site, $type)
     {
         $year = $this->dtH->getYear($tgl);
         $month = $this->dtH->getMonth($tgl);
         $jHari = $this->dtH->jHari($tgl);
 
-        $select = "(SUM(raintime".(int)$month.") + SUM(slippery".(int)$month.")) as total";
+        if ($type == 'yearly') {
+            $select = "(SUM(raintime1) + SUM(raintime2) + SUM(raintime3) + SUM(raintime4) + SUM(raintime5) + SUM(raintime6) + SUM(raintime7) + SUM(raintime9) + SUM(raintime9) + SUM(raintime10) + SUM(raintime11) + SUM(raintime12) + SUM(slippery1) + SUM(slippery2) + SUM(slippery3) + SUM(slippery4) + SUM(slippery5) + SUM(slippery6) + SUM(slippery7) + SUM(slippery8) + SUM(slippery9) + SUM(slippery10) + SUM(slippery11) + SUM(slippery12)) as total";
+        }else{
+            $select = "(SUM(raintime".(int)$month.") + SUM(slippery".(int)$month.")) as total";
+        }
 
-        $builder = $this->planPIT->show_per_day($select, $year, $site, ['CG','CL']);
+        $builder = $this->planPIT->show($select, $year, $site, ['CG','CL']);
         $query = $builder->get()
-        // ->getResultArray();
         ->getRow();
 
         $total = $query->total;
 
-        return $total / $jHari;
+        if ($type == 'daily') {
+            return $total / $jHari;
+        }elseif ($type == 'monthly') {
+            return $total;
+        }elseif ($type == 'yearly') {
+            return $total;
+        }
     }
 
     /**
      * plan fuel*/
-    private function plan_fuelRatio($tgl, $site)
+    private function plan_fuelRatio($tgl, $site, $type)
     {
-        // $select = "*";
+        $year = (int)$this->dtH->getYear($tgl);
+        $month = (int)$this->dtH->getMonth($tgl);
+
         $select = "
             CASE
                 WHEN SUM(targetFuel) <> 0 THEN (SUM(targetDay) / SUM(targetFuel)) 
@@ -1641,9 +1971,15 @@ class DashboardController extends ResourceController
             END as total
         ";
 
-        $builder = $this->bPlan->show_per_day($select, $this->dtH->toYmd($tgl), $site, ['CG','CL','OB']);
+        if ($type == "yearly") {
+            $builder = $this->bPlan->show_by_year($select, $year, $site, ['CG','CL','OB']);
+        }elseif ($type == "monthly") {
+            $builder = $this->bPlan->show_by_month($select, $month, $site, ['CG','CL','OB']);
+        }elseif ($type == "daily") {
+            $builder = $this->bPlan->show_by_date($select, $tgl, $site, ['CG','CL','OB']);
+        }
+
         $query = $builder->get()
-        // ->getResultArray();
         ->getRow();
 
         $total = $query->total;
@@ -1661,7 +1997,7 @@ class DashboardController extends ResourceController
 
         $select = "SUM(avg_distance".(int)$month.") as total";
 
-        $builder = $this->planPIT->show_per_day($select, $year, $site, $prod_code);
+        $builder = $this->planPIT->show($select, $year, $site, $prod_code);
         $query = $builder->get()
         ->getRow();
 

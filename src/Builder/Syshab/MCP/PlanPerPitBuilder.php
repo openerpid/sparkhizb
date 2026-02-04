@@ -5,9 +5,6 @@ namespace Sparkhizb\Builder\Syshab\MCP;
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\DateTimeHelper;
 use Sparkhizb\Helpers\RequestHelper;
-use Sparkhizb\UmmuHazardReport;
-// use App\Hizb\Models\Safety\HazardReportQueueMailModel;
-// use App\Hizb\Models\Safety\HazardReportNumberModel;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
 use Sparkhizb\Models\Syshab\MCP\TypeLoadModel;
 use Sparkhizb\Models\Syshab\MCP\PlanPerPitModel;
@@ -17,15 +14,12 @@ class PlanPerPitBuilder
     public function __construct()
     {
         $this->db = \Config\Database::connect();
-        // $this->iescm = \Config\Database::connect('iescm');
         $this->herp = \Config\Database::connect('herp');
         $this->mcp = \Config\Database::connect('mcp');
         $this->request = \Config\Services::request();
         $this->reqH = new RequestHelper();
         $this->umHelp = new UmmuHelper();
-        // $this->ummu = new UmmuHazardReport();
         $this->model = new PlanPerPitModel();
-        // $this->mNum = new HazardReportNumberModel();
         $this->mSiteDash = new DashboardSiteProjectListModel();
         $this->mTypeLoad = new TypeLoadModel();
         $this->dtH = new DateTimeHelper();
@@ -37,7 +31,7 @@ class PlanPerPitBuilder
      * $site = ["SSA", "SSC"], 
      * $prod_code = ['CG','CL']
      */
-    public function show_per_day($select, $year, $site, $prod_code)
+    public function show($select, $year, $site, $prod_code)
     {
         $table = $this->model->table;
 
