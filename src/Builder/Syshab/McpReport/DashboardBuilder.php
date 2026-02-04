@@ -4,9 +4,6 @@ namespace Sparkhizb\Builder\Syshab\McpReport;
 
 use Sparkhizb\Helpers\UmmuHelper;
 use Sparkhizb\Helpers\RequestHelper;
-use Sparkhizb\UmmuHazardReport;
-// use App\Hizb\Models\Safety\HazardReportQueueMailModel;
-// use App\Hizb\Models\Safety\HazardReportNumberModel;
 use Sparkhizb\Models\DashboardSiteProjectListModel;
 use Sparkhizb\Models\Syshab\MCP\TypeLoadModel;
 
@@ -15,15 +12,11 @@ class DashboardBuilder
     public function __construct()
     {
         $this->db = \Config\Database::connect();
-        // $this->iescm = \Config\Database::connect('iescm');
         $this->herp = \Config\Database::connect('herp');
         $this->mcp = \Config\Database::connect('mcp');
         $this->request = \Config\Services::request();
         $this->reqH = new RequestHelper();
         $this->umHelp = new UmmuHelper();
-        // $this->ummu = new UmmuHazardReport();
-        // $this->model = new HazardReportQueueMailModel();
-        // $this->mNum = new HazardReportNumberModel();
         $this->mSiteDash = new DashboardSiteProjectListModel();
         $this->mTypeLoad = new TypeLoadModel();
     }
