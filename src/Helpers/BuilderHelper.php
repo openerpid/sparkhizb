@@ -423,6 +423,120 @@ class BuilderHelper
         return $builder;
     }
 
+    public function conditions3($params)
+    {
+        $builder = $params['builder'];
+        $id = $params['id'];
+        $search_params = $params['search_params'];
+
+        if ($this->selects and $this->selects != '*') {
+            $builder->select($this->selects);
+        }
+
+        if (isset($params['company_id'])) {
+            $company_id = $params['company_id'];
+            if ($company_id) {
+                $builder->where('company_id', $company_id);
+            }
+        }
+
+        if (isset($params['account_id'])) {
+            $account_id = $params['account_id'];
+            if ($account_id) {
+                $builder->where('created_by', $account_id);
+            }
+        }
+
+        if (isset($params['created_by'])) {
+            $created_by = $params['created_by'];
+            if ($created_by) {
+                $builder->where('created_by', $created_by);
+            }
+        }
+
+        if (isset($params['plant_id'])) {
+            $plant_id = $params['plant_id'];
+            if ($plant_id) {
+                $builder->where('plant_id', $plant_id);
+            }
+        }
+
+        if (isset($params['site_project_id'])) {
+            $site_project_id = $params['site_project_id'];
+            if ($site_project_id) {
+                $builder->where('site_project_id', $site_project_id);
+            }
+        }
+
+        if ($id) {
+            if (is_array($id)) {
+                $builder->whereIn('id', $id);
+            } else {
+                $builder->where('id', $id);
+            }
+        } else {
+            if ($this->where) {
+                foreach ($this->where as $key => $value) {
+                    if ($value != "") {
+                        $builder->where($key, $value);
+                    }
+                }
+            }
+
+            $builder = $this->doSearch($search_params, $builder);
+            $builder = $this->anyWhere($builder);
+
+            if ($this->from_date) {
+                $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->from_date));
+            }
+
+            if ($this->to_date) {
+                $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->to_date));
+            }
+
+            if ($this->date) {
+                if ($this->date->from) {
+                    $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->date->from));
+                }
+
+                if ($this->date->to) {
+                    $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->date->to));
+                }
+            }
+
+            if ($this->datetime) {
+                if ($this->datetime->from) {
+                    $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->datetime->from));
+                }
+
+                if ($this->datetime->to) {
+                    $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->datetime->to));
+                }
+            }
+
+            if ($this->anydate) {
+                $anydate = $this->anydate->anydate;
+                $from = $this->anydate->from;
+                $to = $this->anydate->to;
+
+                if ($anydate == true) {
+                    if ($from) {
+                        $builder->where('created_at >= ', $this->gHelp->dtfFormatter($from));
+                    }
+
+                    if ($to) {
+                        $builder->where('created_at <= ', $this->gHelp->dtfFormatter($to));
+                    }
+                }
+            }
+        }
+
+        $builder->where('deleted_at', null);
+        $builder->where('deleted_at IS NULL');
+
+        return $builder;
+    }
+
     public function withJoin($params)
     {
         $limit = $this->request->getJsonVar('limit');
@@ -1226,6 +1340,15 @@ class BuilderHelper
         return $payload;
     }
 
+    // Contoh :
+    // $params = [
+    //     "builder"       => $builder,
+    //     "id"            => $id,
+    //     "search_params" => ["name"],
+    //     "company_id"    => $this->identity->company_id(),
+    //     "db_conn"       => $this->db, 
+    //     "tb"            => $this->model->table
+    // ];
     public function conditions_with_dbconn($params)
     {
         $builder = $params['builder'];
