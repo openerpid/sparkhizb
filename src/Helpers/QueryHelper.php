@@ -13,6 +13,7 @@ namespace Sparkhizb\Helpers;
 
 // use Sparkhizb\Helpers\DateTimeHelper;
 use Sparkhizb\Auth as OA2Auth;
+use Dorbitt\Helpers\EncrypterHelper;
 
 class QueryHelper
 {
@@ -23,6 +24,7 @@ class QueryHelper
         // $this->identity = new IdentityHelper(); /
         // $this->ummuMsdb = new UmmuMsdb; /
         $this->oa2auth = new OA2Auth;
+        $this->encter = new EncrypterHelper();
     }
 
     public function limit()
@@ -553,11 +555,11 @@ class QueryHelper
 
                 $custom = [
                     'DSN' => '',
-                    'hostname' => base64_decode($host),
-                    'username' => base64_decode($row->username),
-                    'password' => base64_decode($row->password),
-                    'database' => base64_decode($row->dbname),
-                    'DBDriver' => base64_decode($row->dbdriver),
+                    'hostname' => $this->encter->decrypt($host),
+                    'username' => $this->encter->decrypt($row->username),
+                    'password' => $this->encter->decrypt($row->password),
+                    'database' => $this->encter->decrypt($row->dbname),
+                    'DBDriver' => $this->encter->decrypt($row->dbdriver),
                     'DBPrefix' => '',
                     'pConnect' => false,
                     'DBDebug' => true,
@@ -568,7 +570,7 @@ class QueryHelper
                     'compress' => false,
                     'strictOn' => false,
                     'failover' => [],
-                    'port' => base64_decode($row->port),
+                    'port' => $this->encter->decrypt($row->port),
                 ];
 
                 return $custom;
