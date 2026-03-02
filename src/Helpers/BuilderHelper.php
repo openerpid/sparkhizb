@@ -1522,6 +1522,14 @@ class BuilderHelper
             $builder->where('deleted_at IS NULL');
         }
 
+        if ($db_conn->fieldExists('is_testing', $tb)) {
+            if (ENVIRONMENT == "production") {
+                $builder->where('is_testing IS NULL');
+            } else {
+                $builder->where('is_testing', 1);
+            }
+        }
+
         return $builder;
     }
 }
