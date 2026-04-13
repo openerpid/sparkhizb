@@ -1404,10 +1404,8 @@ class BuilderHelper
             }
         } else {
             if ($this->where) {
-                foreach ($this->where as $key => $value) {
-                    if ($value != "") {
-                        $builder->where($key, $value);
-                    }
+                if ($this->where[1] != "") {
+                    $builder->where($this->where[0], $this->where[1]);
                 }
             }
 
