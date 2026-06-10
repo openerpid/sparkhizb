@@ -173,14 +173,14 @@ class QueryHelper
 
     public function orderBy($builder, $allowedFields = null)
     {
-        $sort = $this->request->getJsonVar('sort');
+        $sort = $this->request->getVar('sort');
 
         if (strpos($sort, ".")) {
             $sort = explode(".",$sort);
             $sortCount = count($sort);
             $sort = $sort[$sortCount-1];
         }
-        $order      = $this->request->getJsonVar('order');
+        $order      = $this->request->getVar('order');
 
         if ($sort && $order) {
             if ($allowedFields) {
@@ -201,14 +201,14 @@ class QueryHelper
 
     public function orderBy_j($builder, $allowedFields = null)
     {
-        $sort = $this->request->getJsonVar('sort');
+        $sort = $this->request->getVar('sort');
 
         if (strpos($sort, ".")) {
             $sort = explode(".",$sort);
             $sortCount = count($sort);
             $sort = $sort[$sortCount-1];
         }
-        $order      = $this->request->getJsonVar('order');
+        $order      = $this->request->getVar('order');
 
         if ($sort && $order) {
             if ($allowedFields) {
@@ -253,7 +253,7 @@ class QueryHelper
 
     public function array_search($array, $params)
     {
-        $search = $this->request->getJsonVar('search');
+        $search = $this->request->getVar('search');
 
         if ($search) {
 
@@ -280,9 +280,9 @@ class QueryHelper
 
     public function array_paging($array)
     {
-        $limit = $this->request->getJsonVar('limit');
-        $offset = $this->request->getJsonVar('offset');
-        $search = $this->request->getJsonVar('search');
+        $limit = $this->request->getVar('limit');
+        $offset = $this->request->getVar('offset');
+        $search = $this->request->getVar('search');
 
         if ($search) {
             $offset = 0;
@@ -391,7 +391,7 @@ class QueryHelper
             "incomplete_results"    => false,
             // "jssdata"               => $jssdata,
             // "filter"            => [
-            //     "search" => $this->request->getJsonVar("search"),
+            //     "search" => $this->request->getVar("search"),
             //     "datetime_detail" => [
             //         "from" => $this->dtH->dt
             //     ]
@@ -434,7 +434,7 @@ class QueryHelper
             "incomplete_results"    => false,
             // "jssdata"               => $jssdata,
             // "filter"            => [
-            //     "search" => $this->request->getJsonVar("search"),
+            //     "search" => $this->request->getVar("search"),
             //     "datetime_detail" => [
             //         "from" => $this->dtH->dt
             //     ]
