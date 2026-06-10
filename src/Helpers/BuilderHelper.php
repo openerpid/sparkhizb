@@ -28,15 +28,15 @@ class BuilderHelper
 
         /**
          * Vars*/
-        $this->limit = $this->request->getJsonVar('limit');
-        $this->offset = $this->request->getJsonVar('offset');
+        $this->limit = $this->request->getVar('limit');
+        $this->offset = $this->request->getVar('offset');
 
-        $this->sort = $this->request->getJsonVar('sort');
+        $this->sort = $this->request->getVar('sort');
         if (!$this->sort) {
             $this->sort = $this->request->getVar('sort');
         }
 
-        $this->withCreatedBy = $this->request->getJsonVar('created_by');
+        $this->withCreatedBy = $this->request->getVar('created_by');
 
         if (strpos($this->sort, ".")) {
             // $sort = explode(".",$sort);
@@ -45,27 +45,27 @@ class BuilderHelper
             $this->sort = null;
         }
 
-        $this->order = $this->request->getJsonVar('order');
+        $this->order = $this->request->getVar('order');
         if (!$this->order) {
             $this->order = $this->request->getVar('order');
         }
 
-        $this->search = $this->request->getJsonVar('search');
+        $this->search = $this->request->getVar('search');
         if (!$this->search) {
             $this->search = $this->request->getVar('search');
         }
 
-        $this->anywhere = $this->request->getJsonVar('anywhere');
-        $this->anydate = $this->request->getJsonVar('anydate');
+        $this->anywhere = $this->request->getVar('anywhere');
+        $this->anydate = $this->request->getVar('anydate');
 
-        $this->from_date = $this->request->getJsonVar('from_date');
-        $this->to_date = $this->request->getJsonVar('to_date');
-        $this->date = $this->request->getJsonVar('date');
-        $this->datetime = $this->request->getJsonVar('datetime');
+        $this->from_date = $this->request->getVar('from_date');
+        $this->to_date = $this->request->getVar('to_date');
+        $this->date = $this->request->getVar('date');
+        $this->datetime = $this->request->getVar('datetime');
 
-        $this->selects = $this->request->getJsonVar('selects');
-        $this->where = $this->request->getJsonVar('where');
-        $this->condt = $this->request->getJsonVar('conditions');
+        $this->selects = $this->request->getVar('selects');
+        $this->where = $this->request->getVar('where');
+        $this->condt = $this->request->getVar('conditions');
     }
 
     public function is_testing($db_conn, $tb, $builder)
@@ -1331,6 +1331,27 @@ class BuilderHelper
         return $payload;
     }
 
+    public function payloadInsertBatch($db_conn, $tb, $payload)
+    {
+        foreach ($payload as $key => $value) {
+            if ($db_conn->fieldExists('company_id', $tb)) {
+                $payload[$key]->company_id = $this->identity->company_id();
+            }
+
+            if ($db_conn->fieldExists('created_by', $tb)) {
+                $payload[$key]->created_by = $this->identity->account_id();
+            }
+
+            if ($db_conn->fieldExists('is_testing', $tb)) {
+                if (ENVIRONMENT != "production") {
+                    $payload[$key]->is_testing = 1;
+                }
+            }
+        }
+
+        return $payload;
+    }
+
     public function payloadUpdate($db_conn, $tb, $payload)
     {
         if ($db_conn->fieldExists('updated_by', $tb)) {
@@ -1353,6 +1374,7 @@ class BuilderHelper
     {
         $builder = $params['builder'];
         $id = $params['id'];
+        $company_id = $params['company_id'];
         $search_params = $params['search_params'];
         $db_conn = $params['db_conn'];
         $tb = $params['tb'];
@@ -1480,22 +1502,26 @@ class BuilderHelper
             }
 
             if ($this->date) {
-                if ($this->date->from) {
-                    $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->date->from));
-                }
+                if (is_object($this->date)) {
+                    if ($this->date->from) {
+                        $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->date->from));
+                    }
 
-                if ($this->date->to) {
-                    $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->date->to));
+                    if ($this->date->to) {
+                        $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->date->to));
+                    }   
                 }
             }
 
             if ($this->datetime) {
-                if ($this->datetime->from) {
-                    $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->datetime->from));
-                }
+                if (is_object($this->date)) {
+                    if ($this->datetime->from) {
+                        $builder->where('created_at >= ', $this->gHelp->dtfFormatter($this->datetime->from));
+                    }
 
-                if ($this->datetime->to) {
-                    $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->datetime->to));
+                    if ($this->datetime->to) {
+                        $builder->where('created_at <= ', $this->gHelp->dttFormatter($this->datetime->to));
+                    }
                 }
             }
 
@@ -1520,14 +1546,27 @@ class BuilderHelper
             $builder->where('deleted_at IS NULL');
         }
 
-        if ($db_conn->fieldExists('is_testing', $tb)) {
-            if (ENVIRONMENT == "production") {
-                $builder->where('is_testing IS NULL');
-            } else {
-                $builder->where('is_testing', 1);
+        if (isset($params['is_testing'])) {
+            if ($params['is_testing'] == false) {
+                // otomatis berjalan pengecekan is_testing nya.
+                if ($db_conn->fieldExists('is_testing', $tb)) {
+                    if (ENVIRONMENT == "production") {
+                        $builder->where('is_testing IS NULL');
+                    } else {
+                        $builder->where('is_testing', 1);
+                    }
+                }
             }
         }
 
         return $builder;
+    }
+
+    public function selectIdentity()
+    {
+        return [
+            "iCreated.name as created_by_name",
+            "iUpdated.name as updated_by_name"
+        ];
     }
 }
