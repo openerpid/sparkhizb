@@ -174,25 +174,29 @@ class QueryHelper
     public function orderBy($builder, $allowedFields = null)
     {
         $sort = $this->request->getVar('sort');
+        $order = $this->request->getVar('order');
 
         if (strpos($sort, ".")) {
             $sort = explode(".",$sort);
             $sortCount = count($sort);
             $sort = $sort[$sortCount-1];
         }
-        $order      = $this->request->getVar('order');
 
         if ($sort && $order) {
             if ($allowedFields) {
                 if (in_array($sort, $allowedFields)) {
                     $builder = $builder->orderBy($sort, $order);
                 }
+            }else{
+                $builder = $builder->orderBy($sort, $order);
             }
         }else{
             if ($allowedFields) {
                 if (in_array("id", $allowedFields)) {
                     $builder = $builder->orderBy('id', 'desc');
                 }
+            }else{
+                $builder = $builder->orderBy('id', 'desc');
             }
         }
 

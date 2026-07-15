@@ -1374,7 +1374,7 @@ class BuilderHelper
     {
         $builder = $params['builder'];
         $id = $params['id'];
-        $company_id = $params['company_id'];
+        $company_id = (isset($params['company_id'])) ? $params['company_id'] : '';
         $search_params = $params['search_params'];
         $db_conn = $params['db_conn'];
         $tb = $params['tb'];
@@ -1383,12 +1383,21 @@ class BuilderHelper
             $builder->select($this->selects);
         }
 
-        if (isset($params['company_id'])) {
-            $company_id = $params['company_id'];
-            if ($company_id) {
-                $builder->where('company_id', $company_id);
+        if (isset($params['is_mutabannat'])) {
+            if ($params['is_mutabannat'] == true) {
+                if ($db_conn->fieldExists('is_mutabannat', $tb)) {
+                    $builder->where('is_mutabannat', 1);
+                }
+            }
+        }else{
+            if (isset($params['company_id'])) {
+                $company_id = $params['company_id'];
+                if ($company_id) {
+                    $builder->where('company_id', $company_id);
+                }
             }
         }
+
 
         if (isset($params['account_id'])) {
             $account_id = $params['account_id'];
@@ -1449,7 +1458,11 @@ class BuilderHelper
             if ($this->anywhere) {
                 if (is_array($this->anywhere)) {
                     foreach ($this->anywhere as $key => $value) {
-                        if ($value->anywhere == true) {
+                        if (is_array($value)) {
+                            $value = (object) $value;
+                        }
+
+                        if ($value->anywhere == 'true') {
                             if (is_array($value->column)) {
                                 $builder->whereIn($value->column, $value->value);
                             } else {
@@ -1472,7 +1485,7 @@ class BuilderHelper
                                     }
                                 } else {
                                     if (isset($value->is_null)) {
-                                        if ($value->is_null == true) {
+                                        if ($value->is_null == 'true') {
                                             $builder->where($value->column . " IS NULL ");
                                         }
 
@@ -1487,7 +1500,7 @@ class BuilderHelper
                         }
                     }
                 } else {
-                    if ($this->anywhere->anywhere == true) {
+                    if ($this->anywhere->anywhere == 'true') {
                         $builder->whereIn($this->anywhere->column, $this->anywhere->value);
                     }
                 }
