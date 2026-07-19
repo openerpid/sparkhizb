@@ -1398,7 +1398,6 @@ class BuilderHelper
             }
         }
 
-
         if (isset($params['account_id'])) {
             $account_id = $params['account_id'];
             if ($account_id) {
