@@ -7,6 +7,9 @@ use Firebase\JWT\Key;
 
 class JwtHelper 
 {
+    protected $key;
+    protected $request;
+    
     public function __construct()
     {
         $this->key = getenv('TOKEN_SECRET');

@@ -13,6 +13,8 @@ namespace Sparkhizb\Helpers;
 
 class DateTimeHelper 
 {
+    protected $request;
+    
     public function __construct()
     {
         $this->request = \Config\Services::request();

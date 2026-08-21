@@ -18,6 +18,9 @@ use Sparkhizb\Helpers\JwtHelper;
 
 class RequestHelper
 {
+    protected $request;
+    protected $jwt;
+    
     public function __construct()
     {
         $this->request = \Config\Services::request();

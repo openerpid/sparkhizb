@@ -9,6 +9,12 @@ use Dorbitt\UmmuProfile;
 
 class PrivilegeHelper 
 {
+    protected $jwt;
+    protected $request;
+    protected $auth;
+    protected $umProfile;
+    protected $reqH;
+
     public function __construct()
     {
         $this->jwt = new JwtHelper();
