@@ -15,6 +15,8 @@ use Sparkhizb\Helpers\Curl;
 
 class Auth
 {
+    protected $curli;
+    
     public function __construct()
     {
         $this->curli = new Curl();

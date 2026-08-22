@@ -7,6 +7,10 @@ use Sparkhizb\Auth;
 
 class IdentityHelper 
 {
+    protected $jwt;
+    protected $request;
+    protected $auth;
+    
     public function __construct()
     {
         $this->jwt = new JwtHelper();

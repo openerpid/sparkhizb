@@ -17,6 +17,10 @@ use Dorbitt\Helpers\EncrypterHelper;
 
 class QueryHelper
 {
+    protected $request;
+    protected $oa2auth;
+    protected $encter;
+    
     public function __construct()
     {
         $this->request = \Config\Services::request();

@@ -15,6 +15,9 @@ use Dorbitt\Helpers\CurlHelper as DorbittCurlHelper;
 
 class CurlHelper
 {
+    protected $url;
+    protected $token;
+
     public function __construct()
     {
         $ch = new DorbittCurlHelper();

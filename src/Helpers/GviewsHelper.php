@@ -18,6 +18,9 @@ use JShrink\Minifier;
 
 class GviewsHelper 
 {
+    protected $request;
+    protected $minifier;
+    
     public function __construct()
     {
         $this->request = \Config\Services::request();

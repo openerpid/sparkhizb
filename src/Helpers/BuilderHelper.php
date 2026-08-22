@@ -18,6 +18,12 @@ use Sparkhizb\Helpers\RequestHelper;
 
 class BuilderHelper
 {
+    protected $request;
+    protected $identity;
+    protected $gHelp;
+    protected $UmHelp;
+    protected $reqH;
+
     public function __construct()
     {
         $this->request = \Config\Services::request();

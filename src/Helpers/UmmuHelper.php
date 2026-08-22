@@ -18,6 +18,7 @@ use Config\Services;
 class UmmuHelper
 {
     protected $helpers = ['cookie'];
+    protected $request;
 
     public function __construct()
     {
@@ -920,5 +921,38 @@ class UmmuHelper
         }else{
             return false;
         }
+    }
+
+    /**
+     * $withArray belongsTo $array with $newKey
+     * Memasukan $withArray ke $array, dengan nama param = #newKey
+     * */
+    public function belongsTo($array, $withArray, $newKey)
+    {
+        $rows = $array[0];
+        $param = $array[1];
+
+        $rows2 = $withArray[0];
+        $param2 = $withArray[1];
+
+        if ($rows && $param && $rows2 && $param2) {
+            foreach ($rows as $key => $value) {
+                $with_id = $value->{$param};
+
+                $row = null;
+                if ($rows2) {
+                    foreach ($rows2 as $key2 => $value2) {
+                        $id = $value2->{$param2};
+
+                        if ($id == $with_id) {
+                            $row = $value2;
+                        }
+                    }
+                }
+                $rows[$key]->{$newKey} = $row;
+            }
+        }
+
+        return $rows;
     }
 }
