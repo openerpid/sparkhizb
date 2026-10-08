@@ -188,4 +188,12 @@ class RequestHelper
             return $decode;
         }
     }
+
+    public function moduleKode()
+    {
+        $moduleCode = $this->request->header("Module-Code");
+        $moduleCode = $moduleCode->getValue();
+
+        return $moduleCode;
+    }
 }
