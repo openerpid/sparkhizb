@@ -33,7 +33,7 @@ class QueryHelper
 
     public function limit()
     {
-        $limit      = $this->request->getVar('limit');
+        $limit      = $this->request->getVar('limit') ?? $this->request->getGet('limit');
         
         if (!$limit OR $limit=='undefined') {
             $limit = 0;
@@ -46,7 +46,7 @@ class QueryHelper
 
     public function offset()
     {
-        $offset     = $this->request->getVar('offset');
+        $offset     = $this->request->getVar('offset') ?? $this->request->getGet('offset');
         
         if (!$offset OR $offset=='undefined' OR $this->search()) {
             $offset = 0;
@@ -59,8 +59,8 @@ class QueryHelper
 
     public function sort()
     {
-        $sort = $this->request->getVar('sort');
-        $order = $this->request->getVar('order');
+        $sort = $this->request->getVar('sort') ?? $this->request->getGet('sort');
+        $order = $this->request->getVar('order') ?? $this->request->getGet('order');
         
         if (isset($order['name'])) {
             $sort = $order['name'];
@@ -77,7 +77,7 @@ class QueryHelper
 
     public function order()
     {
-        $order = $this->request->getVar('order');
+        $order = $this->request->getVar('order') ?? $this->request->getGet('order');
 
         if (isset($order['dir'])) {
             $order = $order['dir'];
@@ -94,7 +94,7 @@ class QueryHelper
 
     public function search()
     {
-        $search     = $this->request->getVar('search');
+        $search = $this->request->getVar('search') ?? $this->request->getGet('search');
 
         if (isset($search['value'])) {
             $search = $search['value'];
@@ -105,10 +105,10 @@ class QueryHelper
 
     public function payload()
     {
-        $length = $this->request->getVar('length');
-        $start = $this->request->getVar('start');
-        $order = $this->request->getVar('order');
-        $search = $this->request->getVar('search');
+        $length = $this->request->getVar('length') ?? $this->request->getGet('length');
+        $start = $this->request->getVar('start') ?? $this->request->getGet('start');
+        $order = $this->request->getVar('order') ?? $this->request->getGet('order');
+        $search = $this->request->getVar('search') ?? $this->request->getGet('search');
 
         $payload = [
             "limit"     => $length,
@@ -177,8 +177,8 @@ class QueryHelper
 
     public function orderBy($builder, $allowedFields = null)
     {
-        $sort = $this->request->getVar('sort');
-        $order = $this->request->getVar('order');
+        $sort = $this->request->getVar('sort') ?? $this->request->getGet('sort');
+        $order = $this->request->getVar('order') ?? $this->request->getGet('order');
 
         if (strpos($sort, ".")) {
             $sort = explode(".",$sort);
@@ -209,14 +209,14 @@ class QueryHelper
 
     public function orderBy_j($builder, $allowedFields = null)
     {
-        $sort = $this->request->getVar('sort');
+        $sort = $this->request->getVar('sort') ?? $this->request->getGet('sort');
 
         if (strpos($sort, ".")) {
             $sort = explode(".",$sort);
             $sortCount = count($sort);
             $sort = $sort[$sortCount-1];
         }
-        $order      = $this->request->getVar('order');
+        $order = $this->request->getVar('order') ?? $this->request->getGet('order');
 
         if ($sort && $order) {
             if ($allowedFields) {
@@ -261,7 +261,7 @@ class QueryHelper
 
     public function array_search($array, $params)
     {
-        $search = $this->request->getVar('search');
+        $search = $this->request->getVar('search') ?? $this->request->getGet('search');
 
         if ($search) {
 
@@ -288,9 +288,9 @@ class QueryHelper
 
     public function array_paging($array)
     {
-        $limit = $this->request->getVar('limit');
-        $offset = $this->request->getVar('offset');
-        $search = $this->request->getVar('search');
+        $limit = $this->request->getVar('limit') ?? $this->request->getGet('limit');
+        $offset = $this->request->getVar('offset') ?? $this->request->getGet('offset');
+        $search = $this->request->getVar('search') ?? $this->request->getGet('search');
 
         if ($search) {
             $offset = 0;

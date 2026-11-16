@@ -34,15 +34,9 @@ class BuilderHelper
 
         /**
          * Vars*/
-        $this->limit = $this->request->getVar('limit');
-        $this->offset = $this->request->getVar('offset');
-
-        $this->sort = $this->request->getVar('sort');
-        if (!$this->sort) {
-            $this->sort = $this->request->getVar('sort');
-        }
-
-        $this->withCreatedBy = $this->request->getVar('created_by');
+        $this->limit = $this->request->getVar('limit') ?? $this->request->getGet('limit');
+        $this->offset = $this->request->getVar('offset') ?? $this->request->getGet('offset');
+        $this->sort = $this->request->getVar('sort') ?? $this->request->getGet('sort');
 
         if (strpos($this->sort, ".")) {
             // $sort = explode(".",$sort);
@@ -51,27 +45,18 @@ class BuilderHelper
             $this->sort = null;
         }
 
-        $this->order = $this->request->getVar('order');
-        if (!$this->order) {
-            $this->order = $this->request->getVar('order');
-        }
-
-        $this->search = $this->request->getVar('search');
-        if (!$this->search) {
-            $this->search = $this->request->getVar('search');
-        }
-
-        $this->anywhere = $this->request->getVar('anywhere');
-        $this->anydate = $this->request->getVar('anydate');
-
-        $this->from_date = $this->request->getVar('from_date');
-        $this->to_date = $this->request->getVar('to_date');
-        $this->date = $this->request->getVar('date');
-        $this->datetime = $this->request->getVar('datetime');
-
-        $this->selects = $this->request->getVar('selects');
-        $this->where = $this->request->getVar('where');
-        $this->condt = $this->request->getVar('conditions');
+        $this->withCreatedBy = $this->request->getVar('created_by') ?? $this->request->getGet('created_by');
+        $this->order = $this->request->getVar('order') ?? $this->request->getGet('order');
+        $this->search = $this->request->getVar('search') ?? $this->request->getGet('search');
+        $this->anywhere = $this->request->getVar('anywhere') ?? $this->request->getGet('anywhere');
+        $this->anydate = $this->request->getVar('anydate') ?? $this->request->getGet('anydate');
+        $this->from_date = $this->request->getVar('from_date') ?? $this->request->getGet('from_date');
+        $this->to_date = $this->request->getVar('to_date') ?? $this->request->getGet('to_date');
+        $this->date = $this->request->getVar('date') ?? $this->request->getGet('date');
+        $this->datetime = $this->request->getVar('datetime') ?? $this->request->getGet('datetime');
+        $this->selects = $this->request->getVar('selects') ?? $this->request->getGet('selects');
+        $this->where = $this->request->getVar('where') ?? $this->request->getGet('where');
+        $this->condt = $this->request->getVar('conditions') ?? $this->request->getGet('conditions');
     }
 
     public function is_testing($db_conn, $tb, $builder)
